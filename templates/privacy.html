@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy Policy - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-12">
+        <h1 class="text-4xl md:text-5xl font-bold text-secondary mb-4">
+            Privacy Policy
+        </h1>
+        <p class="text-xl text-slate-600">
+            Last Updated: February 14, 2026
+        </p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-8 md:p-12 mb-8">
+        <div class="prose prose-slate max-w-none">
+            <p class="text-lg text-slate-700 leading-relaxed mb-6">
+                JAIGP (Journal for AI Generated Papers) is committed to protecting your privacy and personal data. This Privacy Policy explains how we collect, use, store, and protect your information in compliance with the General Data Protection Regulation (GDPR) and other applicable privacy laws.
+            </p>
+
+            <h2 class="text-2xl font-bold text-secondary mt-8 mb-4">1. Data Controller</h2>
+            <p class="text-slate-700 leading-relaxed mb-6">
+                The data controller responsible for your personal data is JAIGP, operating at the domain jaigp.org. For data protection inquiries, please contact us through the information provided in the "Contact" section below.
+            </p>
+
+            <h2 class="text-2xl font-bold text-secondary mt-8 mb-4">2. What Data We Collect</h2>
+
+            <h3 class="text-xl font-semibold text-slate-800 mt-6 mb-3">2.1 Account Information (via ORCID)</h3>
+            <p class="text-slate-700 leading-relaxed mb-4">
+                When you create an account using ORCID authentication, we collect:
+            </p>
+            <ul class="list-disc pl-6 mb-6 space-y-2 text-slate-700">
+                <li><strong>ORCID iD</strong> (your unique ORCID identifier)</li>
+                <li><strong>Name</strong> (as registered with ORCID)</li>
+                <li><strong>Email address</strong> (if made available by ORCID)</li>
+                <li><strong>Affiliation</strong> (if provided)</li>
+            </ul>
+
+            <h3 class="text-xl font-semibold text-slate-800 mt-6 mb-3">2.2 Profile Information</h3>
+            <p class="text-slate-700 leading-relaxed mb-4">
+                You may voluntarily provide additional information:
+            </p>
+            <ul class="list-disc pl-6 mb-6 space-y-2 text-slate-700">
+                <li>Google Scholar profile URL</li>
+                <li>Rankless.org profile URL</li>
+                <li>Updated affiliation information</li>
+            </ul>
+
+            <h3 class="text-xl font-semibold text-slate-800 mt-6 mb-3">2.3 Content Data</h3>
+            <ul class="list-disc pl-6 mb-6 space-y-2 text-slate-700">
+                <li>Papers you submit (PDF files, titles, abstracts, metadata)</li>
+                <li>Comments you post on papers</li>
+                <li>Votes on comments</li>
+                <li>AI model information for co-authored papers</li>
+            </ul>
+
+            <h3 class="text-xl font-semibold text-slate-800 mt-6 mb-3">2.4 Technical Data</h3>
+            <ul class="list-disc pl-6 mb-6 space-y-2 text-slate-700">
+                <li>IP address (for security and rate limiting)</li>
+                <li>Browser type and version</li>
+                <li>Session cookies (essential for authentication)</li>
+                <li>Access timestamps</li>
+            </ul>
+
+            <h2 class="text-2xl font-bold text-secondary mt-8 mb-4">3. Legal Basis for Processing</h2>
+            <p class="text-slate-700 leading-relaxed mb-4">
+                We process your personal data under the following legal bases:
+            </p>
+            <ul class="list-disc pl-6 mb-6 space-y-2 text-slate-700">
+                <li><strong>Consent</strong>: You provide explicit consent when creating an account and submitting content</li>
+                <li><strong>Contract</strong>: Processing necessary to provide our services (hosting papers, facilitating collaboration)</li>
+                <li><strong>Legitimate Interest</strong>: Security measures, fraud prevention, and service improvement</li>
+            </ul>
+
+            <h2 class="text-2xl font-bold text-secondary mt-8 mb-4">4. How We Use Your Data</h2>
+            <p class="text-slate-700 leading-relaxed mb-4">
+                We use your personal data for the following purposes:
+            </p>
+            <ul class="list-disc pl-6 mb-6 space-y-2 text-slate-700">
+                <li><strong>Account Management</strong>: Authenticate users and manage accounts</li>
+                <li><strong>Content Display</strong>: Display your name and profile information on papers you author</li>
+                <li><strong>Communication</strong>: Send essential service notifications (if email provided)</li>
+                <li><strong>Security</strong>: Prevent fraud, abuse, and unauthorized access</li>
+                <li><strong>Legal Compliance</strong>: Comply with legal obligations and respond to valid legal requests</li>
+                <li><strong>Service Improvement</strong>: Analyze usage patterns to improve our platform (anonymized data)</li>
+            </ul>
+
+            <h2 class="text-2xl font-bold text-secondary mt-8 mb-4">5. Data Sharing and Disclosure</h2>
+
+            <h3 class="text-xl font-semibold text-slate-800 mt-6 mb-3">5.1 Public Information</h3>
+            <p class="text-slate-700 leading-relaxed mb-6">
+                The following information is <strong>publicly visible</strong> by design:
+            </p>
+            <ul class="list-disc pl-6 mb-6 space-y-2 text-slate-700">
+                <li>Your name (as displayed on papers and profile)</li>
+                <li>ORCID iD</li>
+                <li>Affiliation (if provided)</li>
+                <li>Google Scholar and Rankless.org URLs (if provided)</li>
+                <li>Papers you've submitted (including all metadata)</li>
+                <li>Comments you've posted</li>
+            </ul>
+
+            <h3 class="text-xl font-semibold text-slate-800 mt-6 mb-3">5.2 Third-Party Services</h3>
+            <p class="text-slate-700 leading-relaxed mb-4">
+                We use the following third-party services:
+            </p>
+            <ul class="list-disc pl-6 mb-6 space-y-2 text-slate-700">
+                <li><strong>ORCID</strong>: For authentication (covered by ORCID's privacy policy)</li>
+                <li><strong>OpenAlex</strong>: For research field classification (no personal data shared)</li>
+            </ul>
+
+            <h3 class="text-xl font-semibold text-slate-800 mt-6 mb-3">5.3 We Do NOT</h3>
+            <ul class="list-disc pl-6 mb-6 space-y-2 text-slate-700">
+                <li>Sell your personal data to third parties</li>
+                <li>Use your data for targeted advertising</li>
+                <li>Share your email address publicly</li>
+                <li>Track you across other websites</li>
+            </ul>
+
+            <h2 class="text-2xl font-bold text-secondary mt-8 mb-4">6. Data Retention</h2>
+            <p class="text-slate-700 leading-relaxed mb-6">
+                We retain your data as follows:
+            </p>
+            <ul class="list-disc pl-6 mb-6 space-y-2 text-slate-700">
+                <li><strong>Account Data</strong>: Retained until you request account deletion</li>
+                <li><strong>Published Papers</strong>: Retained indefinitely for academic record</li>
+                <li><strong>Comments</strong>: Retained with published papers</li>
+                <li><strong>Session Data</strong>: Expires after 24 hours of inactivity</li>
+                <li><strong>Technical Logs</strong>: Retained for 90 days for security purposes</li>
+            </ul>
+
+            <h2 class="text-2xl font-bold text-secondary mt-8 mb-4">7. Your Rights (GDPR)</h2>
+            <p class="text-slate-700 leading-relaxed mb-4">
+                Under GDPR, you have the following rights:
+            </p>
+
+            <div class="space-y-4 mb-6">
+                <div class="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                    <h4 class="font-semibold text-slate-800 mb-2">Right to Access</h4>
+                    <p class="text-sm text-slate-700">Request a copy of all personal data we hold about you.</p>
+                </div>
+
+                <div class="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                    <h4 class="font-semibold text-slate-800 mb-2">Right to Rectification</h4>
+                    <p class="text-sm text-slate-700">Correct inaccurate or incomplete data (via profile edit).</p>
+                </div>
+
+                <div class="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                    <h4 class="font-semibold text-slate-800 mb-2">Right to Erasure ("Right to be Forgotten")</h4>
+                    <p class="text-sm text-slate-700">Request deletion of your account and personal data. Note: Published papers may be retained for academic integrity, but with authorship anonymized.</p>
+                    <a href="/auth/profile/delete" class="text-primary hover:text-blue-700 text-sm font-medium mt-2 inline-block">Delete My Account →</a>
+                </div>
+
+                <div class="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                    <h4 class="font-semibold text-slate-800 mb-2">Right to Data Portability</h4>
+                    <p class="text-sm text-slate-700">Receive your data in a structured, machine-readable format.</p>
+                    <a href="/auth/profile/export" class="text-primary hover:text-blue-700 text-sm font-medium mt-2 inline-block">Export My Data →</a>
+                </div>
+
+                <div class="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                    <h4 class="font-semibold text-slate-800 mb-2">Right to Restriction</h4>
+                    <p class="text-sm text-slate-700">Request limitation of data processing in certain circumstances.</p>
+                </div>
+
+                <div class="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                    <h4 class="font-semibold text-slate-800 mb-2">Right to Object</h4>
+                    <p class="text-sm text-slate-700">Object to processing based on legitimate interests.</p>
+                </div>
+
+                <div class="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                    <h4 class="font-semibold text-slate-800 mb-2">Right to Withdraw Consent</h4>
+                    <p class="text-sm text-slate-700">Withdraw consent at any time (by deleting your account).</p>
+                </div>
+            </div>
+
+            <h2 class="text-2xl font-bold text-secondary mt-8 mb-4">8. Cookies</h2>
+            <p class="text-slate-700 leading-relaxed mb-6">
+                We use only <strong>essential cookies</strong> necessary for the website to function:
+            </p>
+            <ul class="list-disc pl-6 mb-6 space-y-2 text-slate-700">
+                <li><strong>Session Cookie</strong>: Keeps you logged in (expires after 24 hours)</li>
+                <li><strong>Cookie Consent</strong>: Remembers your cookie preferences</li>
+            </ul>
+            <p class="text-slate-700 leading-relaxed mb-6">
+                We do NOT use tracking cookies, advertising cookies, or third-party analytics cookies.
+            </p>
+
+            <h2 class="text-2xl font-bold text-secondary mt-8 mb-4">9. Data Security</h2>
+            <p class="text-slate-700 leading-relaxed mb-6">
+                We implement industry-standard security measures:
+            </p>
+            <ul class="list-disc pl-6 mb-6 space-y-2 text-slate-700">
+                <li>HTTPS encryption for all data transmission</li>
+                <li>Secure session management with HTTPOnly and Secure cookies</li>
+                <li>Rate limiting to prevent abuse</li>
+                <li>Regular security audits</li>
+                <li>Access controls and authentication</li>
+                <li>Secure file storage with validation</li>
+            </ul>
+
+            <h2 class="text-2xl font-bold text-secondary mt-8 mb-4">10. International Data Transfers</h2>
+            <p class="text-slate-700 leading-relaxed mb-6">
+                Our servers are located in the European Union. Data is not transferred outside the EU/EEA except through ORCID authentication (which complies with GDPR).
+            </p>
+
+            <h2 class="text-2xl font-bold text-secondary mt-8 mb-4">11. Children's Privacy</h2>
+            <p class="text-slate-700 leading-relaxed mb-6">
+                JAIGP is not intended for users under 16 years of age. We do not knowingly collect personal data from children under 16. If you believe we have inadvertently collected such data, please contact us immediately.
+            </p>
+
+            <h2 class="text-2xl font-bold text-secondary mt-8 mb-4">12. Changes to This Policy</h2>
+            <p class="text-slate-700 leading-relaxed mb-6">
+                We may update this Privacy Policy from time to time. We will notify users of material changes by posting the new policy with an updated "Last Updated" date. Your continued use of JAIGP after changes constitutes acceptance of the updated policy.
+            </p>
+
+            <h2 class="text-2xl font-bold text-secondary mt-8 mb-4">13. Contact & Data Protection Officer</h2>
+            <p class="text-slate-700 leading-relaxed mb-6">
+                For privacy-related questions, data access requests, or to exercise your GDPR rights, please contact:
+            </p>
+            <div class="bg-blue-50 border-l-4 border-blue-400 p-6 mb-6">
+                <p class="text-slate-800 mb-2">
+                    <strong>Data Protection Contact:</strong><br>
+                    JAIGP - Journal for AI Generated Papers<br>
+                    Website: <a href="https://jaigp.org" class="text-primary hover:text-blue-700">jaigp.org</a><br>
+                    For data requests: Use the links in Section 7 above
+                </p>
+            </div>
+
+            <h2 class="text-2xl font-bold text-secondary mt-8 mb-4">14. Supervisory Authority</h2>
+            <p class="text-slate-700 leading-relaxed mb-6">
+                If you believe your data protection rights have been violated, you have the right to lodge a complaint with your local data protection supervisory authority.
+            </p>
+
+            <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-8">
+                <p class="text-sm text-slate-600 italic">
+                    By using JAIGP, you acknowledge that you have read and understood this Privacy Policy and consent to the collection and processing of your personal data as described herein.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mb-8">
+        <a href="/about" class="text-primary hover:text-blue-700 font-medium">
+            ← Back to About
+        </a>
+    </div>
+</div>
+{% endblock %}

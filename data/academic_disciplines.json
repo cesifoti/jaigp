@@ -1,0 +1,208 @@
+{
+  "Humanities": {
+    "History": {
+      "Ancient History": ["Egyptian History", "Greek History", "Roman History", "Mesopotamian History"],
+      "Medieval History": ["Byzantine History", "Islamic Golden Age", "European Medieval History"],
+      "Early Modern History": ["Renaissance History", "Age of Exploration", "Reformation History"],
+      "Modern History": ["18th Century History", "19th Century History", "20th Century History"],
+      "Regional History": {
+        "European History": ["British History", "French History", "German History", "Scandinavian History", "Eastern European History"],
+        "Asian History": ["Chinese History", "Japanese History", "Indian History", "Southeast Asian History"],
+        "American History": ["North American History", "Latin American History", "Caribbean History"],
+        "African History": ["North African History", "Sub-Saharan African History", "East African History"],
+        "Middle Eastern History": ["Ottoman History", "Persian History", "Arab History"]
+      }
+    },
+    "Philosophy": {
+      "Metaphysics": ["Ontology", "Philosophy of Mind", "Philosophy of Time", "Cosmology"],
+      "Epistemology": ["Theory of Knowledge", "Philosophy of Science", "Skepticism"],
+      "Ethics": ["Moral Philosophy", "Applied Ethics", "Metaethics", "Normative Ethics"],
+      "Logic": ["Formal Logic", "Mathematical Logic", "Informal Logic", "Modal Logic"],
+      "Aesthetics": ["Philosophy of Art", "Philosophy of Music", "Philosophy of Literature"],
+      "Political Philosophy": ["Social Contract Theory", "Justice Theory", "Democracy Theory"]
+    },
+    "Literature": {
+      "Literary Criticism": ["Formalism", "Structuralism", "Post-structuralism", "Feminist Criticism"],
+      "Comparative Literature": ["World Literature", "Translation Studies", "Literary Theory"],
+      "Regional Literature": ["English Literature", "American Literature", "French Literature", "German Literature", "Asian Literature"],
+      "Genre Studies": ["Poetry", "Drama", "Novel", "Short Story", "Creative Nonfiction"]
+    },
+    "Linguistics": {
+      "Theoretical Linguistics": ["Syntax", "Semantics", "Phonology", "Morphology"],
+      "Applied Linguistics": ["Language Teaching", "Translation", "Lexicography"],
+      "Sociolinguistics": ["Language Variation", "Language Policy", "Multilingualism"],
+      "Psycholinguistics": ["Language Acquisition", "Language Processing", "Neurolinguistics"],
+      "Computational Linguistics": ["Natural Language Processing", "Corpus Linguistics", "Machine Translation"]
+    },
+    "Religious Studies": {
+      "Theology": ["Christian Theology", "Islamic Theology", "Jewish Theology", "Buddhist Studies"],
+      "Comparative Religion": ["World Religions", "Religious Anthropology", "Interfaith Studies"],
+      "History of Religion": ["Ancient Religions", "Religious Movements", "Secularization Studies"]
+    },
+    "Arts": {
+      "Visual Arts": ["Painting", "Sculpture", "Photography", "Digital Art"],
+      "Performing Arts": ["Theater", "Dance", "Music Performance", "Film"],
+      "Art History": ["Renaissance Art", "Modern Art", "Contemporary Art", "Asian Art"],
+      "Music Theory": ["Composition", "Musicology", "Ethnomusicology"]
+    }
+  },
+  "Social Sciences": {
+    "Economics": {
+      "Microeconomics": ["Consumer Theory", "Game Theory", "Market Structure", "Industrial Organization"],
+      "Macroeconomics": ["Monetary Policy", "Fiscal Policy", "Economic Growth", "Business Cycles"],
+      "Econometrics": ["Time Series Analysis", "Panel Data Analysis", "Causal Inference"],
+      "Development Economics": ["Poverty Studies", "International Development", "Agricultural Economics"],
+      "Behavioral Economics": ["Decision Theory", "Experimental Economics", "Neuroeconomics"],
+      "Labor Economics": ["Wage Theory", "Unemployment", "Human Capital"]
+    },
+    "Political Science": {
+      "Comparative Politics": ["Political Systems", "Democratization", "Authoritarian Regimes"],
+      "International Relations": ["International Security", "International Political Economy", "Diplomacy"],
+      "Political Theory": ["Democratic Theory", "Political Ideologies", "Political Philosophy"],
+      "Public Administration": ["Public Policy", "Bureaucracy", "Governance"],
+      "Political Economy": ["Capitalism", "Socialism", "Economic Systems"]
+    },
+    "Sociology": {
+      "Social Theory": ["Classical Theory", "Contemporary Theory", "Critical Theory"],
+      "Social Stratification": ["Class", "Race and Ethnicity", "Gender Studies"],
+      "Urban Sociology": ["Urbanization", "Community Studies", "Spatial Sociology"],
+      "Economic Sociology": ["Work and Organizations", "Markets", "Economic Behavior"],
+      "Cultural Sociology": ["Culture and Identity", "Media Studies", "Popular Culture"],
+      "Demography": ["Population Studies", "Migration", "Fertility"]
+    },
+    "Psychology": {
+      "Cognitive Psychology": ["Memory", "Perception", "Attention", "Decision Making"],
+      "Developmental Psychology": ["Child Development", "Adolescence", "Aging"],
+      "Social Psychology": ["Group Dynamics", "Attitudes", "Social Cognition", "Prejudice"],
+      "Clinical Psychology": ["Psychotherapy", "Psychological Assessment", "Psychopathology"],
+      "Neuroscience": ["Behavioral Neuroscience", "Cognitive Neuroscience", "Neuropsychology"],
+      "Industrial Psychology": ["Organizational Behavior", "Human Factors", "Personnel Psychology"]
+    },
+    "Anthropology": {
+      "Cultural Anthropology": ["Ethnography", "Cultural Theory", "Symbolic Anthropology"],
+      "Biological Anthropology": ["Primatology", "Human Evolution", "Forensic Anthropology"],
+      "Archaeology": ["Prehistoric Archaeology", "Classical Archaeology", "Historical Archaeology"],
+      "Linguistic Anthropology": ["Language and Culture", "Discourse Analysis", "Language Ideology"]
+    },
+    "Geography": {
+      "Human Geography": ["Economic Geography", "Political Geography", "Cultural Geography", "Urban Geography"],
+      "Physical Geography": ["Geomorphology", "Climatology", "Biogeography", "Hydrology"],
+      "Regional Geography": ["Regional Studies", "Area Studies"],
+      "Geographic Information Science": ["GIS", "Remote Sensing", "Cartography", "Spatial Analysis"]
+    }
+  },
+  "Natural Sciences": {
+    "Physics": {
+      "Classical Mechanics": ["Newtonian Mechanics", "Analytical Mechanics", "Continuum Mechanics"],
+      "Quantum Mechanics": ["Quantum Field Theory", "Quantum Computing", "Quantum Information"],
+      "Thermodynamics": ["Statistical Mechanics", "Non-equilibrium Thermodynamics"],
+      "Electromagnetism": ["Electrodynamics", "Plasma Physics", "Optics"],
+      "Relativity": ["Special Relativity", "General Relativity", "Cosmology"],
+      "Condensed Matter Physics": ["Solid State Physics", "Soft Matter Physics", "Nanophysics"],
+      "Particle Physics": ["High Energy Physics", "Nuclear Physics", "Astroparticle Physics"]
+    },
+    "Chemistry": {
+      "Organic Chemistry": ["Synthetic Chemistry", "Natural Products", "Medicinal Chemistry"],
+      "Inorganic Chemistry": ["Coordination Chemistry", "Materials Chemistry", "Bioinorganic Chemistry"],
+      "Physical Chemistry": ["Quantum Chemistry", "Chemical Kinetics", "Thermochemistry", "Spectroscopy"],
+      "Analytical Chemistry": ["Chromatography", "Mass Spectrometry", "Electrochemistry"],
+      "Biochemistry": ["Enzymology", "Metabolism", "Molecular Biology", "Structural Biology"]
+    },
+    "Biology": {
+      "Molecular Biology": ["Genetics", "Genomics", "Proteomics", "Gene Expression"],
+      "Cell Biology": ["Cell Signaling", "Cell Division", "Organelles"],
+      "Evolutionary Biology": ["Population Genetics", "Phylogenetics", "Speciation", "Macroevolution"],
+      "Ecology": ["Community Ecology", "Ecosystem Ecology", "Conservation Biology", "Marine Ecology"],
+      "Physiology": ["Animal Physiology", "Plant Physiology", "Comparative Physiology"],
+      "Neuroscience": ["Neurobiology", "Behavioral Neuroscience", "Developmental Neuroscience"],
+      "Microbiology": ["Bacteriology", "Virology", "Mycology", "Immunology"],
+      "Botany": ["Plant Taxonomy", "Plant Ecology", "Plant Pathology"],
+      "Zoology": ["Entomology", "Ornithology", "Mammalogy", "Herpetology"]
+    },
+    "Earth Sciences": {
+      "Geology": ["Mineralogy", "Petrology", "Sedimentology", "Structural Geology"],
+      "Geophysics": ["Seismology", "Geomagnetism", "Geodynamics"],
+      "Atmospheric Sciences": ["Meteorology", "Climatology", "Atmospheric Chemistry"],
+      "Oceanography": ["Physical Oceanography", "Chemical Oceanography", "Marine Biology"],
+      "Environmental Science": ["Environmental Chemistry", "Environmental Physics", "Ecology"]
+    },
+    "Astronomy": {
+      "Astrophysics": ["Stellar Astrophysics", "Galactic Astronomy", "Extragalactic Astronomy"],
+      "Planetary Science": ["Planetary Geology", "Exoplanets", "Astrobiology"],
+      "Cosmology": ["Physical Cosmology", "Observational Cosmology", "Dark Matter and Dark Energy"]
+    }
+  },
+  "Formal Sciences": {
+    "Mathematics": {
+      "Pure Mathematics": {
+        "Algebra": ["Linear Algebra", "Abstract Algebra", "Algebraic Geometry", "Representation Theory"],
+        "Analysis": ["Real Analysis", "Complex Analysis", "Functional Analysis", "Harmonic Analysis"],
+        "Geometry": ["Differential Geometry", "Algebraic Geometry", "Topology", "Geometric Topology"],
+        "Number Theory": ["Analytic Number Theory", "Algebraic Number Theory", "Computational Number Theory"],
+        "Logic and Foundations": ["Mathematical Logic", "Set Theory", "Category Theory", "Proof Theory"]
+      },
+      "Applied Mathematics": {
+        "Numerical Analysis": ["Numerical Linear Algebra", "Computational Methods", "Scientific Computing"],
+        "Optimization": ["Linear Programming", "Convex Optimization", "Discrete Optimization"],
+        "Dynamical Systems": ["Chaos Theory", "Bifurcation Theory", "Ergodic Theory"],
+        "Mathematical Physics": ["Quantum Mechanics", "Statistical Mechanics", "Field Theory"]
+      },
+      "Statistics": ["Probability Theory", "Statistical Inference", "Bayesian Statistics", "Time Series Analysis", "Multivariate Analysis"]
+    },
+    "Computer Science": {
+      "Theory of Computation": ["Computational Complexity", "Algorithms", "Formal Languages", "Computability Theory"],
+      "Artificial Intelligence": ["Machine Learning", "Deep Learning", "Natural Language Processing", "Computer Vision", "Robotics"],
+      "Systems": ["Operating Systems", "Distributed Systems", "Computer Networks", "Databases"],
+      "Software Engineering": ["Software Design", "Software Testing", "Requirements Engineering"],
+      "Programming Languages": ["Compiler Design", "Programming Paradigms", "Type Theory"],
+      "Computer Graphics": ["3D Graphics", "Image Processing", "Visualization"],
+      "Human-Computer Interaction": ["User Interface Design", "Usability", "Interaction Design"],
+      "Cybersecurity": ["Cryptography", "Network Security", "Information Security"]
+    },
+    "Logic": ["Mathematical Logic", "Philosophical Logic", "Computational Logic", "Modal Logic"],
+    "Statistics": ["Mathematical Statistics", "Applied Statistics", "Biostatistics", "Econometrics"]
+  },
+  "Applied Sciences": {
+    "Engineering": {
+      "Mechanical Engineering": ["Thermodynamics", "Fluid Mechanics", "Manufacturing", "Robotics"],
+      "Electrical Engineering": ["Circuit Theory", "Signal Processing", "Power Systems", "Electronics"],
+      "Civil Engineering": ["Structural Engineering", "Transportation Engineering", "Geotechnical Engineering"],
+      "Chemical Engineering": ["Process Engineering", "Reaction Engineering", "Separation Processes"],
+      "Aerospace Engineering": ["Aerodynamics", "Propulsion", "Flight Mechanics"],
+      "Computer Engineering": ["Computer Architecture", "Embedded Systems", "VLSI Design"],
+      "Biomedical Engineering": ["Medical Imaging", "Biomechanics", "Tissue Engineering"]
+    },
+    "Medicine and Health": {
+      "Clinical Medicine": ["Internal Medicine", "Surgery", "Pediatrics", "Psychiatry"],
+      "Public Health": ["Epidemiology", "Health Policy", "Environmental Health", "Biostatistics"],
+      "Pharmacy": ["Pharmacology", "Pharmaceutical Chemistry", "Clinical Pharmacy"],
+      "Nursing": ["Clinical Nursing", "Nursing Theory", "Public Health Nursing"]
+    },
+    "Agriculture": {
+      "Agronomy": ["Crop Science", "Soil Science", "Plant Breeding"],
+      "Animal Science": ["Animal Nutrition", "Animal Breeding", "Veterinary Science"],
+      "Forestry": ["Forest Management", "Forest Ecology", "Urban Forestry"],
+      "Food Science": ["Food Chemistry", "Food Microbiology", "Food Engineering"]
+    },
+    "Architecture": ["Architectural Design", "Urban Planning", "Landscape Architecture", "Building Technology"],
+    "Business": {
+      "Management": ["Strategic Management", "Operations Management", "Human Resource Management"],
+      "Marketing": ["Consumer Behavior", "Digital Marketing", "Brand Management"],
+      "Finance": ["Corporate Finance", "Investment", "Financial Markets"],
+      "Accounting": ["Financial Accounting", "Management Accounting", "Auditing"]
+    },
+    "Education": ["Educational Psychology", "Curriculum Development", "Educational Technology", "Higher Education"],
+    "Law": ["Constitutional Law", "Criminal Law", "International Law", "Corporate Law", "Intellectual Property Law"]
+  },
+  "Interdisciplinary": {
+    "Cognitive Science": ["Artificial Intelligence", "Psychology", "Linguistics", "Neuroscience", "Philosophy of Mind"],
+    "Environmental Studies": ["Environmental Science", "Environmental Policy", "Sustainability Studies", "Climate Science"],
+    "Area Studies": ["African Studies", "Asian Studies", "European Studies", "Latin American Studies", "Middle Eastern Studies"],
+    "Gender Studies": ["Women's Studies", "Queer Studies", "Masculinity Studies"],
+    "Media Studies": ["Film Studies", "Television Studies", "Digital Media", "Journalism"],
+    "Cultural Studies": ["Popular Culture", "Critical Theory", "Postcolonial Studies"],
+    "Science and Technology Studies": ["History of Science", "Philosophy of Science", "Science Policy", "Technology and Society"],
+    "Bioethics": ["Medical Ethics", "Research Ethics", "Environmental Ethics"],
+    "Data Science": ["Big Data Analytics", "Machine Learning", "Statistical Modeling", "Data Visualization"]
+  }
+}

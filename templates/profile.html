@@ -1,0 +1,361 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - {{ profile_user.name }} - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Profile Header -->
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 md:p-8 mb-8">
+        <div class="flex items-start justify-between">
+            <div class="flex items-start space-x-6">
+                <!-- Avatar -->
+                <div class="w-20 h-20 bg-primary rounded-lg flex items-center justify-center text-white text-3xl font-bold flex-shrink-0">
+                    {{ profile_user.name[0].upper() }}
+                </div>
+
+                <!-- User Info -->
+                <div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <h1 class="text-3xl font-bold text-secondary">
+                            {{ profile_user.name }}
+                        </h1>
+                        {% if profile_user.badge %}
+                            {% set badge = profile_user.badge %}
+                            {% set works_count = profile_user.works_count %}
+                            {% include 'components/badge.html' %}
+                        {% endif %}
+                    </div>
+
+                    <!-- ORCID -->
+                    <div class="flex items-center space-x-2 mb-2">
+                        <span class="text-sm text-slate-600">ORCID:</span>
+                        <a href="https://orcid.org/{{ profile_user.orcid_id }}"
+                           target="_blank"
+                           class="text-sm text-primary hover:text-blue-700 font-mono flex items-center">
+                            {{ profile_user.orcid_id }}
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                            </svg>
+                        </a>
+                    </div>
+
+                    <!-- Email -->
+                    {% if profile_user.email %}
+                    <div class="text-sm text-slate-600 mb-1">
+                        <span class="font-medium">Email:</span> {{ profile_user.email }}
+                    </div>
+                    {% endif %}
+
+                    <!-- Affiliation -->
+                    {% if profile_user.affiliation %}
+                    <div class="text-sm text-slate-600 mb-3">
+                        <span class="font-medium">Affiliation:</span> {{ profile_user.affiliation }}
+                    </div>
+                    {% endif %}
+
+                    <!-- Metrics Row -->
+                    <div class="flex flex-wrap gap-4 items-center text-sm" id="metrics-row">
+                        <!-- ORCID Works -->
+                        {% if profile_user.works_count %}
+                        <div class="flex items-center">
+                            <svg class="w-4 h-4 mr-1 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <span class="font-medium text-slate-700">{{ profile_user.works_count }} works</span>
+                        </div>
+                        {% endif %}
+
+                        <!-- Google Scholar Citations -->
+                        <div id="scholar-metrics" class="flex items-center gap-4">
+                            {% if profile_user.scholar_citations %}
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 mr-1 text-slate-500" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 24a7 7 0 110-14 7 7 0 010 14zm0-24L0 9.5l4.838 3.94A8 8 0 0112 9a8 8 0 017.162 4.44L24 9.5z"/>
+                                </svg>
+                                <span class="font-medium text-slate-700">{{ profile_user.scholar_citations }} citations</span>
+                            </div>
+                            {% if profile_user.scholar_h_index %}
+                            <div class="text-slate-600">
+                                h-index: <span class="font-medium">{{ profile_user.scholar_h_index }}</span>
+                            </div>
+                            {% endif %}
+                            {% if profile_user.scholar_i10_index %}
+                            <div class="text-slate-600">
+                                i10-index: <span class="font-medium">{{ profile_user.scholar_i10_index }}</span>
+                            </div>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- External Links -->
+                    <div class="mt-3 flex flex-wrap gap-4">
+                        {% if profile_user.google_scholar_url %}
+                        <a href="{{ profile_user.google_scholar_url }}"
+                           target="_blank"
+                           id="scholar-link"
+                           class="text-sm text-primary hover:text-blue-700 inline-flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 24a7 7 0 110-14 7 7 0 010 14zm0-24L0 9.5l4.838 3.94A8 8 0 0112 9a8 8 0 017.162 4.44L24 9.5z"/>
+                            </svg>
+                            Google Scholar
+                            <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                            </svg>
+                        </a>
+                        {% endif %}
+
+                        {% if profile_user.rankless_url %}
+                        <a href="{{ profile_user.rankless_url }}"
+                           target="_blank"
+                           class="text-sm text-primary hover:text-blue-700 inline-flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                            Rankless.org Profile
+                            <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                            </svg>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Button (if viewing own profile) -->
+            <div class="flex flex-col gap-2">
+                {% if is_own_profile %}
+                <a href="/auth/profile/edit"
+                   class="bg-slate-100 text-slate-700 px-4 py-2 rounded-md hover:bg-slate-200 transition text-sm font-medium text-center">
+                    Edit Profile
+                </a>
+                <button id="refresh-badge-btn"
+                        class="bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm font-medium">
+                    <span class="btn-text">{% if profile_user.badge_updated_at %}Refresh Badge{% else %}Get Badge{% endif %}</span>
+                    <span class="btn-loading hidden">{% if profile_user.badge_updated_at %}Refreshing...{% else %}Getting badge...{% endif %}</span>
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-8">
+            <!-- Papers Section -->
+            <div>
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-secondary">JAIGP Papers</h2>
+                    {% if is_own_profile %}
+                    <a href="/submit"
+                       class="bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm font-medium">
+                        Submit New Paper
+                    </a>
+                    {% endif %}
+                </div>
+
+                {% if papers %}
+                <div class="space-y-6">
+                    {% for paper in papers %}
+                    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:border-primary transition">
+                        <a href="/paper/{{ paper.id }}" class="block group">
+                            <h3 class="text-xl font-bold text-secondary group-hover:text-primary transition mb-2">
+                                {{ paper.title|smart_title }}
+                            </h3>
+                            <p class="text-slate-600 text-sm mb-3 line-clamp-2">
+                                {{ paper.abstract[:200] }}...
+                            </p>
+                            <div class="flex flex-wrap gap-4 text-xs text-slate-500">
+                                <span>Published {{ paper.published_date|format_date }}</span>
+                                <span>Version {{ paper.current_version }}</span>
+                                {% if paper.comments %}
+                                <span>{{ paper.comments|length }} comments</span>
+                                {% endif %}
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-12 text-slate-500">
+                    <p>No papers submitted yet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Recent Publications from ORCID -->
+            {% if profile_user.orcid_works %}
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                <h3 class="text-lg font-bold text-secondary mb-4">Most Recent Non-JAIGP Publications</h3>
+                <p class="text-xs text-slate-500 mb-4">From ORCID profile (journal articles and books)</p>
+                <div class="space-y-4">
+                    {% for work in profile_user.orcid_works %}
+                    <div class="text-sm">
+                        <h4 class="font-medium text-slate-800 mb-1">{{ work.title }}</h4>
+                        <p class="text-slate-600 mb-1">{{ work.journal }}</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-slate-500">{{ work.year }}</span>
+                            {% if work.url %}
+                            <a href="{{ work.url }}" target="_blank" class="text-xs text-primary hover:text-blue-700">
+                                View Publication →
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if not loop.last %}
+                    <hr class="border-slate-200">
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="mt-4 pt-4 border-t border-slate-200">
+                    <a href="https://orcid.org/{{ profile_user.orcid_id }}"
+                       target="_blank"
+                       class="text-sm text-primary hover:text-blue-700 inline-flex items-center">
+                        View all on ORCID
+                        <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Badge Info -->
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                <h3 class="text-lg font-bold text-secondary mb-4">Badge System</h3>
+                <div class="space-y-3 text-sm text-slate-600">
+                    <div class="flex items-center justify-between">
+                        <span>Gold (50+ works)</span>
+                        {% set badge = 'gold' %}{% include 'components/badge.html' %}
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span>Silver (25-49 works)</span>
+                        {% set badge = 'silver' %}{% include 'components/badge.html' %}
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span>Copper (6-24 works)</span>
+                        {% set badge = 'copper' %}{% include 'components/badge.html' %}
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span>New (&lt;6 works)</span>
+                        {% set badge = 'noob' %}{% include 'components/badge.html' %}
+                    </div>
+                </div>
+                <p class="mt-4 text-xs text-slate-500">
+                    Badges are calculated based on journal articles and books in your ORCID publication record.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if is_own_profile %}
+<script>
+// Badge refresh functionality
+document.getElementById('refresh-badge-btn').addEventListener('click', async function() {
+    const btn = this;
+    const btnText = btn.querySelector('.btn-text');
+    const btnLoading = btn.querySelector('.btn-loading');
+
+    btn.disabled = true;
+    btnText.classList.add('hidden');
+    btnLoading.classList.remove('hidden');
+
+    try {
+        const response = await fetch('/auth/profile/refresh-badge', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            location.reload(); // Reload to show updated badge
+        } else {
+            alert('Failed to refresh badge. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error refreshing badge:', error);
+        alert('An error occurred. Please try again.');
+    } finally {
+        btn.disabled = false;
+        btnText.classList.remove('hidden');
+        btnLoading.classList.add('hidden');
+    }
+});
+
+// Google Scholar scraping (client-side to distribute IP load)
+{% if profile_user.google_scholar_url %}
+async function fetchScholarMetrics() {
+    try {
+        // Extract user ID from Scholar URL
+        const scholarUrl = '{{ profile_user.google_scholar_url }}';
+        const userId = scholarUrl.match(/user=([^&]+)/)?.[1];
+        if (!userId) return;
+
+        // Fetch Scholar page (via client's browser to distribute requests)
+        const proxyUrl = `https://scholar.google.com/citations?user=${userId}&hl=en`;
+        const response = await fetch(proxyUrl, {
+            mode: 'cors',
+            credentials: 'omit'
+        });
+
+        if (!response.ok) return;
+
+        const html = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        // Extract metrics
+        const statsTable = doc.querySelector('#gsc_rsb_st');
+        if (!statsTable) return;
+
+        const citations = statsTable.querySelector('tr:nth-child(1) td:nth-child(2)')?.textContent?.trim();
+        const hIndex = statsTable.querySelector('tr:nth-child(2) td:nth-child(2)')?.textContent?.trim();
+        const i10Index = statsTable.querySelector('tr:nth-child(3) td:nth-child(2)')?.textContent?.trim();
+
+        // Send to server
+        if (citations || hIndex || i10Index) {
+            const formData = new FormData();
+            formData.append('citations', citations || '0');
+            formData.append('h_index', hIndex || '0');
+            formData.append('i10_index', i10Index || '0');
+
+            await fetch('/auth/profile/update-scholar', {
+                method: 'POST',
+                body: formData
+            });
+
+            // Update UI
+            if (citations) {
+                const metricsRow = document.getElementById('scholar-metrics');
+                metricsRow.innerHTML = `
+                    <div class="flex items-center">
+                        <svg class="w-4 h-4 mr-1 text-slate-500" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 24a7 7 0 110-14 7 7 0 010 14zm0-24L0 9.5l4.838 3.94A8 8 0 0112 9a8 8 0 017.162 4.44L24 9.5z"/>
+                        </svg>
+                        <span class="font-medium text-slate-700">${citations} citations</span>
+                    </div>
+                    ${hIndex ? `<div class="text-slate-600">h-index: <span class="font-medium">${hIndex}</span></div>` : ''}
+                    ${i10Index ? `<div class="text-slate-600">i10-index: <span class="font-medium">${i10Index}</span></div>` : ''}
+                `;
+            }
+        }
+    } catch (error) {
+        console.log('Could not fetch Scholar metrics (CORS blocked):', error);
+        // This is expected - Google Scholar blocks CORS requests
+        // We tried, but if it fails, it's okay
+    }
+}
+
+// Try to fetch Scholar metrics on page load (may be blocked by CORS)
+if ('{{ profile_user.google_scholar_url }}') {
+    fetchScholarMetrics();
+}
+{% endif %}
+</script>
+{% endif %}
+{% endblock %}

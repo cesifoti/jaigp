@@ -1,0 +1,49 @@
+"""Database setup and session management."""
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import QueuePool
+import config
+
+# Create database engine with connection pooling for PostgreSQL
+if "postgresql" in config.DATABASE_URL:
+    engine = create_engine(
+        config.DATABASE_URL,
+        poolclass=QueuePool,
+        pool_size=20,              # Keep 20 connections ready
+        max_overflow=40,           # Allow 40 more if needed (total: 60)
+        pool_pre_ping=True,        # Check connections are alive
+        pool_recycle=3600,         # Recycle connections after 1 hour
+        echo=config.DEBUG
+    )
+else:
+    # SQLite configuration (for development)
+    engine = create_engine(
+        config.DATABASE_URL,
+        connect_args={"check_same_thread": False},
+        echo=config.DEBUG
+    )
+
+# Create session factory
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Create base class for models
+Base = declarative_base()
+
+def get_db():
+    """Dependency for database sessions."""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+def init_db():
+    """Initialize database tables."""
+    # Import all models to ensure they're registered
+    from models.user import User
+    from models.paper import Paper, PaperVersion, PaperHumanAuthor, PaperAIAuthor, PaperField
+    from models.comment import Comment, CommentVote
+
+    # Create all tables
+    Base.metadata.create_all(bind=engine)

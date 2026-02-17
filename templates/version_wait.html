@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Please Wait - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-yellow-100 rounded-full mb-4">
+            <svg class="w-10 h-10 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+        </div>
+        <h1 class="text-3xl font-bold text-secondary mb-2">
+            Version Submission Limit Reached
+        </h1>
+        <p class="text-lg text-slate-600">
+            You can submit a new version in:
+        </p>
+    </div>
+
+    <!-- Countdown Timer -->
+    <div class="bg-white rounded-lg shadow-lg border-2 border-primary p-8 mb-8">
+        <div class="text-center">
+            <div id="countdown" class="text-6xl font-bold text-primary mb-4 font-mono">
+                <span id="minutes">{{ minutes_remaining }}</span>:<span id="seconds">{{ '%02d'|format(seconds_display) }}</span>
+            </div>
+            <p class="text-sm text-slate-600 mb-6">
+                <span id="status-text">Time remaining until you can submit version {{ paper.current_version + 1 }}</span>
+            </p>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-200 rounded-full h-3 mb-4">
+                <div id="progress-bar" class="bg-primary h-3 rounded-full transition-all duration-1000" style="width: {{ (seconds_remaining / 3600 * 100)|round(1) }}%"></div>
+            </div>
+
+            <p class="text-xs text-slate-500">
+                Last version submitted: {{ last_version_time|format_date("%B %d, %Y at %I:%M %p UTC") }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Paper Info -->
+    <div class="bg-slate-50 rounded-lg border border-slate-200 p-6 mb-8">
+        <h2 class="text-xl font-bold text-secondary mb-4">Paper Information</h2>
+        <div class="space-y-3">
+            <div>
+                <span class="text-sm font-semibold text-slate-700">Title:</span>
+                <p class="text-slate-900">{{ paper.title }}</p>
+            </div>
+            <div>
+                <span class="text-sm font-semibold text-slate-700">Current Version:</span>
+                <p class="text-slate-900">v{{ paper.current_version }}</p>
+            </div>
+            <div>
+                <span class="text-sm font-semibold text-slate-700">Next Version Available:</span>
+                <p class="text-slate-900">{{ next_version_time|format_date("%B %d, %Y at %I:%M %p UTC") }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Why This Limit? -->
+    <div class="bg-blue-50 border-l-4 border-blue-400 p-6 mb-8">
+        <div class="flex items-start">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-blue-800">Why one version per hour?</h3>
+                <p class="text-sm text-blue-700 mt-2">
+                    This rate limit ensures thoughtful revisions and prevents server overload. Use this time to carefully review your changes, gather feedback, or explore other papers on JAIGP.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/paper/{{ paper.id }}"
+           class="bg-slate-100 text-slate-700 px-6 py-3 rounded-md hover:bg-slate-200 transition font-medium text-center">
+            View Current Paper
+        </a>
+        <button id="submit-button"
+                disabled
+                class="bg-slate-300 text-slate-500 px-6 py-3 rounded-md font-medium text-center cursor-not-allowed transition"
+                onclick="window.location.href='/submit/{{ paper.id }}/update'">
+            Submit New Version
+            <span class="text-xs block mt-1">Available in <span id="button-countdown"></span></span>
+        </button>
+        <a href="/"
+           class="bg-white text-primary border-2 border-primary px-6 py-3 rounded-md hover:bg-slate-50 transition font-medium text-center">
+            Browse Papers
+        </a>
+    </div>
+</div>
+
+<script>
+    // Initial values from server
+    let secondsRemaining = {{ seconds_remaining }};
+    const totalSeconds = 3600; // 1 hour
+
+    // DOM elements
+    const minutesEl = document.getElementById('minutes');
+    const secondsEl = document.getElementById('seconds');
+    const statusText = document.getElementById('status-text');
+    const progressBar = document.getElementById('progress-bar');
+    const submitButton = document.getElementById('submit-button');
+    const buttonCountdown = document.getElementById('button-countdown');
+
+    // Update countdown display
+    function updateDisplay() {
+        const minutes = Math.floor(secondsRemaining / 60);
+        const seconds = secondsRemaining % 60;
+
+        minutesEl.textContent = minutes;
+        secondsEl.textContent = seconds.toString().padStart(2, '0');
+        buttonCountdown.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+        // Update progress bar
+        const progressPercent = ((totalSeconds - secondsRemaining) / totalSeconds) * 100;
+        progressBar.style.width = progressPercent + '%';
+
+        // Check if countdown finished
+        if (secondsRemaining <= 0) {
+            clearInterval(countdownInterval);
+            statusText.textContent = 'You can now submit a new version!';
+            submitButton.disabled = false;
+            submitButton.className = 'bg-primary text-white px-6 py-3 rounded-md hover:bg-blue-700 transition font-medium text-center cursor-pointer';
+            submitButton.innerHTML = 'Submit New Version <span class="text-xs block mt-1">Ready!</span>';
+            progressBar.style.width = '100%';
+
+            // Play a subtle notification (optional)
+            try {
+                const audio = new Audio('data:audio/wav;base64,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');
+                audio.volume = 0.3;
+                audio.play();
+            } catch (e) {
+                // Silently fail if audio doesn't work
+            }
+        }
+    }
+
+    // Countdown interval
+    const countdownInterval = setInterval(() => {
+        if (secondsRemaining > 0) {
+            secondsRemaining--;
+            updateDisplay();
+        }
+    }, 1000);
+
+    // Initial display
+    updateDisplay();
+
+    // Auto-refresh when countdown finishes (optional)
+    setTimeout(() => {
+        if (secondsRemaining <= 0) {
+            // Enable the button and show ready state
+        }
+    }, secondsRemaining * 1000);
+</script>
+{% endblock %}

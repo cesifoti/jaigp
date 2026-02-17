@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Verification Email Sent - JAIGP{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-8 text-center">
+        <!-- Success Icon -->
+        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M3 10l6.75 4.5M21 10l-6.75 4.5m0 0l-1.14.76a2 2 0 01-2.22 0l-1.14-.76"></path>
+            </svg>
+        </div>
+
+        <!-- Success Message -->
+        <h1 class="text-3xl font-bold text-secondary mb-4">Verification Email Sent!</h1>
+
+        <p class="text-lg text-slate-600 mb-6">
+            We've sent a verification link to:
+        </p>
+
+        <p class="text-xl font-semibold text-primary mb-8">
+            {{ email }}
+        </p>
+
+        <!-- Instructions -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8 text-left">
+            <h2 class="text-lg font-semibold text-secondary mb-3">Next Steps:</h2>
+            <ol class="space-y-2 text-slate-700">
+                <li class="flex gap-3">
+                    <span class="flex-shrink-0 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">1</span>
+                    <span>Check your inbox (and spam folder) for an email from JAIGP</span>
+                </li>
+                <li class="flex gap-3">
+                    <span class="flex-shrink-0 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">2</span>
+                    <span>Click the verification link in the email</span>
+                </li>
+                <li class="flex gap-3">
+                    <span class="flex-shrink-0 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">3</span>
+                    <span>Your paper will be published and visible to everyone!</span>
+                </li>
+            </ol>
+        </div>
+
+        <!-- Important Note -->
+        <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-8 text-left">
+            <p class="text-sm text-slate-600">
+                <strong class="text-slate-900">Important:</strong> The verification link will expire in 7 days. Your paper won't be publicly visible until you verify your email address.
+            </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="/" class="px-6 py-3 bg-primary text-white rounded-md hover:bg-blue-700 transition font-medium">
+                Return to Homepage
+            </a>
+            <a href="/auth/profile" class="px-6 py-3 bg-white border border-slate-300 text-slate-700 rounded-md hover:bg-slate-50 transition font-medium">
+                View My Profile
+            </a>
+        </div>
+
+        <!-- Didn't receive email? -->
+        <div class="mt-8 pt-8 border-t border-slate-200">
+            <p class="text-sm text-slate-600">
+                Didn't receive the email? Check your spam folder or contact us at
+                <a href="mailto:support@jaigp.org" class="text-primary hover:underline">support@jaigp.org</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

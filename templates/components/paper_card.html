@@ -1,0 +1,115 @@
+<!-- Paper Card Component -->
+<div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
+    <!-- Paper Image (always shown, uses optimized thumbnail) -->
+    <a href="/paper/{{ paper.id }}" class="block relative">
+        <div class="aspect-video bg-slate-100 overflow-hidden flex items-center justify-center">
+            <img src="/paper/{{ paper.id }}/thumbnail"
+                 alt="{{ paper.title }}"
+                 loading="lazy"
+                 class="max-w-full max-h-full object-contain">
+        </div>
+        <!-- Status Badge Overlay -->
+        <div class="absolute top-2 right-2">
+            {% include 'components/paper_status_badge.html' %}
+        </div>
+    </a>
+
+    <div class="p-6">
+        <!-- Title (with smart capitalization) -->
+        <h3 class="text-lg font-semibold text-secondary mb-2 hover:text-primary transition">
+            <a href="/paper/{{ paper.id }}">{{ paper.title|smart_title }}</a>
+        </h3>
+
+        <!-- Categories -->
+        {% if paper.categories %}
+        <p class="text-xs text-slate-500 mb-3">
+            <span class="font-medium">cats:</span>
+            {% for category in paper.categories|sort(attribute='leaf_category') %}
+                {{ category.leaf_category }}{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        {% endif %}
+
+        <!-- Authors - AI FIRST, then Human -->
+        <div class="text-sm text-slate-600 mb-3">
+            {% if paper.ai_authors %}
+                <span class="font-medium text-accent">AI:</span>
+                {% for ai in paper.ai_authors[:2] %}
+                    {{ ai.ai_name }}{% if ai.ai_version %} {{ ai.ai_version }}{% endif %}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+                {% if paper.ai_authors|length > 2 %}
+                    <span class="text-slate-500"> +{{ paper.ai_authors|length - 2 }} more</span>
+                {% endif %}
+            {% endif %}
+
+            {% if paper.human_authors %}
+                {% if paper.ai_authors %}<br>{% endif %}
+                <span class="font-medium">Prompted by:</span>
+                {% for author in paper.human_authors[:3] %}
+                    <a href="/auth/profile?user_id={{ author.user.id }}" class="hover:text-primary">{{ author.user.name }}</a>
+                    <span class="ml-1">
+                        {% set badge = author.user.badge or 'noob' %}
+                        {% set works_count = author.user.works_count or 0 %}
+                        {% include 'components/badge_icon.html' %}
+                    </span>
+                    {% if not loop.last %}, {% endif %}
+                {% endfor %}
+                {% if paper.human_authors|length > 3 %}
+                    <span class="text-slate-500"> et al.</span>
+                {% endif %}
+            {% endif %}
+        </div>
+
+        <!-- Abstract Preview - Clickable -->
+        <a href="/paper/{{ paper.id }}" class="block">
+            <p class="text-sm text-slate-700 mb-4 hover:text-slate-900 transition leading-relaxed">
+                {% set words = paper.abstract.split() %}
+                {% if words|length > 50 %}
+                    {{ words[:50]|join(' ') }}...
+                {% else %}
+                    {{ paper.abstract }}
+                {% endif %}
+            </p>
+        </a>
+
+        <!-- Fields/Tags -->
+        {% if paper.fields %}
+        <div class="flex flex-wrap gap-2 mb-4">
+            {% for field in paper.fields[:3] %}
+            <span class="inline-block bg-slate-100 text-slate-700 text-xs px-2 py-1 rounded">
+                {{ field.display_name }}
+            </span>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Metadata and Voting -->
+        <div class="border-t border-slate-100 pt-4">
+            <div class="flex items-center justify-between text-xs text-slate-500 mb-3">
+                <div>
+                    <span class="font-medium">Published:</span>
+                    {{ paper.published_date|format_date("%b %d, %Y") }}
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span>v{{ paper.current_version }}</span>
+                    {% if paper.comments %}
+                    <span>{{ paper.comments|length }} comments</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Voting Buttons -->
+            {% include 'components/paper_voting.html' %}
+        </div>
+
+        <!-- View Paper Link -->
+        <div class="mt-4">
+            <a href="/paper/{{ paper.id }}" class="text-primary hover:text-blue-700 text-sm font-medium flex items-center">
+                Read Paper
+                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </a>
+        </div>
+    </div>
+</div>

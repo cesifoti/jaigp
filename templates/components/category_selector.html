@@ -1,0 +1,212 @@
+<!-- Hierarchical Category Selector Component -->
+<div id="category-selector" class="mb-6">
+    <label class="block text-sm font-medium text-slate-900 mb-2">
+        Academic Categories *
+        <span class="text-sm font-normal text-slate-600">(Select 2-5 categories)</span>
+    </label>
+
+    <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
+        <!-- Search Box -->
+        <div class="mb-4">
+            <input type="text"
+                   id="category-search"
+                   placeholder="Search categories (e.g., 'machine learning', 'history', 'economics')..."
+                   class="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-primary focus:border-primary"
+                   autocomplete="off">
+
+            <!-- Search Results -->
+            <div id="search-results" class="hidden mt-2 max-h-60 overflow-y-auto bg-white border border-slate-300 rounded-md shadow-lg">
+                <!-- Results will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Selected Categories -->
+        <div id="selected-categories" class="mb-4">
+            <div class="text-sm font-medium text-slate-700 mb-2">Selected Categories (<span id="category-count">0</span>/5):</div>
+            <div id="category-chips" class="flex flex-wrap gap-2 min-h-[40px] items-center">
+                <span class="text-sm text-slate-400">No categories selected yet</span>
+            </div>
+        </div>
+
+        <!-- Validation Message -->
+        <div id="category-validation" class="hidden text-sm text-red-600 mt-2">
+            Please select at least 2 categories.
+        </div>
+
+        <!-- Hidden input to store selected categories as JSON -->
+        <input type="hidden" id="categories-data" name="categories" value="[]">
+    </div>
+
+    <!-- Help Text -->
+    <p class="text-xs text-slate-600 mt-2">
+        Select the most specific categories that describe your paper. You can search by keyword or browse the hierarchy.
+    </p>
+</div>
+
+<script>
+// Category Selection Logic
+(function() {
+    let selectedCategories = [];
+    const minCategories = 2;
+    const maxCategories = 5;
+
+    // All categories (will be populated from server)
+    let allCategories = [];
+
+    // Initialize
+    function init() {
+        loadCategories();
+        setupSearchBox();
+        updateDisplay();
+    }
+
+    // Load categories from server
+    function loadCategories() {
+        fetch('/api/categories/list')
+            .then(response => response.json())
+            .then(data => {
+                allCategories = data.categories;
+            })
+            .catch(error => {
+                console.error('Error loading categories:', error);
+            });
+    }
+
+    // Setup search box
+    function setupSearchBox() {
+        const searchBox = document.getElementById('category-search');
+        const searchResults = document.getElementById('search-results');
+
+        let searchTimeout;
+
+        searchBox.addEventListener('input', function(e) {
+            clearTimeout(searchTimeout);
+            const query = e.target.value.trim().toLowerCase();
+
+            if (query.length < 2) {
+                searchResults.classList.add('hidden');
+                return;
+            }
+
+            searchTimeout = setTimeout(() => {
+                const results = searchCategories(query);
+                displaySearchResults(results);
+            }, 300);
+        });
+
+        // Close search results when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!searchBox.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.classList.add('hidden');
+            }
+        });
+    }
+
+    // Search categories
+    function searchCategories(query) {
+        return allCategories
+            .filter(cat => {
+                const pathLower = cat.path.toLowerCase();
+                const leafLower = cat.leaf.toLowerCase();
+                return pathLower.includes(query) || leafLower.includes(query);
+            })
+            .slice(0, 20);
+    }
+
+    // Display search results
+    function displaySearchResults(results) {
+        const container = document.getElementById('search-results');
+
+        if (results.length === 0) {
+            container.innerHTML = '<div class="p-3 text-sm text-slate-500">No categories found</div>';
+            container.classList.remove('hidden');
+            return;
+        }
+
+        container.innerHTML = results.map(cat => `
+            <div class="category-result p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-0"
+                 data-path="${cat.path}"
+                 data-leaf="${cat.leaf}"
+                 onclick="addCategory('${cat.path}', '${cat.leaf}')">
+                <div class="text-sm font-medium text-slate-900">${cat.leaf}</div>
+                <div class="text-xs text-slate-500">${cat.path}</div>
+            </div>
+        `).join('');
+
+        container.classList.remove('hidden');
+    }
+
+    // Add category
+    window.addCategory = function(path, leaf) {
+        // Check if already selected
+        if (selectedCategories.some(c => c.path === path)) {
+            return;
+        }
+
+        // Check max limit
+        if (selectedCategories.length >= maxCategories) {
+            alert(`Maximum ${maxCategories} categories allowed`);
+            return;
+        }
+
+        selectedCategories.push({ path, leaf });
+        updateDisplay();
+
+        // Clear search
+        document.getElementById('category-search').value = '';
+        document.getElementById('search-results').classList.add('hidden');
+    };
+
+    // Remove category
+    window.removeCategory = function(path) {
+        selectedCategories = selectedCategories.filter(c => c.path !== path);
+        updateDisplay();
+    };
+
+    // Update display
+    function updateDisplay() {
+        const container = document.getElementById('category-chips');
+        const countSpan = document.getElementById('category-count');
+        const hiddenInput = document.getElementById('categories-data');
+        const validation = document.getElementById('category-validation');
+
+        // Update count
+        countSpan.textContent = selectedCategories.length;
+
+        // Update chips
+        if (selectedCategories.length === 0) {
+            container.innerHTML = '<span class="text-sm text-slate-400">No categories selected yet</span>';
+        } else {
+            container.innerHTML = selectedCategories.map(cat => `
+                <div class="inline-flex items-center gap-2 bg-primary text-white px-3 py-1.5 rounded-full text-sm">
+                    <span>${cat.leaf}</span>
+                    <button type="button"
+                            onclick="removeCategory('${cat.path}')"
+                            class="hover:bg-blue-700 rounded-full p-0.5 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Update hidden input
+        hiddenInput.value = JSON.stringify(selectedCategories);
+
+        // Update validation
+        if (selectedCategories.length < minCategories) {
+            validation.classList.remove('hidden');
+        } else {
+            validation.classList.add('hidden');
+        }
+    }
+
+    // Initialize on load
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+</script>

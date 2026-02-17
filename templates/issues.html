@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Issues - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto">
+    <!-- Breadcrumb -->
+    <nav class="mb-8 text-sm">
+        <ol class="flex items-center space-x-2 text-slate-600">
+            <li><a href="/issues" class="hover:text-primary transition">Issues</a></li>
+            {% if year %}
+            <li class="flex items-center">
+                <svg class="w-4 h-4 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+                <a href="/issues/{{ year }}" class="hover:text-primary transition">{{ year }}</a>
+            </li>
+            {% endif %}
+            {% if month %}
+            <li class="flex items-center">
+                <svg class="w-4 h-4 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+                <a href="/issues/{{ year }}/{{ month }}" class="hover:text-primary transition">{{ month }}</a>
+            </li>
+            {% endif %}
+            {% if day %}
+            <li class="flex items-center">
+                <svg class="w-4 h-4 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+                <span class="text-slate-900 font-medium">{{ day }}</span>
+            </li>
+            {% endif %}
+        </ol>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="mb-8">
+        <h1 class="text-4xl font-bold text-secondary mb-2">
+            {% if view == 'years' %}
+                Browse by Year
+            {% elif view == 'months' %}
+                {{ year }} - Select Month
+            {% elif view == 'days' %}
+                {{ month }} {{ year }} - Select Day
+            {% elif view == 'papers' %}
+                Papers from {{ month }} {{ day }}, {{ year }}
+            {% endif %}
+        </h1>
+        <p class="text-slate-600">
+            {% if view == 'years' %}
+                Explore papers organized by publication year
+            {% elif view == 'months' %}
+                Browse papers from {{ year }}
+            {% elif view == 'days' %}
+                Browse papers from {{ month }} {{ year }}
+            {% elif view == 'papers' %}
+                All papers published on this date
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Years View -->
+    {% if view == 'years' %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for item in years %}
+        <a href="/issues/{{ item.year }}"
+           class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md hover:border-primary transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-3xl font-bold text-secondary">{{ item.year }}</h3>
+                    <p class="text-sm text-slate-600 mt-1">{{ item.count }} papers</p>
+                </div>
+                <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Months View -->
+    {% if view == 'months' %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for item in months %}
+        <a href="/issues/{{ year }}/{{ item.month }}"
+           class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md hover:border-primary transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-2xl font-bold text-secondary">{{ item.month }}</h3>
+                    <p class="text-sm text-slate-600 mt-1">{{ item.count }} papers</p>
+                </div>
+                <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Days View -->
+    {% if view == 'days' %}
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+        {% for item in days %}
+        <a href="/issues/{{ year }}/{{ month }}/{{ item.day }}"
+           class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 hover:shadow-md hover:border-primary transition text-center">
+            <div class="text-2xl font-bold text-secondary">{{ item.day }}</div>
+            <p class="text-xs text-slate-600 mt-1">{{ item.count }} papers</p>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Papers View -->
+    {% if view == 'papers' %}
+        {% if papers %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for paper in papers %}
+                {% include 'components/paper_card.html' %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-12 text-center">
+            <div class="text-slate-400 mb-4">
+                <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-600 mb-2">No papers for this date</h3>
+            <p class="text-slate-500">Check other dates or submit a paper!</p>
+        </div>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}
