@@ -1,0 +1,134 @@
+<!-- Papers tab content — loaded via HTMX or included in initial page -->
+
+<!-- Tab title -->
+<h2 class="text-3xl font-bold text-secondary mb-4" id="papers-title">
+    {% if stage_name in ['Recent Movements', 'All'] %}{{ stage_name }}{% else %}{{ stage_name }} Papers{% endif %}
+</h2>
+
+<!-- Per-tab description banner -->
+{% if stage == 0 %}
+<div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex items-start gap-3">
+    <svg class="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+    </svg>
+    <p class="text-sm text-red-800">
+        <strong>Screened Out.</strong> These submissions did not meet the minimum standard of academic substance set by our AI quality screen. They are listed here for transparency. Authors may revise and resubmit once any cooldown period has passed. <a href="/rules" class="underline hover:text-red-900">Learn about the screening process &rarr;</a>
+    </p>
+</div>
+{% elif stage == 1 %}
+<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex items-start gap-3">
+    <svg class="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+    </svg>
+    <p class="text-sm text-blue-800">
+        <strong>Screened.</strong> These papers passed the automated AI quality screen and are now in the public pipeline. They are open for community comments and can receive endorsements from verified ORCID scholars to advance.
+    </p>
+</div>
+{% elif stage == 2 %}
+<div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4 mb-6 flex items-start gap-3">
+    <svg class="w-5 h-5 text-indigo-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+    </svg>
+    <p class="text-sm text-indigo-800">
+        <strong>Endorsed.</strong> These papers have been endorsed by a verified ORCID scholar. They are eligible for AI review, or currently undergoing it.
+    </p>
+</div>
+{% elif stage == 3 %}
+<div class="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-6 flex items-start gap-3">
+    <svg class="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"></path>
+    </svg>
+    <p class="text-sm text-purple-800">
+        <strong>AI Reviewed.</strong> These papers have completed AI-powered review via <a href="https://reviewer3.com" target="_blank" rel="noopener" class="underline hover:text-purple-900">Reviewer3.com</a>. They are now awaiting human peer review, which will be introduced in the future.
+    </p>
+</div>
+{% elif stage == 4 %}
+<div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 flex items-start gap-3">
+    <svg class="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
+    </svg>
+    <p class="text-sm text-amber-800">
+        <strong>Peer Reviewed (future).</strong> This stage is not yet active. In the future, papers that clear AI review will be evaluated by human peer reviewers.
+    </p>
+</div>
+{% elif stage == 5 %}
+<div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6 flex items-start gap-3">
+    <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+    </svg>
+    <p class="text-sm text-green-800">
+        <strong>Accepted (future).</strong> Once human peer review is available, papers that complete the full pipeline will appear here.
+    </p>
+</div>
+{% endif %}
+
+{% if papers %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for paper in papers %}
+            {% include 'components/paper_card.html' %}
+        {% endfor %}
+    </div>
+
+    {% if total_pages > 1 %}
+    <div class="flex items-center justify-between mt-8 pt-8 border-t border-slate-200">
+        <div class="text-sm text-slate-600">
+            Page {{ page }} of {{ total_pages }} ({{ total_papers }} total)
+        </div>
+        <div class="flex gap-2">
+            {% if page > 1 %}
+            <button hx-get="/papers-tab?stage={{ stage }}&page=1" hx-target="#papers-content" hx-swap="innerHTML"
+               class="px-4 py-2 text-sm bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition">First</button>
+            <button hx-get="/papers-tab?stage={{ stage }}&page={{ page - 1 }}" hx-target="#papers-content" hx-swap="innerHTML"
+               class="px-4 py-2 text-sm bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition">Previous</button>
+            {% endif %}
+
+            <div class="hidden sm:flex gap-2">
+                {% for p in range([page - 2, 1]|max, [page + 3, total_pages + 1]|min) %}
+                    {% if p == page %}
+                    <span class="px-4 py-2 text-sm bg-primary text-white rounded-md font-medium">{{ p }}</span>
+                    {% else %}
+                    <button hx-get="/papers-tab?stage={{ stage }}&page={{ p }}" hx-target="#papers-content" hx-swap="innerHTML"
+                       class="px-4 py-2 text-sm bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition">{{ p }}</button>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            {% if page < total_pages %}
+            <button hx-get="/papers-tab?stage={{ stage }}&page={{ page + 1 }}" hx-target="#papers-content" hx-swap="innerHTML"
+               class="px-4 py-2 text-sm bg-primary text-white rounded-md hover:bg-blue-700 transition">Next</button>
+            <button hx-get="/papers-tab?stage={{ stage }}&page={{ total_pages }}" hx-target="#papers-content" hx-swap="innerHTML"
+               class="px-4 py-2 text-sm bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition">Last</button>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+{% else %}
+<div class="bg-white rounded-lg shadow-sm border border-slate-200 p-12 text-center">
+    <div class="text-slate-400 mb-4">
+        <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+    </div>
+    <h3 class="text-xl font-bold text-slate-600 mb-2">No papers at this stage</h3>
+    <p class="text-slate-500 mb-6">
+        {% if stage == 0 %}
+            No papers have been screened out yet.
+        {% elif stage == 1 %}
+            No papers have passed AI screening yet — be the first!
+        {% elif stage == 5 %}
+            No papers have been accepted yet.
+        {% else %}
+            Papers will appear here as they progress through the review pipeline.
+        {% endif %}
+    </p>
+    {% if user and stage == 1 %}
+    <a href="/submit" class="inline-block bg-primary text-white px-6 py-3 rounded-md hover:bg-blue-700 transition font-medium">
+        Submit First Paper
+    </a>
+    {% elif not user %}
+    <a href="/auth/login" class="inline-block bg-primary text-white px-6 py-3 rounded-md hover:bg-blue-700 transition font-medium">
+        Login to Submit
+    </a>
+    {% endif %}
+</div>
+{% endif %}

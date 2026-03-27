@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}{% if success %}Email Verified{% else %}Verification Failed{% endif %} - JAIGP{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-8 text-center">
+        {% if success %}
+            <!-- Success Icon -->
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+
+            <!-- Success Message -->
+            {% if already_verified %}
+                <h1 class="text-3xl font-bold text-secondary mb-4">Already Verified</h1>
+                <p class="text-lg text-slate-600 mb-8">
+                    This paper has already been verified and is publicly visible.
+                </p>
+            {% else %}
+                <h1 class="text-3xl font-bold text-secondary mb-4">Email Verified Successfully!</h1>
+                <p class="text-lg text-slate-600 mb-8">
+                    Your paper is now published and visible to everyone.
+                </p>
+            {% endif %}
+
+            <!-- Paper Info -->
+            {% if paper %}
+            <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 mb-8 text-left">
+                <h2 class="text-xl font-semibold text-secondary mb-3">{{ paper.title }}</h2>
+                <p class="text-sm text-slate-600">
+                    {{ paper.abstract[:200] }}{% if paper.abstract|length > 200 %}...{% endif %}
+                </p>
+            </div>
+            {% endif %}
+
+            <!-- Celebration Message -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+                <p class="text-slate-700">
+                    🎉 Your paper is now part of JAIGP's growing collection of AI-generated research!
+                </p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                {% if paper %}
+                <a href="/paper/{{ paper.id }}" class="px-6 py-3 bg-primary text-white rounded-md hover:bg-blue-700 transition font-medium">
+                    View Your Paper
+                </a>
+                {% endif %}
+                <a href="/" class="px-6 py-3 bg-white border border-slate-300 text-slate-700 rounded-md hover:bg-slate-50 transition font-medium">
+                    Browse All Papers
+                </a>
+            </div>
+
+        {% else %}
+            <!-- Error Icon -->
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </div>
+
+            <!-- Error Message -->
+            <h1 class="text-3xl font-bold text-secondary mb-4">Verification Failed</h1>
+            <p class="text-lg text-slate-600 mb-8">
+                We couldn't verify your email. The verification link may be invalid or expired.
+            </p>
+
+            <!-- Help Message -->
+            <div class="bg-red-50 border border-red-200 rounded-lg p-6 mb-8 text-left">
+                <h2 class="text-lg font-semibold text-secondary mb-3">What happened?</h2>
+                <ul class="space-y-2 text-slate-700 list-disc list-inside">
+                    <li>The verification link may have expired (links are valid for 7 days)</li>
+                    <li>The paper may have already been verified</li>
+                    <li>The link may be invalid or corrupted</li>
+                </ul>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/" class="px-6 py-3 bg-primary text-white rounded-md hover:bg-blue-700 transition font-medium">
+                    Return to Homepage
+                </a>
+                <a href="mailto:support@jaigp.org" class="px-6 py-3 bg-white border border-slate-300 text-slate-700 rounded-md hover:bg-slate-50 transition font-medium">
+                    Contact Support
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

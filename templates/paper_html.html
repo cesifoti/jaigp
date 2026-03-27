@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}{{ paper.title|smart_title }} (HTML) - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto">
+    <!-- Back to Paper Button -->
+    <div class="mb-6">
+        <a href="/paper/{{ paper.id }}"
+           class="inline-flex items-center text-primary hover:text-blue-700 font-medium transition">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Paper
+        </a>
+    </div>
+
+    <!-- Version Selector -->
+    {% if paper.versions|length > 1 %}
+    <div class="mb-6 bg-slate-50 border border-slate-200 rounded-lg p-4">
+        <label for="version-select" class="block text-sm font-medium text-slate-700 mb-2">
+            Viewing version:
+        </label>
+        <select id="version-select"
+                onchange="window.location.href='/paper/{{ paper.id }}/html?version='+this.value"
+                class="block w-full max-w-xs px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+            {% for v in paper.versions|sort(attribute='version_number', reverse=True) %}
+            <option value="{{ v.version_number }}" {% if v.version_number == current_version %}selected{% endif %}>
+                Version {{ v.version_number }}
+                {% if v.version_number == paper.current_version %}(current){% endif %}
+                - {{ v.created_at|format_date("%b %d, %Y") }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    {% endif %}
+
+    <!-- Format Toggle -->
+    <div class="mb-6 flex flex-wrap gap-3">
+        <a href="/paper/{{ paper.id }}{% if version_number and version_number != paper.current_version %}?version={{ version_number }}{% endif %}"
+           class="px-4 py-2 bg-slate-100 text-slate-700 rounded-md hover:bg-slate-200 transition text-sm font-medium">
+            View PDF
+        </a>
+        <span class="px-4 py-2 bg-accent text-white rounded-md text-sm font-medium">
+            Viewing HTML
+        </span>
+        <a href="/paper/{{ paper.id }}/markdown{% if version_number and version_number != paper.current_version %}?version={{ version_number }}{% endif %}"
+           class="px-4 py-2 bg-slate-100 text-slate-700 rounded-md hover:bg-slate-200 transition text-sm font-medium">
+            Download Markdown
+        </a>
+    </div>
+
+    <!-- HTML Content -->
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-8 prose prose-slate max-w-none">
+        {{ html_content|safe }}
+    </div>
+
+    <!-- Note about auto-generation -->
+    <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-slate-700">
+        <p class="font-medium text-slate-900 mb-1">📝 About this HTML version</p>
+        <p>
+            This HTML document was automatically generated from the PDF.
+            Some formatting, figures, or mathematical notation may not be perfectly preserved.
+            For the authoritative version, please refer to the <a href="/paper/{{ paper.id }}/pdf" class="text-primary hover:underline">PDF</a>.
+        </p>
+    </div>
+</div>
+
+<style>
+/* Additional prose styling for better readability */
+.prose p {
+    text-align: justify;
+    hyphens: auto;
+    margin-bottom: 1.25em;
+}
+
+.prose h1 {
+    font-size: 2.5em;
+    line-height: 1.2;
+    margin-bottom: 0.5em;
+}
+
+.prose h2 {
+    font-size: 1.8em;
+    margin-top: 2em;
+    margin-bottom: 0.75em;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 0.3em;
+}
+
+.prose .abstract {
+    background: #f1f5f9;
+    padding: 1.5rem;
+    border-left: 4px solid #2563eb;
+    margin: 1.5rem 0;
+    border-radius: 0.25rem;
+}
+
+.prose .endnotes {
+    font-size: 0.9em;
+    color: #475569;
+}
+
+.prose .endnotes li {
+    margin-bottom: 0.75em;
+}
+</style>
+{% endblock %}

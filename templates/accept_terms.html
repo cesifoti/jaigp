@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Accept Terms - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-12">
+    <div class="bg-white rounded-xl border border-slate-200 p-8">
+        <div class="text-center mb-6">
+            <div class="w-14 h-14 bg-primary rounded-lg flex items-center justify-center mx-auto mb-4">
+                <span class="text-white font-bold text-2xl">J</span>
+            </div>
+            <h1 class="text-2xl font-bold text-secondary mb-2">Welcome to JAIGP</h1>
+            <p class="text-slate-600">Before you continue, please review and accept our terms.</p>
+        </div>
+
+        <div class="bg-slate-50 rounded-lg border border-slate-200 p-5 mb-6 max-h-64 overflow-y-auto text-sm text-slate-700 leading-relaxed space-y-3">
+            <p>By using JAIGP, you agree that:</p>
+            <ul class="list-disc pl-5 space-y-2">
+                <li>You are responsible for all content you submit, including papers, prompts, discussion posts, and comments.</li>
+                <li>You grant JAIGP a non-exclusive, royalty-free, perpetual, worldwide license to use, reproduce, modify, adapt, distribute, sublicense, and create derivative works from your content for operating, improving, and promoting the journal.</li>
+                <li>Your content may be processed by AI systems, including Anthropic's Claude (for screening and summarization) and Reviewer3.com (for AI peer review).</li>
+                <li>Content you submit may be shared with third-party services used to operate JAIGP.</li>
+                <li>JAIGP may use your content for research, analytics, and AI training purposes.</li>
+                <li>Your name, ORCID iD, affiliation, and submitted content are publicly visible.</li>
+            </ul>
+            <p>For full details, read the <a href="/terms" target="_blank" class="text-primary hover:underline">Terms of Service</a> and <a href="/privacy" target="_blank" class="text-primary hover:underline">Privacy Policy</a>.</p>
+        </div>
+
+        <form method="post" action="/auth/accept-terms">
+            <label class="flex items-start gap-3 mb-6 cursor-pointer">
+                <input type="checkbox" name="accept" value="1" required
+                       class="mt-1 w-4 h-4 text-primary border-slate-300 rounded focus:ring-primary">
+                <span class="text-sm text-slate-700">
+                    I have read and agree to the <a href="/terms" target="_blank" class="text-primary hover:underline font-medium">Terms of Service</a> and <a href="/privacy" target="_blank" class="text-primary hover:underline font-medium">Privacy Policy</a>.
+                </span>
+            </label>
+            <button type="submit"
+                    class="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                Continue to JAIGP
+            </button>
+        </form>
+
+        <p class="text-xs text-slate-400 text-center mt-4">
+            You can delete your account and data at any time from your profile settings.
+        </p>
+    </div>
+</div>
+{% endblock %}

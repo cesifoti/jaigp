@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Account - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-full mb-4">
+            <svg class="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+        </div>
+        <h1 class="text-3xl font-bold text-secondary mb-2">
+            Delete Your Account
+        </h1>
+        <p class="text-lg text-slate-600">
+            This action cannot be undone
+        </p>
+    </div>
+
+    <!-- Warning Box -->
+    <div class="bg-red-50 border-2 border-red-400 rounded-lg p-6 mb-8">
+        <h2 class="text-xl font-bold text-red-900 mb-4">⚠️ Important Information</h2>
+
+        <div class="space-y-4 text-red-800">
+            <p class="font-semibold">If you delete your account, the following will happen:</p>
+
+            <ul class="list-disc pl-6 space-y-2">
+                <li>Your personal information (name, email, ORCID, profile URLs) will be <strong>permanently deleted</strong></li>
+                <li>All papers where you are the sole author will be <strong>permanently deleted</strong>, including PDF files</li>
+                <li>Your authorship will be removed from co-authored papers (the papers themselves remain)</li>
+                <li>All your community posts, comments, and votes will be <strong>deleted</strong></li>
+                <li>All your direct messages (sent and received) will be <strong>deleted</strong></li>
+                <li>All your follow relationships and notifications will be <strong>deleted</strong></li>
+                <li>You will be immediately logged out</li>
+                <li>This action <strong>cannot be reversed</strong></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- What Gets Deleted -->
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 mb-8">
+        <h3 class="text-lg font-bold text-secondary mb-4">What Will Be Deleted:</h3>
+        <div class="space-y-3">
+            <div class="flex items-start space-x-3">
+                <svg class="w-5 h-5 text-red-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                </svg>
+                <div>
+                    <p class="font-semibold text-slate-900">Profile Information</p>
+                    <p class="text-sm text-slate-600">Name: {{ profile_user.name }}</p>
+                    <p class="text-sm text-slate-600">ORCID: {{ profile_user.orcid_id }}</p>
+                    {% if profile_user.email %}
+                    <p class="text-sm text-slate-600">Email: {{ profile_user.email }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="flex items-start space-x-3">
+                <svg class="w-5 h-5 text-red-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                </svg>
+                <div>
+                    <p class="font-semibold text-slate-900">Authorship Records</p>
+                    <p class="text-sm text-slate-600">{{ paper_count }} paper authorship{{ 's' if paper_count != 1 else '' }}</p>
+                </div>
+            </div>
+
+            <div class="flex items-start space-x-3">
+                <svg class="w-5 h-5 text-red-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                </svg>
+                <div>
+                    <p class="font-semibold text-slate-900">Comments and Interactions</p>
+                    <p class="text-sm text-slate-600">All your comments and votes</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alternative Options -->
+    <div class="bg-blue-50 border-l-4 border-blue-400 p-6 mb-8">
+        <h3 class="text-lg font-semibold text-blue-900 mb-3">Consider These Alternatives:</h3>
+        <ul class="space-y-2 text-blue-800">
+            <li class="flex items-start">
+                <svg class="w-5 h-5 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                <div>
+                    <span class="font-semibold">Edit your profile</span> - Update your information instead of deleting
+                    <a href="/auth/profile/edit" class="text-blue-600 hover:text-blue-800 ml-2">Edit Profile →</a>
+                </div>
+            </li>
+            <li class="flex items-start">
+                <svg class="w-5 h-5 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                <div>
+                    <span class="font-semibold">Export your data</span> - Download a copy before deleting
+                    <a href="/auth/profile/export" class="text-blue-600 hover:text-blue-800 ml-2">Export Data →</a>
+                </div>
+            </li>
+            <li class="flex items-start">
+                <svg class="w-5 h-5 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                <div>
+                    <span class="font-semibold">Just log out</span> - Your account will remain inactive
+                    <a href="/auth/logout" class="text-blue-600 hover:text-blue-800 ml-2">Logout →</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Confirmation Form -->
+    <div class="bg-white rounded-lg shadow-sm border-2 border-red-500 p-6 mb-8">
+        <h3 class="text-lg font-bold text-red-900 mb-4">Confirm Account Deletion</h3>
+
+        <p class="text-slate-700 mb-6">
+            Type <strong class="font-mono bg-slate-100 px-2 py-1 rounded">DELETE</strong> to confirm:
+        </p>
+
+        <form action="/auth/profile/delete" method="POST" onsubmit="return confirmDeletion(event)">
+            <input
+                type="text"
+                id="confirm-text"
+                name="confirmation"
+                class="w-full px-4 py-3 border-2 border-slate-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 mb-4 font-mono"
+                placeholder="Type DELETE here"
+                autocomplete="off"
+            >
+
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button
+                    type="submit"
+                    id="delete-button"
+                    disabled
+                    class="bg-red-600 text-white px-6 py-3 rounded-md hover:bg-red-700 transition font-medium disabled:bg-slate-300 disabled:cursor-not-allowed">
+                    Delete My Account Permanently
+                </button>
+                <a
+                    href="/auth/profile"
+                    class="bg-slate-100 text-slate-700 px-6 py-3 rounded-md hover:bg-slate-200 transition font-medium text-center">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Legal Notice -->
+    <div class="text-center text-sm text-slate-500 mb-8">
+        <p>
+            This action is performed in accordance with GDPR Article 17 (Right to Erasure).<br>
+            For more information, see our <a href="/privacy" class="text-primary hover:text-blue-700">Privacy Policy</a>.
+        </p>
+    </div>
+</div>
+
+<script>
+    // Enable delete button only when user types DELETE
+    const confirmInput = document.getElementById('confirm-text');
+    const deleteButton = document.getElementById('delete-button');
+
+    confirmInput.addEventListener('input', function() {
+        if (this.value.trim() === 'DELETE') {
+            deleteButton.disabled = false;
+            deleteButton.classList.remove('disabled:bg-slate-300', 'disabled:cursor-not-allowed');
+        } else {
+            deleteButton.disabled = true;
+            deleteButton.classList.add('disabled:bg-slate-300', 'disabled:cursor-not-allowed');
+        }
+    });
+
+    function confirmDeletion(event) {
+        const confirmed = confirm('Are you absolutely sure you want to delete your account? This cannot be undone.');
+        if (!confirmed) {
+            event.preventDefault();
+            return false;
+        }
+        return true;
+    }
+</script>
+{% endblock %}

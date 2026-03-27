@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ app_name }}{% endblock %}</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/static/images/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32.png">
+    <link rel="apple-touch-icon" href="/static/images/apple-touch-icon.png">
+
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jaigp.org{{ request.path }}">
+    <meta property="og:title" content="{% block og_title %}JAIGP - Journal for AI Generated Papers{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Where humans and machines are welcomed. AI-generated research, reviewed transparently, built collaboratively.{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}https://jaigp.org/static/images/og-image.png{% endblock %}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:site_name" content="JAIGP">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://jaigp.org{{ request.path }}">
+    <meta name="twitter:title" content="{% block twitter_title %}JAIGP - Journal for AI Generated Papers{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}Where humans and machines are welcomed. AI-generated research, reviewed transparently.{% endblock %}">
+    <meta name="twitter:image" content="{% block twitter_image %}https://jaigp.org/static/images/og-image.png{% endblock %}">
+
+    <!-- General Meta Tags -->
+    <meta name="description" content="{% block meta_description %}JAIGP — where humans and machines are welcomed. The world's first Open Prompting journal. AI-generated research, reviewed transparently, built collaboratively through community prompts.{% endblock %}">
+    <meta name="keywords" content="AI generated papers, artificial intelligence, research journal, academic publishing, AI research, machine learning, open access">
+    <meta name="author" content="JAIGP">
+
+    <!-- Google Fonts - Inter for UI, Source Serif for reading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,500&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+    <!-- KaTeX for TeX math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+        onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true},{left: '\\\\(', right: '\\\\)', display: false},{left: '\\\\[', right: '\\\\]', display: true}], throwOnError: false});"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/custom.css">
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        serif: ['"Source Serif 4"', 'Georgia', 'Cambria', 'serif'],
+                        mono: ['IBM Plex Mono', 'Monaco', 'Courier New', 'monospace'],
+                    },
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#1e293b',
+                        accent: '#10b981',
+                    },
+                    fontSize: {
+                        'body': ['1.0625rem', { lineHeight: '1.75' }],
+                        'body-lg': ['1.125rem', { lineHeight: '1.78' }],
+                    },
+                    maxWidth: {
+                        'reading': '42rem',
+                    }
+                }
+            }
+        }
+    </script>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="h-full bg-slate-50 text-slate-900 font-sans">
+    <!-- Navigation -->
+    {% include 'components/nav.html' %}
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-secondary text-white mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold mb-3">JAIGP</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        Where humans and machines are welcomed. An open experiment in AI-generated research.
+                    </p>
+                    <p class="text-xs text-slate-400 mt-3">
+                        <a href="/about" class="text-accent hover:text-green-300 transition">Learn more about JAIGP &rarr;</a>
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-3">Journal</h3>
+                    <ul class="space-y-1.5 text-sm">
+                        <li><a href="/" class="text-slate-300 hover:text-accent transition">Home</a></li>
+                        <li><a href="/rules" class="text-slate-300 hover:text-accent transition">Rules</a></li>
+                        <li><a href="/issues" class="text-slate-300 hover:text-accent transition">Browse Papers</a></li>
+                        <li><a href="/submit" class="text-slate-300 hover:text-accent transition">Submit a Paper</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-3">Community</h3>
+                    <ul class="space-y-1.5 text-sm">
+                        <li><a href="/prompts" class="text-slate-300 hover:text-accent transition">Community Feed</a></li>
+                        <li><a href="/prompts?tab=archive" class="text-slate-300 hover:text-accent transition">Prompt Archive</a></li>
+                        <li><a href="/terms" class="text-slate-300 hover:text-accent transition">Terms</a></li>
+                        <li><a href="/privacy" class="text-slate-300 hover:text-accent transition">Privacy</a></li>
+                        <li><a href="https://github.com/cesifoti/jaigp" target="_blank" rel="noopener" class="text-slate-300 hover:text-accent transition">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-slate-700 mt-8 pt-8 text-center text-sm text-slate-400">
+                <p>&copy; 2026 JAIGP. All rights reserved. <a href="https://github.com/cesifoti/jaigp" target="_blank" rel="noopener" class="text-slate-500 hover:text-accent transition">Open source on GitHub</a>.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-consent" class="hidden fixed bottom-0 left-0 right-0 bg-slate-900 text-white p-4 shadow-lg z-50 border-t-2 border-primary">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex-1 text-sm">
+                <p class="mb-2">
+                    <strong>🍪 We use essential cookies</strong>
+                </p>
+                <p class="text-slate-300">
+                    We use only essential cookies necessary for authentication and site functionality. No tracking or advertising cookies.
+                    <a href="/privacy" class="text-accent hover:text-green-300 underline ml-1">Learn more</a>
+                </p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="acceptCookies()" class="bg-primary hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium transition">
+                    Accept
+                </button>
+                <button onclick="dismissCookieConsent()" class="bg-slate-700 hover:bg-slate-600 text-white px-6 py-2 rounded-md font-medium transition">
+                    Dismiss
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom JS -->
+    <script src="/static/js/app.js"></script>
+
+    <!-- Cookie Consent Script -->
+    <script>
+        // Check if user has already consented
+        function checkCookieConsent() {
+            const consent = localStorage.getItem('cookie_consent');
+            if (!consent) {
+                document.getElementById('cookie-consent').classList.remove('hidden');
+            }
+        }
+
+        function acceptCookies() {
+            localStorage.setItem('cookie_consent', 'accepted');
+            localStorage.setItem('cookie_consent_date', new Date().toISOString());
+            document.getElementById('cookie-consent').classList.add('hidden');
+        }
+
+        function dismissCookieConsent() {
+            localStorage.setItem('cookie_consent', 'dismissed');
+            document.getElementById('cookie-consent').classList.add('hidden');
+        }
+
+        // Show banner on page load if needed
+        window.addEventListener('DOMContentLoaded', checkCookieConsent);
+    </script>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

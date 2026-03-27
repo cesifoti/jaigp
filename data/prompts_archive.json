@@ -1,0 +1,1791 @@
+{
+  "generated_at": "2026-03-27T09:19:02.043511Z",
+  "total_prompts": 240,
+  "total_sessions": 13,
+  "sessions": [
+    {
+      "id": "e7f4d1dc-1e31-4178-8695-ae6931f021fa",
+      "title": "5-Stage Peer Review Pipeline",
+      "started_at": "2026-02-24T12:00:18.795Z",
+      "prompt_count": 8,
+      "prompts": [
+        {
+          "text": "Resume work",
+          "timestamp": "2026-02-24T12:00:18.795Z",
+          "prompt_type": "procedural",
+          "session_index": 1,
+          "global_index": 1
+        },
+        {
+          "text": "[dev_server] is responding with a 500 internal server error. 500 Server Error\nUndefinedError: 'stage_counts' is undefined\nTraceback\n\nFile [server_path], line 487, in getattr‒\n\n484.         Unlike :meth:`getitem` the attribute *must* be a string.\n\n485.         \"\"\"\n\n486.         try:\n\n487.             return getattr(obj, attribute)\n\n488.         except AttributeError:\n\n489.             pass\n\n490.         try:\n\nFile templates/home.html, line 87, in block 'content'+\n\nFile templates/base.html, line 76, in top-level template code+\n\nFile templates/home.html, line 1, in top-level template code+\n\nFile [server_path], line 939, in handle_exception+\n\nFile [server_path], line 1304, in render+\n\nFile [server_path], line 40, in __init__+\n\nFile [server_path], line 209, in TemplateResponse+\n\nFile [server_path], line 79, in homepage+\n\nFile [server_path], line 212, in run_endpoint_function+\n\nFile [server_path], line 301, in app+\n\nFile [server_path], line 73, in app+\n\nFile [server_path], line 51, in wrapped_app+\n\nFile [server_path], line 62, in wrapped_app+\n\nFile [server_path], line 76, in app+\n\nFile [server_path], line 288, in handle+\n\nFile [server_path], line 735, in app+\n\nFile [server_path], line 715, in __call__+\n\nFile [server_path], line 51, in wrapped_app+\n\nFile [server_path], line 62, in wrapped_app+\n\nFile [server_path][REDACTED].py, line 62, in __call__+\n\nFile [server_path], line 149, in coro+\n\nFile [server_path], line 163, in call_next+\n\nFile [server_path], line 14, in dispatch+\n\nFile [server_path], line 187, in __call__+\n\nFile [server_path], line 83, in collapse_excgroups+\n\nFile /usr/lib/python3.12/contextlib.py, line 158, in __exit__+\n\nFile [server_path], line 185, in __call__+\n\nFile [server_path], line 149, in coro+\n\nFile [server_path], line 163, in call_next+\n\nFile [server_path], line 80, in dispatch+\n\nFile [server_path], line 187, in __call__+\n\nFile [server_path], line 83, in collapse_excgroups+\n\nFile /usr/lib/python3.12/contextlib.py, line 158, in __exit__+\n\nFile [server_path], line 185, in __call__+\n\nFile [server_path], line 159, in __call__+\n\nFile [server_path], line 165, in __call__",
+          "timestamp": "2026-02-24T12:03:15.944Z",
+          "prompt_type": "procedural",
+          "session_index": 2,
+          "global_index": 2
+        },
+        {
+          "text": "I have now received an API key and API instructions from reviewer3.com. Here is the link to the API documentation https://www.dropbox.[REDACTED]-API-DocsPDF.pdf?rlkey=7d0sj8axhxt08s2whl9y5566t&st=ustngx12&dl=0 and here is my API key [REDACTED]   I would like us to use this to update the dev version of the site so that we can test the AI reviewer flow. We should be able to go as far as getting an AI review from the system using this key.",
+          "timestamp": "2026-02-27T08:20:59.931Z",
+          "prompt_type": "key",
+          "session_index": 3,
+          "global_index": 3
+        },
+        {
+          "text": "Cannot test the feature by loging on dev with ORCID. I am getting the following error. orcid logo\nError: The provided redirect URI [dev_url] does not match the redirect URIs registered by JAIGP ([REDACTED]).\nYou have reached this page due to an error with the application's integration. Please report this error to the organization that is requesting your ORCID iD.",
+          "timestamp": "2026-02-27T09:43:51.859Z",
+          "prompt_type": "procedural",
+          "session_index": 4,
+          "global_index": 4
+        },
+        {
+          "text": "I got the login to work again. But I cannot find where to submit the paper for AI review. I would assume I would have a link directly on the paper's page when I am loged in as the author of that paper. E.g. a prominent action button for submit to AI review here: [dev_url]",
+          "timestamp": "2026-02-27T09:50:08.259Z",
+          "prompt_type": "procedural",
+          "session_index": 5,
+          "global_index": 5
+        },
+        {
+          "text": "Thanks. We need to iron a few more kinks on dev to get this feature right. Let's take paper number 1 [dev_url] back to the stage \"endorsed.\" This will allow me to go through the system again and collect feedback.  Also, allow me as an admin to advance or rewind papers using this panel. [dev_url] also, we are missing this paper, which is available in prod [dev_url]",
+          "timestamp": "2026-02-28T09:40:40.441Z",
+          "prompt_type": "procedural",
+          "session_index": 6,
+          "global_index": 6
+        },
+        {
+          "text": "Paper 1 is also missing its homepage image, even though it is available in prod. [dev_url]",
+          "timestamp": "2026-02-28T09:45:43.476Z",
+          "prompt_type": "procedural",
+          "session_index": 7,
+          "global_index": 7
+        },
+        {
+          "text": "Here is feedback to improve the AI review process. First, let's update the text by removing the Journal Mode mention. We need to keep this simple and focused on the purpose, without internal technical details of reviewer3. Second, in the \"AI review in progress...\" screen we need to give an instruction of the action the author can take (wait an the review will load once it is completed). Third, the email I received to view my review at reviewer3 is broken ([local_url] maybe once the review is done let's send authors back to JAIGP to see their reviews. Fourth, and this is really important, to consider that a paper passed AI review we need to ask authors to submit a revised version of the paper and answers to each of the questions raised by the AI review. These answers should be entered in dialogue boxes under each reviewer comment and cannot be left empty. We will then need to prepare a package with the revised version and the answers and  send this back to reviewer3.com for re-review. This time, we can get pushback on any of the specific issues or a notice of approval. But the authors should never be able to approve themselves. They always need an external approval from the AI review. So the action at the end of this page ([dev_url] is to resubmit for approval, not to advance to peer review.",
+          "timestamp": "2026-02-28T09:55:21.882Z",
+          "prompt_type": "procedural",
+          "session_index": 8,
+          "global_index": 8
+        }
+      ]
+    },
+    {
+      "id": "5c8e90e5-3b93-49bd-88f9-c1d4d1f8cd2e",
+      "title": "Paper Presentation & UI Improvements",
+      "started_at": "2026-03-02T15:04:57.574Z",
+      "prompt_count": 10,
+      "prompts": [
+        {
+          "text": "In this folder we have a journal for ai generated papers (jaigp.com), we have a dev and a production version using git. I am trying to submit a paper to the dev version, but the email verification did not send any email to me. Let's investigate and propose a solution before we do anything.",
+          "timestamp": "2026-03-02T15:04:57.574Z",
+          "prompt_type": "procedural",
+          "session_index": 1,
+          "global_index": 9
+        },
+        {
+          "text": "Can I use an email alias, set up by email forwarding to another account? Or do I need a dedicated inbox with username and password?",
+          "timestamp": "2026-03-02T15:09:07.055Z",
+          "prompt_type": "procedural",
+          "session_index": 2,
+          "global_index": 10
+        },
+        {
+          "text": "Ok, I created an email called contact@jaigp.org with google what data do you need to set up the SMTP server?",
+          "timestamp": "2026-03-02T15:17:09.164Z",
+          "prompt_type": "procedural",
+          "session_index": 3,
+          "global_index": 11
+        },
+        {
+          "text": "Gmail App Password [REDACTED]",
+          "timestamp": "2026-03-02T15:18:04.410Z",
+          "prompt_type": "procedural",
+          "session_index": 4,
+          "global_index": 12
+        },
+        {
+          "text": "I am sorry. I gave you the App password for the wrong account. Please forget the app password I gave and use instead: [REDACTED]",
+          "timestamp": "2026-03-02T15:28:28.201Z",
+          "prompt_type": "procedural",
+          "session_index": 5,
+          "global_index": 13
+        },
+        {
+          "text": "Can we make the pending verification badge in this type of page have a button for resend verification email? [dev_url]",
+          "timestamp": "2026-03-02T15:30:07.925Z",
+          "prompt_type": "procedural",
+          "session_index": 6,
+          "global_index": 14
+        },
+        {
+          "text": "The paper attention inequality on twitter is at stage 2 (I pushed it forward with the admin panel [dev_url] but when I go to the paper page [dev_url] it shows as submitted and not eligible for AI review. It should be eligible for AI review once it is at stage 2.",
+          "timestamp": "2026-03-02T15:36:32.350Z",
+          "prompt_type": "procedural",
+          "session_index": 7,
+          "global_index": 15
+        },
+        {
+          "text": "Now it says the paper is eligible for AI review, but it doesn;t have a button to submit for AI review. We have worked a version that allowed us to do this already, submitting the paper to reviewer3.com based on their API [dev_url]",
+          "timestamp": "2026-03-02T15:40:36.544Z",
+          "prompt_type": "procedural",
+          "session_index": 8,
+          "global_index": 16
+        },
+        {
+          "text": "Once I click on submit for AI review it asks me to add an email to your profile, but I already did in the past for a previous paper and I did when submitting this paper as well (and validated the email to). So we need to do a better job at how we handle that email information and state in the backend. We cannot ask the email each time.",
+          "timestamp": "2026-03-02T15:45:13.906Z",
+          "prompt_type": "procedural",
+          "session_index": 9,
+          "global_index": 17
+        },
+        {
+          "text": "Let's make sure that we capture the email of a user, identified by their ORCID, no matter when they give it to us (first submission, second submission, etc.). Also, we need to provide the option for a user to have multiple emails, since it is common for academics to have multiple affiliations or change affiliations during their career.",
+          "timestamp": "2026-03-02T15:48:15.377Z",
+          "prompt_type": "procedural",
+          "session_index": 10,
+          "global_index": 18
+        }
+      ]
+    },
+    {
+      "id": "e7f02f13-1656-4e0c-827b-87057625d3db",
+      "title": "Multi-Email User Support",
+      "started_at": "2026-03-02T16:08:05.708Z",
+      "prompt_count": 4,
+      "prompts": [
+        {
+          "text": "A couple of small things. This page [dev_url] needs to have a field at the top indicating which reviewer company was used. In this case it was reviewer3.com but we might add other reviewing services in the future. Also, the page right before that said that the page would refresh automatically once the review was completed, but that was not the case, I had to manually refresh to see the review.",
+          "timestamp": "2026-03-02T16:08:05.708Z",
+          "prompt_type": "procedural",
+          "session_index": 1,
+          "global_index": 19
+        },
+        {
+          "text": "Also, once a paper is in a Review stage, we need to provide a way for the author to navigate back to the page with the reviews. We should be saving those reviews and an author can take a few days to provide a response, so we need to provide them with ways to access the review page and enter their answer from this page: [dev_url] and in their profile page",
+          "timestamp": "2026-03-02T16:10:00.421Z",
+          "prompt_type": "procedural",
+          "session_index": 2,
+          "global_index": 20
+        },
+        {
+          "text": "The AI review page should, at the top,  provide the option to download the review as PDF or markdown [dev_url]",
+          "timestamp": "2026-03-02T16:14:52.008Z",
+          "prompt_type": "procedural",
+          "session_index": 3,
+          "global_index": 21
+        },
+        {
+          "text": "When the paper is in the AI review version and I click Submit New Version on the paper page I get a 500 error. [dev_url] (500 error text 500 Server Error\nTypeError: Object of type PaperCategory is not JSON serializable\nTraceback\n\nFile /usr/lib/python3.12/json/encoder.py, line 180, in default‒\n\n177.                 return super().default(o)\n\n178.\n\n179.         \"\"\"\n\n180.         raise TypeError(f'Object of type {o.__class__.__name__} '\n\n181.                         f'is not JSON serializable')\n\n182.\n\n183.     def encode(self, o):\n\nFile /usr/lib/python3.12/json/encoder.py, line 258, in iterencode+\n\nFile /usr/lib/python3.12/json/encoder.py, line 200, in encode+\n\nFile /usr/lib/python3.12/json/__init__.py, line 238, in dumps+\n\nFile [server_path], line 658, in htmlsafe_json_dumps+\n\nFile [server_path], line 1714, in do_tojson+\n\nFile templates/submit_update.html, line 130, in block 'content'+\n\nFile templates/base.html, line 76, in top-level template code+\n\nFile templates/submit_update.html, line 1, in top-level template code+\n\nFile [server_path], line 939, in handle_exception+\n\nFile [server_path], line 1304, in render+\n\nFile [server_path], line 40, in __init__+\n\nFile [server_path], line 209, in TemplateResponse+\n\nFile [server_path], line 419, in update_form+\n\nFile [server_path], line 212, in run_endpoint_function+\n\nFile [server_path], line 301, in app+\n\nFile [server_path], line 73, in app+\n\nFile [server_path], line 51, in wrapped_app+\n\nFile [server_path], line 62, in wrapped_app+\n\nFile [server_path], line 76, in app+\n\nFile [server_path], line 288, in handle+\n\nFile [server_path], line 735, in app+\n\nFile [server_path], line 715, in __call__+\n\nFile [server_path], line 51, in wrapped_app+\n\nFile [server_path], line 62, in wrapped_app+\n\nFile [server_path][REDACTED].py, line 62, in __call__+\n\nFile [server_path], line 149, in coro+\n\nFile [server_path], line 163, in call_next+\n\nFile [server_path], line 14, in dispatch+\n\nFile [server_path], line 187, in __call__+\n\nFile [server_path], line 83, in collapse_excgroups+\n\nFile /usr/lib/python3.12/contextlib.py, line 158, in __exit__+\n\nFile [server_path], line 185, in __call__+\n\nFile [server_path], line 149, in coro+\n\nFile [server_path], line 163, in call_next+\n\nFile [server_path], line 80, in dispatch+\n\nFile [server_path], line 187, in __call__+\n\nFile [server_path], line 83, in collapse_excgroups+\n\nFile /usr/lib/python3.12/contextlib.py, line 158, in __exit__+\n\nFile [server_path], line 185, in __call__+\n\nFile [server_path], line 159, in __call__+\n\nFile [server_path], line 165, in __call__). When a paper is in a review stage it has to be locked, and the only updates possible are response to reviews. We cannot have authors change papers post reviews. The editing history has to be auditable and unique. Let's think about this carefully since we are running a five stage process.",
+          "timestamp": "2026-03-02T16:22:21.463Z",
+          "prompt_type": "procedural",
+          "session_index": 4,
+          "global_index": 22
+        }
+      ]
+    },
+    {
+      "id": "c1752ce3-0d0b-4016-8c57-e3e03bf1f00b",
+      "title": "Paper Locking & Review Stages",
+      "started_at": "2026-03-03T09:02:52.759Z",
+      "prompt_count": 38,
+      "prompts": [
+        {
+          "text": "We are working on the dev branch of this project on improvements to the submission and AI review system. I just submitted a new version of the paper [dev_url] but the PDF is not showing up on the site (it says file not found). Let's review the submit new version pipeline to avoid ths type of mistakes.",
+          "timestamp": "2026-03-03T09:02:52.759Z",
+          "prompt_type": "procedural",
+          "session_index": 1,
+          "global_index": 23
+        },
+        {
+          "text": "When testing the AI-review system with a new version of the paper the system stop me from advancing at this screen by saying that the AI Review was already submitted ([dev_url] We have to allow a new AI review for papers that at some point returned to the first step (submitted) and are going thorugh the pipeline again. We need to keep also keep track of the history of stages of each paper and add information about that to the admin panel.",
+          "timestamp": "2026-03-03T09:09:02.248Z",
+          "prompt_type": "procedural",
+          "session_index": 2,
+          "global_index": 24
+        },
+        {
+          "text": "The production server has the same email validation issue we identfied and fixed in dev yesterday. We need to promote this fix to production without pushing any of the other changes. Is that possible?",
+          "timestamp": "2026-03-03T16:14:45.260Z",
+          "prompt_type": "procedural",
+          "session_index": 3,
+          "global_index": 25
+        },
+        {
+          "text": "The three ideas 1 to 3 in your options. We need to capture emails better, verifiy and validate them with the account we added to smtp, and capture multiple emails.",
+          "timestamp": "2026-03-03T16:16:12.750Z",
+          "prompt_type": "procedural",
+          "session_index": 4,
+          "global_index": 26
+        },
+        {
+          "text": "Did we have any submission that got stuck in prod because of this? Can we send a reminder to those people to complete their submissions now?",
+          "timestamp": "2026-03-03T16:27:31.636Z",
+          "prompt_type": "procedural",
+          "session_index": 5,
+          "global_index": 27
+        },
+        {
+          "text": "Yes. Go ahead please.",
+          "timestamp": "2026-03-03T16:29:11.941Z",
+          "prompt_type": "procedural",
+          "session_index": 6,
+          "global_index": 28
+        },
+        {
+          "text": "Let's go back to working on dev. There, the page on the ai-review [dev_url] needs to have an option to save and provide the ability for the user to return to that page later. It is a long form that we cannot expect the user to complete in one try.",
+          "timestamp": "2026-03-03T16:58:06.431Z",
+          "prompt_type": "procedural",
+          "session_index": 7,
+          "global_index": 29
+        },
+        {
+          "text": "We are going to continue working on the journal of AI generated papers hosted at jaigp.org. Today, we are working on the dev branch, and we will need to update the logic for AI reviewed papers to include a new endpoint focused on revised papers  here is the documentation of the API in html https://www.dropbox.[REDACTED]-API-DocsRevise.html?rlkey=5aaw24seekcwuppc8jivzv105&dl=0 and in PDF form https://www.dropbox.[REDACTED]-API-REVISE.pdf?rlkey=5e5kp7gva2kdhomf9mu06uw8p&dl=0 . The goal of today's update is to complete the AI review part of the submission process which we have right now in the dev branch. The pipeline now needs to include an option to resubmit a paper using the /revise method of the API. This means we need to track the {sessionID} of a paper when we first submit it, so that we can then submit a revised manuscript that is an updated version of the same paper, but addressing the comments of the original submission. The revise endpoint will score each comment in a a four point scale and also includes a desk reject option in case the resubmission is not good enough. Uploads a revised PDF and an author response, then evaluates how well the original review comments were addressed. This is a synchronous endpoint — it blocks until the evaluation is complete and returns the scored results.\n\nThe review session must be completed before a revision can be submitted.\n\nEach comment from the original review is scored on a 1–4 scale:\n\n1 — Ignored: No mention in author response, no changes in paper.\n2 — Weakly acknowledged: Author mentions the comment but no meaningful paper changes.\n3 — Well acknowledged: Meaningful paper changes that substantially address the concern.\n4 — Fully addressed: Thorough changes that completely resolve the concern.\nThe endpoint may also return a desk rejection (deskReject: true) if the submission is non-substantive, contains manipulation attempts, or includes unprofessional language. We will test this by submitting a new version of a paper addressing the comments. We need to generate a resubmission screen that focuses on submitting a new version of the paper, as well as a document with point by point response to the reviewers. The new version of the paper will be submitted to the revise endpoint for evaluation. Please let me know if you have any questions about this before you proceed. This is an important refactor and we need to make sure we do not mess up anything we have working at the moment.",
+          "timestamp": "2026-03-15T10:05:42.002Z",
+          "prompt_type": "procedural",
+          "session_index": 8,
+          "global_index": 37
+        },
+        {
+          "text": "Thanks. For 1, let's replace the author response format with a simple \"upload\" response dialogue. Authors should upload their revised papers and response, and we will need to make both of these available in the paper's page once the paper completes the AI review stage. For 2, the new criteria seems reasonable. We should also provide feedback for the user, in case some of the comments are below 3, so they can focus on that. In the author's page, after paper has been reviewed, we should provide also information of each comment and how it was scored by the AI reviewer. We want to make the process as auditable and transparent as possible. If paper is Desk Rejected it goes back to stage 1, and would need to collect and new endorsement to move to stage 2 and becoming eligible for AI review again. The endorser cannot be the same as in the last time. For 4, yes, the author can revise again, up to three times. They should be informed about this prominently each time they are about to submit, so they know they are running out of attempts.",
+          "timestamp": "2026-03-15T11:10:43.786Z",
+          "prompt_type": "procedural",
+          "session_index": 9,
+          "global_index": 38
+        },
+        {
+          "text": "There is one important detail, what is send back for revision as a response to the API is not the author response letter, but the revised manuscript file.",
+          "timestamp": "2026-03-15T11:16:11.266Z",
+          "prompt_type": "procedural",
+          "session_index": 10,
+          "global_index": 39
+        },
+        {
+          "text": "Now we would like to migrate the production datasets and papers to the dev version to continue testing.",
+          "timestamp": "2026-03-15T12:53:42.375Z",
+          "prompt_type": "procedural",
+          "session_index": 11,
+          "global_index": 40
+        },
+        {
+          "text": "Now let's continue working on the dev branch. I would like to tighten the antispamming criteria, to avoid authors with no track record to spam the journal with slop publications. Right now we ask only for ORCID verification, but we are getting mostly submissions from authors with 0 orcid words. Let's discuss a set fo filters that we can use to keep them at bay. For instance, we can limit the number of papers submitted in a period of time, or demand higher verification in terms of endorsements for authors that are lower in the ORCID badge system. Also, authors can get submission credits based on their ability to push articles to the more advanced stages of the journal. Also, let's discuss how we present the papers in the homepage, so we show the best we have, instead of just the latest, without it looking empty or dated.",
+          "timestamp": "2026-03-15T12:59:10.857Z",
+          "prompt_type": "key",
+          "session_index": 12,
+          "global_index": 41
+        },
+        {
+          "text": "I think it is important to keep it simple enough that people can easily understand the rule. The Hard submission gate is good and simple. We could add that to the dev version already and include it in the about page. Still, we might want authors with 0 works, but they can have only one concurrent paper in the pipeline at any point in time and need two endorsers that are bronze or higher to move on to AI review. Authors that are bronze or higher can concurrently have more papers on the pipeline. We also want to keep track of the endorsers, so we need to include information about the papers they've endorsed and their fate in their author's page. Also, I am thinking that we could run the papers by an AI at time of submission to see if they pass muster as papers trying to make a contribution, or if they are gibberish essays. This could be done with an API call to Claude and a good prompt. But I am not sure what we would get. We could try this with the current 46 papers we have and see how they would be classified, so I can check against my intuition of what looks legit.",
+          "timestamp": "2026-03-15T13:08:31.744Z",
+          "prompt_type": "procedural",
+          "session_index": 13,
+          "global_index": 42
+        },
+        {
+          "text": "1 sounds good. 2 agree that the pipeline is stages 1 to 4. 3. Both endorsements need to come in before the paper becomes eligible for AI review. 4. That sounds right. Let's keep it purely informational right now.",
+          "timestamp": "2026-03-15T13:13:52.943Z",
+          "prompt_type": "procedural",
+          "session_index": 14,
+          "global_index": 43
+        },
+        {
+          "text": "[Key reference redacted]",
+          "timestamp": "2026-03-15T13:23:57.717Z",
+          "prompt_type": "procedural",
+          "session_index": 15,
+          "global_index": 44
+        },
+        {
+          "text": "[REDACTED]",
+          "timestamp": "2026-03-15T13:24:03.097Z",
+          "prompt_type": "procedural",
+          "session_index": 16,
+          "global_index": 45
+        },
+        {
+          "text": "provide me with a full list of all the papers including human author, the number, the status, sorted by status",
+          "timestamp": "2026-03-15T14:13:23.834Z",
+          "prompt_type": "procedural",
+          "session_index": 17,
+          "global_index": 46
+        },
+        {
+          "text": "This list makes sence. Show me the prompt you used to evaluate them with the API. Let's also think of a procedure where we can implement these changes, rejecting papers at the first stage with this screening process and communicating it to authors. We need a way to do this first rejection swiftly at time of submission.",
+          "timestamp": "2026-03-15T14:39:53.066Z",
+          "prompt_type": "procedural",
+          "session_index": 18,
+          "global_index": 47
+        },
+        {
+          "text": "I think it is ok if we take a few minutes or more to screen papers. No need for this immediate. Also, no need to appeal. Papers that are rejected should be deleted from the system and authors can start a new submission. For this, we need to have some place where we keep track of the submissions and the screening status, so that the same author doesn't get to submit again and again until they get something to pass. Maybe each rejection at the screening stage comes with a 48 hour cooldown period for that author. I agree on feeding the full abstract of the prompt. Also, the Journal is about papers that are AI Generated, so papers that are AI generated are ok. You can still generate good or bad papers using AI and this experiment is an effort to help find the former. Let's think of a new plan based on this and what you suggested earlier.",
+          "timestamp": "2026-03-15T14:46:11.745Z",
+          "prompt_type": "procedural",
+          "session_index": 19,
+          "global_index": 48
+        },
+        {
+          "text": "I think that sending verification is good as a first step, even if the paper is rejected, so we can validate the email and add the user to our records. We may need to contact them later. Also, human verification is very expensive and not possible at the moment, so we should reject borderline papers with a different message with straight rejection. One that would encourage the author to resubmit. A borderline doesn't consume a strike in the same way that a straight up rejection, meaning that the author is still qualified to try again. But three borderlines on a row are a strike. For the Paper Pipeline section in the homepage, we should add a new stage 0. Stage 0 is submitted, and stage 1 is AI screened. The other stages, 2 Endorsed, 3 AI review, etc. remain the same. Let's think of the plan with this modifications.",
+          "timestamp": "2026-03-15T14:55:13.179Z",
+          "prompt_type": "procedural",
+          "session_index": 20,
+          "global_index": 49
+        },
+        {
+          "text": "Update the homepage, the papers pipeline page on the admin panel, and the author's pages and the papers pages in dev to include these changes. Make sure that the new paper screening model is consistent trhoughout the site. Update the about [REDACTED] reflects this new model.",
+          "timestamp": "2026-03-15T15:21:39.377Z",
+          "prompt_type": "procedural",
+          "session_index": 21,
+          "global_index": 50
+        },
+        {
+          "text": "Let's review this. Many of the papers that appear now in AI screened, like those from Joaquim Machado, are papers that were rejected when we run the screen before. Also, let's make sure we are not missing any papers. Let's bring the latest papers from the production environment to dev and run the screen from scratch.",
+          "timestamp": "2026-03-15T15:39:23.936Z",
+          "prompt_type": "procedural",
+          "session_index": 22,
+          "global_index": 51
+        },
+        {
+          "text": "In the admin papers-pipeline dashboard we need to include the rejected papers too [dev_url] and in the home page, we need to include level 0 with the papers rejected by the AI screen. Also, in the author's page the rejected papers should appear. It is likely that the author will delete the paper when it gets rejected, but we should keep track of it, so they get counted towards the cooldowns and strikes. They should always remain in the admin panel, so we have a trace to rely on in case there are disputes.",
+          "timestamp": "2026-03-15T17:17:06.595Z",
+          "prompt_type": "procedural",
+          "session_index": 23,
+          "global_index": 52
+        },
+        {
+          "text": "I like the idea of communicating in the homepage what each stage means. Right now we do that for screened out, but should include a similar short explanation for all of the six stages. We also need to update the about page to include an explanation of the process that includes the idea of papers being screened out.",
+          "timestamp": "2026-03-15T19:17:46.084Z",
+          "prompt_type": "procedural",
+          "session_index": 24,
+          "global_index": 53
+        },
+        {
+          "text": "Let's change the text for Endorsed from this: \"Endorsed. A verified ORCID scholar has endorsed each of these papers, vouching for its scholarly merit. Authors have submitted their work to AI-powered peer review and are awaiting or responding to reviewer feedback.\" To this: \"Endorsed. A verified ORCID scholar has endorsed each of these papers, indicating it is eligible for AI review.\" Let's keep this distinction on mind. Endorsement is not a strong quality control, but a simple badge indicating a paper is eligible for AI review.",
+          "timestamp": "2026-03-15T19:25:37.266Z",
+          "prompt_type": "procedural",
+          "session_index": 25,
+          "global_index": 54
+        },
+        {
+          "text": "We need to make sure that papers in the AI Screened stage have a button allowing a loged in author to endorse them ([dev_url] If the author is not loged in, clicking on the button should ask them to login with ORCID.",
+          "timestamp": "2026-03-15T19:30:07.065Z",
+          "prompt_type": "procedural",
+          "session_index": 26,
+          "global_index": 55
+        },
+        {
+          "text": "When a paper like this is in AI review ([dev_url] it is not a 2 to 5 minute process, since it involves also the author producing a new version of the paper and getting it accepted by the AI reviewer. We need to update the text of AI review in progress to commuicate the longer process we have discussed.",
+          "timestamp": "2026-03-15T20:18:33.354Z",
+          "prompt_type": "procedural",
+          "session_index": 27,
+          "global_index": 56
+        },
+        {
+          "text": "The author of this paper submitted it for AI review ([dev_url] and it hangs, meaning that it shows AI review in progress, but does not continue to another page showing him the reviews. Let's check what is happening here. Is it that the reviewer3 API is not responding? Or is it that we have an issue on our end of the site?",
+          "timestamp": "2026-03-16T09:47:30.370Z",
+          "prompt_type": "procedural",
+          "session_index": 28,
+          "global_index": 57
+        },
+        {
+          "text": "In dev, on the AI review system, I got a report from a user that after resubmitting a paper, they can see the comments of the subsequent resubmissions on the website, but not on the PDFs available for download. Each resubmission needs to generate an additional PDF, so we need to look at this pipeline and make sure that the way it works satisfies the process we describe: a process where an author submits a paper for AI review, and that paper then gets resubmitted and evaluated based on whether it has addressed the comments using  the revise endpoint. The user then must be able to get the resubmission comments in PDF and in the website as they use their attempts to get the paper AI reviewed.",
+          "timestamp": "2026-03-16T14:24:28.477Z",
+          "prompt_type": "procedural",
+          "session_index": 29,
+          "global_index": 58
+        },
+        {
+          "text": "For the admin panel, we need to make the papers pipeline page sortable and filterable [dev_url]",
+          "timestamp": "2026-03-16T14:51:29.632Z",
+          "prompt_type": "procedural",
+          "session_index": 30,
+          "global_index": 59
+        },
+        {
+          "text": "Also, when an author tries to endorse its own paper, instead of saying that an error has ocurred, the message needs to explain to them how the endorsement rules work.",
+          "timestamp": "2026-03-16T14:53:48.132Z",
+          "prompt_type": "procedural",
+          "session_index": 31,
+          "global_index": 60
+        },
+        {
+          "text": "When I tried to endorse this paper [dev_url] as myself (the author) the message I got in the pop up was \"An error occurred. Please try again.\" We need to provide an explanation of what the author needs to do, not simply put that error.",
+          "timestamp": "2026-03-16T15:15:09.237Z",
+          "prompt_type": "procedural",
+          "session_index": 32,
+          "global_index": 61
+        },
+        {
+          "text": "Since resubmission is a slow process, we need to send the author a new page to wait for the resubmission and don'",
+          "timestamp": "2026-03-16T15:58:06.962Z",
+          "prompt_type": "procedural",
+          "session_index": 33,
+          "global_index": 62
+        },
+        {
+          "text": "Since resubmission is a slow process, we need to send the author a new page to wait for the resubmission and don't give them the impression this is an automatic or very quick thing. Also, after a paper passes AI review we need to include in the page all of the materials produced. This includes a possibility to look at the issues raised by the AI reviewer and the responses provided, in html format (as a webpage connected to the page of the paper) and as a downloadable pdf [dev_url] also, on the right pane of versions we need to indicate which versions a paper was on Version History\nv2 (current)\nMar 16, 2026\nRevised after AI review (attempt 1)\n\nv1\nMar 06, 2026\nInitial submission\n\nView this version → for example, version 1 of this paper went through AI screen, endorsement, and entered AI review. Version 2 is the version that exited AI review. Finally, when a paper passes AI review it is not automatically under human peer review, it is eligible for human peer review and we need to communicate that. What we have right now Human Peer Review\n\nThis paper is undergoing human peer review.",
+          "timestamp": "2026-03-16T16:02:51.708Z",
+          "prompt_type": "procedural",
+          "session_index": 34,
+          "global_index": 63
+        },
+        {
+          "text": "We need to include the langauge of eligible for peer review in the homepage as well. Right nw we have this:  Human Peer Review. These papers have cleared AI review and are now being evaluated by human peer reviewers — one suggested by the author and one drawn from the paper's references. The editorial board makes the final acceptance decision. We should mention that it is eligible, and when it is under review, we should show it is under review, but we still need to work on that system. For the next release, we will focus on the AI review sytem for now.",
+          "timestamp": "2026-03-16T16:23:55.680Z",
+          "prompt_type": "procedural",
+          "session_index": 35,
+          "global_index": 64
+        },
+        {
+          "text": "This paper should appear as endorsed nut only shows up as AI screened on the dev site [dev_url] what happened here?",
+          "timestamp": "2026-03-16T18:13:29.324Z",
+          "prompt_type": "procedural",
+          "session_index": 36,
+          "global_index": 65
+        },
+        {
+          "text": "Since we are testing the site now, let's reset this paper to the endorsed stage with no strikes.",
+          "timestamp": "2026-03-16T18:15:49.268Z",
+          "prompt_type": "procedural",
+          "session_index": 37,
+          "global_index": 66
+        },
+        {
+          "text": "A paper that passes AI review will often experience a change in its title and abstract. To accomodate this, we need to include a field for the new title and new abstract in the resubmission form, and we need to display the latest version of the title and abstract throughout the site. Also, editors with access to the Admin panel, should be able to update the title and abstract of a paper using the papers pipeline manage section [dev_url]  also the editorial board menu should allow accounts (identified by their ORCID) with the rank of editor or associate editor to access the admin menu. Finally, the users table in the admin panel [dev_url] needs to be sortable and filterable, and all fields must be visible (right now the rightmost column is mostly occluded since it is outside the box). Let's make a plan to work on these changes.",
+          "timestamp": "2026-03-17T08:11:16.154Z",
+          "prompt_type": "procedural",
+          "session_index": 38,
+          "global_index": 67
+        }
+      ]
+    },
+    {
+      "id": "f3d8adb2-45f0-4dc6-a177-2e46150f3a71",
+      "title": "AI Review Response Form & Draft Saving",
+      "started_at": "2026-03-03T17:26:00.711Z",
+      "prompt_count": 1,
+      "prompts": [
+        {
+          "text": "Also, the form to respond to AI reviews must include fields to update the Title and Abstract of the papers. These are likely to change at the time of review.",
+          "timestamp": "2026-03-03T17:26:00.711Z",
+          "prompt_type": "procedural",
+          "session_index": 1,
+          "global_index": 30
+        }
+      ]
+    },
+    {
+      "id": "706d3c3a-b89b-478a-ae8c-1bf06478906a",
+      "title": "Development Session Continuation",
+      "started_at": "2026-03-06T17:03:01.930Z",
+      "prompt_count": 4,
+      "prompts": [
+        {
+          "text": "resume JAIGP",
+          "timestamp": "2026-03-06T17:03:01.930Z",
+          "prompt_type": "procedural",
+          "session_index": 1,
+          "global_index": 31
+        },
+        {
+          "text": "Great. Also, if something is missing in the submit form I get a JSON looking error instead of an error in the [REDACTED] the submitter to fix the error. {\n  \"detail\": \"Please select at least 2 categories\"\n}",
+          "timestamp": "2026-03-06T17:06:39.789Z",
+          "prompt_type": "procedural",
+          "session_index": 2,
+          "global_index": 32
+        },
+        {
+          "text": "Great. Let's reduce the minimum number of categories that an author has to select to just one.",
+          "timestamp": "2026-03-06T17:10:42.864Z",
+          "prompt_type": "procedural",
+          "session_index": 3,
+          "global_index": 33
+        },
+        {
+          "text": "Check the site for broken links or processess to make sure everything is working. After doing that, send an email apology to any author that was unable to submit a paper inviting them to submit again.",
+          "timestamp": "2026-03-06T17:11:55.639Z",
+          "prompt_type": "procedural",
+          "session_index": 4,
+          "global_index": 34
+        }
+      ]
+    },
+    {
+      "id": "ed922c8d-25fb-4ce2-a7b9-9f50b0cb3be9",
+      "title": "Quick Fixes & Patches",
+      "started_at": "2026-03-15T09:55:33.950Z",
+      "prompt_count": 2,
+      "prompts": [
+        {
+          "text": "show me the names of the sessions I can resume from this folder",
+          "timestamp": "2026-03-15T09:55:33.950Z",
+          "prompt_type": "procedural",
+          "session_index": 1,
+          "global_index": 35
+        },
+        {
+          "text": "which one is the most recent one?",
+          "timestamp": "2026-03-15T09:55:50.959Z",
+          "prompt_type": "procedural",
+          "session_index": 2,
+          "global_index": 36
+        }
+      ]
+    },
+    {
+      "id": "0bc06c4e-44d4-417d-acab-eb88be20f6e2",
+      "title": "Admin Editing, Production Deploy & Open Prompt",
+      "started_at": "2026-03-17T08:26:38.943Z",
+      "prompt_count": 57,
+      "prompts": [
+        {
+          "text": "In the papers pipeline [dev_url] we also need a tab for papers that are pending verification, with the option for editors to delete these papers or to nudge authors. Nudge, auto generates a polite email reminding the author to verify the paper and provides a verification link to continue their submission process.  Also, the admin menu should have an option to write an email that can be send to all registered authors, or directed only to authors at a particular stage of the pipeline. That email should be sent from the google account we created for this particular project and is activated as SMTP in this server (contact@jaigp.org).",
+          "timestamp": "2026-03-17T08:26:38.943Z",
+          "prompt_type": "procedural",
+          "session_index": 1,
+          "global_index": 68
+        },
+        {
+          "text": "In production, at JAIGP.com a user reported two issues. One is that people get logged in into a different account. This is a serious issue we need to check. The other one is that users cannot delete papers. Can you check both of these on the production server, and then check that we are not making the same mistakes in the development server?",
+          "timestamp": "2026-03-18T09:04:11.412Z",
+          "prompt_type": "procedural",
+          "session_index": 2,
+          "global_index": 71
+        },
+        {
+          "text": "Can we check dev for these or similar issues. We want to make sure we are perfect when we release in a few days.",
+          "timestamp": "2026-03-18T09:20:35.422Z",
+          "prompt_type": "procedural",
+          "session_index": 3,
+          "global_index": 72
+        },
+        {
+          "text": "Thanks. Now we need to get ready for deploy. We will be working on the development branch, not in production. We will be doing several things in steps. First, I would like to bring all the papers in the production server that are not in the development server and run them through the AI screening system we have. Also, we need to make sure that any new paper that comes in is run automatically through the AI screen (first step of our pipeline).",
+          "timestamp": "2026-03-18T17:29:37.562Z",
+          "prompt_type": "procedural",
+          "session_index": 4,
+          "global_index": 73
+        },
+        {
+          "text": "Now that we have all papers in dev, we need to send an email to all authors that have a paper at any stage of the process on the dev server, explaining them that in a few days we will be introducing a new review pipeline, and that this will affect their papers. We need to frame this delicately, since some authors that have been submitting a lot of papers will see many of their papers screened out right away. That will be dissapointing for them. Our objective at this stage is to both, be fair, and raise the bar. So let's work on the draft of that email text first, explaining the pipeline well and what it means to them, and once we agree on that, we can send the email to all authors with papers on the pipeline.",
+          "timestamp": "2026-03-18T17:41:15.565Z",
+          "prompt_type": "procedural",
+          "session_index": 5,
+          "global_index": 74
+        },
+        {
+          "text": "This is good, but I think we need to work on a few things. First, we need to explain the cooldowns that happen as papers get screened out. Also, we need to epxlain how authors with different ORCID badges are affected by this and why. Also, we do not want to communicate this as \"that every published paper\" since many papers will not get to publication. Most won't. What we can promise is to provide a process that attempts to be a fair pipeline, but where not all papers will make it far.",
+          "timestamp": "2026-03-18T17:44:43.581Z",
+          "prompt_type": "procedural",
+          "session_index": 6,
+          "global_index": 75
+        },
+        {
+          "text": "Thanks. For 1, Badge Bypass, please check the code. We need to make sure we are consistent with what we do and say. I am ok with all papers being screened, even if someone is gold. Making the process uniform is simpler, and authors with a good track record will have no problems passing the first screen. Also, When describing the stages, we need to communicate how a stage enables the next one. For example, a paper needs to receive an endorsement to become eligible for AI review. We should also mention that the AI review is powered by reviewer3.com and provide a link to their site.",
+          "timestamp": "2026-03-18T17:49:36.395Z",
+          "prompt_type": "procedural",
+          "session_index": 7,
+          "global_index": 76
+        },
+        {
+          "text": "That's great. I think we are almost there. One important point is that this update will only bring papers to AI review, since the Human peer review system will be introduced later (we still need to work on that).",
+          "timestamp": "2026-03-18T17:54:45.134Z",
+          "prompt_type": "procedural",
+          "session_index": 8,
+          "global_index": 77
+        },
+        {
+          "text": "Instead of comming soon, let's say something like coming in the future, since it might take us a bit of time to get there. Also, for the title, let's focus it on the introduction of AI review. For dear {name} will you be able to send separate emails to each with their names? If not, let's just use Dear Author and keep it simple.",
+          "timestamp": "2026-03-18T18:02:20.383Z",
+          "prompt_type": "procedural",
+          "session_index": 9,
+          "global_index": 78
+        },
+        {
+          "text": "Let's test this email by sending it to the authors of the papers that have cleared the AI review stage.",
+          "timestamp": "2026-03-18T18:03:35.270Z",
+          "prompt_type": "procedural",
+          "session_index": 10,
+          "global_index": 79
+        },
+        {
+          "text": "Let's now send this email to all remainig authors",
+          "timestamp": "2026-03-18T18:10:59.035Z",
+          "prompt_type": "procedural",
+          "session_index": 11,
+          "global_index": 80
+        },
+        {
+          "text": "Let's now talk about the overall design of the wesbite. Right now it is very wireframey, and we would like this update to move it to something that is a bit more polished. We will be releasing many new features, so the design needs to show that maturation of the product. Creating an AI review system is a first in the world, that we should be proud of, and we are also proud of our relationship with reviewer3.com that we need to make more visible whenever that is appropriate. Also, the journal is about experimentation in the open, and the benefits of that, so we can embrace that spirit. This release will focus on the AI review, and will leave the human peer review as a forthcoming feature (once we have enough papers past AI review) so we need to communicate that as well in the home, about, etc. Let's discuss how we can improve the design with these goals in mind. Also, pages of papers that have moved through the pipeline (like [dev_url] have a lot of banners on the top and we should be able to find more elegant ways to pack that information, without using the full width of the screen, while making access to the review materials more prominent. Let's discuss how we can improve the design with these goals in mind. Also, the review summary view should show be reversed time ordered, with the final review first, not last [dev_url]   let's talk about this.",
+          "timestamp": "2026-03-19T08:05:20.991Z",
+          "prompt_type": "procedural",
+          "session_index": 12,
+          "global_index": 81
+        },
+        {
+          "text": "I think this is mostly good. For the hero, I would prefer something less bombastic and more along the lines that we are experimenting in the open to understand what AI generated research can be.  Let's move ahead with this changes and see where we get. Let's make sure we do not mess up any of the functionality we have while working on the design.",
+          "timestamp": "2026-03-19T08:11:35.406Z",
+          "prompt_type": "procedural",
+          "session_index": 13,
+          "global_index": 82
+        },
+        {
+          "text": "The paper page ([dev_url] was greatly improved. I think there are a few things we can improve further. The \"Stage 4: Human Peer Review\" indicator in this example is redundant, since we already have the breadcrumbs and the review status. So let's remobe that element and add the stage to the review status dialogue on the right. Also, let's put information about the authors (at least their names) right under the title of the paper (as it is usually done). Also, in the review page we should number each of the comments/sections to make them easier to read and refer to. In the homepage, we need to bring back the title of the journal as the main title of the page \"Journal for AI Generated Papers\" and we can make a shorter tag line along the lines: JAIGP is an open exploration on AI generated research. You can rephrase this, but avoid the word experiment. After the hero, we can include text about our partnership with reviewer3. For the tabs the default view should be the one with the papers that are more advanced in the pipeline, and we should not divide them so strongly by dates, so that each row is always filled with content. We should have them reversed time sorted based on when they succeeded at the last stage, and include a breadcrumb with the key dates (when where they submitted and when they cleared the last stage that they cleared). We should move the How it Works content to above the tabs with papers. And the titles of the sections should use the write tense (e.g. AI Review Papers -> AI Reviewed Papers). Also, the papers should show in the last stage they cleared, not the next stage. So for instance, a paper that clears AI review, should be shown at stage 3 AI review, a paper that is endorsed but not yet AI reviewed should show at stage 2, etc.",
+          "timestamp": "2026-03-19T08:36:40.002Z",
+          "prompt_type": "procedural",
+          "session_index": 14,
+          "global_index": 83
+        },
+        {
+          "text": "By the way, this paper's PDF  is just a page of blank text [dev_url] but when I copy paste the text into another application I can see the text. Other PDFs render fine, so there is something wrong with this particular PDF.",
+          "timestamp": "2026-03-19T08:52:33.973Z",
+          "prompt_type": "procedural",
+          "session_index": 15,
+          "global_index": 84
+        },
+        {
+          "text": "Thanks. Can we make sure that we detect and apply this solution for similar problems in the future at the time of submission. Or detect it and pop up a warning for the users asking them to parse their PDF into pages if we detect this problem? What solution you think is best?",
+          "timestamp": "2026-03-19T08:57:13.723Z",
+          "prompt_type": "procedural",
+          "session_index": 16,
+          "global_index": 85
+        },
+        {
+          "text": "I would like us to now move the development server to production. This is a delicate operation. First, we need to bring any paper that was submitted to production that is not in the development server to the development server, and screen it as all other papers. We also need to make sure we reconcyle the database of users. Once we have that ready, we should check that everything is working on ok and move the development environment to production. Let's do this very carefully.",
+          "timestamp": "2026-03-20T17:03:07.568Z",
+          "prompt_type": "procedural",
+          "session_index": 17,
+          "global_index": 86
+        },
+        {
+          "text": "This is great. Thanks!",
+          "timestamp": "2026-03-20T17:36:05.352Z",
+          "prompt_type": "procedural",
+          "session_index": 18,
+          "global_index": 87
+        },
+        {
+          "text": "I would like to start working on a new feature. We are going to work on production this time. I would like to create a feature called \"Open Prompt\" it would be a top level menu for all users called \"prompt\" that would enter into a screen where a user will be able to see all of the prompts that have been created to make jaigp. We will need to extract all of the prompts that are already in this computer and put them in an easy to scroll and read page as an archive. As this are the prompts that initiated the system. Then, add an interface in which a any user can suggest a prompt. Suggested prompts then can be voted with up and down arrows (green and red) and sorted by date, number of ups, downs, and divisiveness a measure of how split is the vote. Users will contribute posts with their ORCID identity. Let's start working on this feature.",
+          "timestamp": "2026-03-20T17:41:33.037Z",
+          "prompt_type": "key",
+          "session_index": 19,
+          "global_index": 88
+        },
+        {
+          "text": "Make the community suggestions the default. Show always the last prompt runs, up to the last 200 words well spaced in paragraphs and  presented prominently with the text \"Last Prompt.\" There is also a prominent next prompt that a person can suggest. Underneath the suggestion box, there is a list of all of the prompts that have been suggested in boxes with a vote up and vote down icon on the right of the box. The number of up, down, and net votes are shown next to the up and down arrows. We show up to 100 suggested prompts in the page before starting pagination. The table of suggested prompts can be sorted in the multiple ways we discussed.",
+          "timestamp": "2026-03-20T17:57:28.581Z",
+          "prompt_type": "procedural",
+          "session_index": 20,
+          "global_index": 89
+        },
+        {
+          "text": "We are having an issue when parsing the prompts, both in the last prompt and in the archive. In the prompts we need to show only what was written by the human, by me in that session, not by you. So we need to parse and extract those inputs, like the one I am giving you right now.",
+          "timestamp": "2026-03-20T18:03:06.567Z",
+          "prompt_type": "procedural",
+          "session_index": 21,
+          "global_index": 90
+        },
+        {
+          "text": "The last prompt being shown in the open prompt section are from three days ago. It is this one Last Prompt\n#175 · Paper Presentation Refinements · 2026-03-17\nWe need to apply these changes (tex text support and abstract) to the dev version of the server. When it should be the one I am just submitting right now.",
+          "timestamp": "2026-03-20T18:11:59.787Z",
+          "prompt_type": "procedural",
+          "session_index": 22,
+          "global_index": 91
+        },
+        {
+          "text": "Now let us work on getting the human prompts only to the archive section. The archive section now shows machine like prompts generated internally by Claude.",
+          "timestamp": "2026-03-20T18:19:15.340Z",
+          "prompt_type": "procedural",
+          "session_index": 23,
+          "global_index": 92
+        },
+        {
+          "text": "The prompts in the archive section should include also the prompts from today. Even this one. Also, the archive section needs to provide a bulk download of all the prompts if anyone wants to get it, and a URL that would be easy for a bot to learn and detect.",
+          "timestamp": "2026-03-20T18:23:28.321Z",
+          "prompt_type": "procedural",
+          "session_index": 24,
+          "global_index": 93
+        },
+        {
+          "text": "Let us search for any session from Feb 13, maybe before I named this project jaigp. We should have prompts there that are from earlier. Also, I dont see posts from today March 20 in the archive. The latest archive prompts are annotated as 2026-03-17",
+          "timestamp": "2026-03-20T18:31:04.497Z",
+          "prompt_type": "procedural",
+          "session_index": 25,
+          "global_index": 94
+        },
+        {
+          "text": "The archive should run only until I tell you. At that moment we will close the archive, freeze the features of the website, and launch and wait to get suggested prompts. We need to also strip any information from the archive that could be considered sensitive, like paths username sever names, IP addresses, API keys, etc. The files of the archives must not have this information at all. This is not something we can mask on the frontend, we need to eliminate it completely from the archive fails, which starting soon, will be static and never regenerated. Then, we need to work on a different and also important feature for the community suggestions page. First, it has to look more like a social media feed. The user names had to feed to their accounts and should appear on top. We can make it look a bit more like threads, X, or bluesky. Also, we need to create a page and document that very clearly explain the current rules of the journals. That page should be able to be generated from the history of prompts and from you doing an inspection to the system and checking all of the rules and processes we have in place to manage papers through the pipeline, authenticate and badge authors, etc. Make the rules page colored and bulleted, so the rules are easy to read and in diagrams that explain their flow as necessary.",
+          "timestamp": "2026-03-20T18:45:06.526Z",
+          "prompt_type": "procedural",
+          "session_index": 26,
+          "global_index": 95
+        },
+        {
+          "text": "I just added credits. Try the last prompt again.",
+          "timestamp": "2026-03-20T18:47:07.007Z",
+          "prompt_type": "procedural",
+          "session_index": 27,
+          "global_index": 96
+        },
+        {
+          "text": "Try again.",
+          "timestamp": "2026-03-20T18:50:54.033Z",
+          "prompt_type": "procedural",
+          "session_index": 28,
+          "global_index": 97
+        },
+        {
+          "text": "I added credits like 5 minutes ago.",
+          "timestamp": "2026-03-20T18:51:10.758Z",
+          "prompt_type": "procedural",
+          "session_index": 29,
+          "global_index": 98
+        },
+        {
+          "text": "The archive should run only until I tell you. At that moment we will close the       \narchive, freeze the features of the website, and launch and wait to get suggested      \nprompts. We need to also strip any information from the archive that could be          \nconsidered sensitive, like paths username sever names, IP addresses, API keys, etc.    \nThe files of the archives must not have this information at all. This is not something \n we can mask on the frontend, we need to eliminate it completely from the archive      \nfails, which starting soon, will be static and never regenerated. Then, we need to     \nwork on a different and also important feature for the community suggestions page.     \nFirst, it has to look more like a social media feed. The user names had to feed to     \ntheir accounts and should appear on top. We can make it look a bit more like threads,  \nX, or bluesky. Also, we need to create a page and document that very clearly explain   \nthe current rules of the journals. That page should be able to be generated from the   \nhistory of prompts and from you doing an inspection to the system and checking all of  \nthe rules and processes we have in place to manage papers through the pipeline,        \nauthenticate and badge authors, etc. Make the rules page colored and bulleted, so the  \nrules are easy to read and in diagrams that explain their flow as necessary.",
+          "timestamp": "2026-03-20T18:51:38.921Z",
+          "prompt_type": "procedural",
+          "session_index": 30,
+          "global_index": 99
+        },
+        {
+          "text": "The archive should run only until I tell you. At that moment we will close the       \narchive, freeze the features of the website, and launch and wait to get suggested      \nprompts. We need to also strip any information from the archive that could be          \nconsidered sensitive, like paths username sever names, IP addresses, API keys, etc.    \nThe files of the archives must not have this information at all. This is not something \n we can mask on the frontend, we need to eliminate it completely from the archive      \nfails, which starting soon, will be static and never regenerated. Then, we need to     \nwork on a different and also important feature for the community suggestions page.     \nFirst, it has to look more like a social media feed. The user names had to feed to     \ntheir accounts and should appear on top. We can make it look a bit more like threads,  \nX, or bluesky. Also, we need to create a page and document that very clearly explain   \nthe current rules of the journals. That page should be able to be generated from the   \nhistory of prompts and from you doing an inspection to the system and checking all of  \nthe rules and processes we have in place to manage papers through the pipeline,        \nauthenticate and badge authors, etc. Make the rules page colored and bulleted, so the  \nrules are easy to read and in diagrams that explain their flow as necessary.",
+          "timestamp": "2026-03-20T18:51:45.462Z",
+          "prompt_type": "procedural",
+          "session_index": 31,
+          "global_index": 100
+        },
+        {
+          "text": "The archive should run only until I tell you. At that moment we will close the       \narchive, freeze the features of the website, and launch and wait to get suggested      \nprompts. We need to also strip any information from the archive that could be          \nconsidered sensitive, like paths username sever names, IP addresses, API keys, etc.    \nThe files of the archives must not have this information at all. This is not something \n we can mask on the frontend, we need to eliminate it completely from the archive      \nfails, which starting soon, will be static and never regenerated. Then, we need to     \nwork on a different and also important feature for the community suggestions page.     \nFirst, it has to look more like a social media feed. The user names had to feed to     \ntheir accounts and should appear on top. We can make it look a bit more like threads,  \nX, or bluesky. Also, we need to create a page and document that very clearly explain   \nthe current rules of the journals. That page should be able to be generated from the   \nhistory of prompts and from you doing an inspection to the system and checking all of  \nthe rules and processes we have in place to manage papers through the pipeline,        \nauthenticate and badge authors, etc. Make the rules page colored and bulleted, so the  \nrules are easy to read and in diagrams that explain their flow as necessary.",
+          "timestamp": "2026-03-20T18:52:14.625Z",
+          "prompt_type": "procedural",
+          "session_index": 32,
+          "global_index": 101
+        },
+        {
+          "text": "The archive should run only until I tell you. At that moment we will close the       \narchive, freeze the features of the website, and launch and wait to get suggested      \nprompts. We need to also strip any information from the archive that could be          \nconsidered sensitive, like paths username sever names, IP addresses, API keys, etc.    \nThe files of the archives must not have this information at all. This is not something \n we can mask on the frontend, we need to eliminate it completely from the archive      \nfails, which starting soon, will be static and never regenerated. Then, we need to     \nwork on a different and also important feature for the community suggestions page.     \nFirst, it has to look more like a social media feed. The user names had to feed to     \ntheir accounts and should appear on top. We can make it look a bit more like threads,  \nX, or bluesky. Also, we need to create a page and document that very clearly explain   \nthe current rules of the journals. That page should be able to be generated from the   \nhistory of prompts and from you doing an inspection to the system and checking all of  \nthe rules and processes we have in place to manage papers through the pipeline,        \nauthenticate and badge authors, etc. Make the rules page colored and bulleted, so the  \nrules are easy to read and in diagrams that explain their flow as necessary.",
+          "timestamp": "2026-03-20T18:53:22.146Z",
+          "prompt_type": "procedural",
+          "session_index": 33,
+          "global_index": 102
+        },
+        {
+          "text": "The archive should run only until I tell you. At that moment we will close the       \narchive, freeze the features of the website, and launch and wait to get suggested      \nprompts. We need to also strip any information from the archive that could be          \nconsidered sensitive, like paths username sever names, IP addresses, API keys, etc.    \nThe files of the archives must not have this information at all. This is not something \n we can mask on the frontend, we need to eliminate it completely from the archive      \nfails, which starting soon, will be static and never regenerated. Then, we need to     \nwork on a different and also important feature for the community suggestions page.     \nFirst, it has to look more like a social media feed. The user names had to feed to     \ntheir accounts and should appear on top. We can make it look a bit more like threads,  \nX, or bluesky. Also, we need to create a page and document that very clearly explain   \nthe current rules of the journals. That page should be able to be generated from the   \nhistory of prompts and from you doing an inspection to the system and checking all of  \nthe rules and processes we have in place to manage papers through the pipeline,        \nauthenticate and badge authors, etc. Make the rules page colored and bulleted, so the  \nrules are easy to read and in diagrams that explain their flow as necessary.",
+          "timestamp": "2026-03-20T18:53:56.714Z",
+          "prompt_type": "procedural",
+          "session_index": 34,
+          "global_index": 103
+        },
+        {
+          "text": "The archive should run only until I tell you. At that moment we will close the       \n                                                                                       \narchive, freeze the features of the website, and launch and wait to get suggested      \n                                                                                       \nprompts. We need to also strip any information from the archive that could be          \n                                                                                       \nconsidered sensitive, like paths username sever names, IP addresses, API keys, etc.    \n                                                                                       \nThe files of the archives must not have this information at all. This is not something \n                                                                                       \n we can mask on the frontend, we need to eliminate it completely from the archive      \n                                                                                       \nfails, which starting soon, will be static and never regenerated. Then, we need to     \n                                                                                       \nwork on a different and also important feature for the community suggestions page.     \n                                                                                       \nFirst, it has to look more like a social media feed. The user names had to feed to     \n                                                                                       \ntheir accounts and should appear on top. We can make it look a bit more like threads,  \n                                                                                       \nX, or bluesky. Also, we need to create a page and document that very clearly explain   \n                                                                                       \nthe current rules of the journals. That page should be able to be generated from the   \n                                                                                       \nhistory of prompts and from you doing an inspection to the system and checking all of  \n                                                                                       \nthe rules and processes we have in place to manage papers through the pipeline,        \n                                                                                       \nauthenticate and badge authors, etc. Make the rules page colored and bulleted, so the  \n                                                                                       \nrules are easy to read and in diagrams that explain their flow as necessary.",
+          "timestamp": "2026-03-20T18:58:54.865Z",
+          "prompt_type": "procedural",
+          "session_index": 35,
+          "global_index": 105
+        },
+        {
+          "text": "Great. Now, let's make the last prompt smaller, to make room for the next prompt suggestion. The next prompt is a single dialogue box. No title, no context. The character limit is 5000. The icon of the account posting is shown next to the dialogue ready to post, like in a social media website. If the account doesn't have an image, it shows the letter of their first name in a blue square, as we have been doing it in the site. Also, on a very different topic, here is the logo of reviewer3 The archive should run only until I tell you. At that moment we will close the       \n                                                                                       \narchive, freeze the features of the website, and launch and wait to get suggested      \n                                                                                       \nprompts. We need to also strip any information from the archive that could be          \n                                                                                       \nconsidered sensitive, like paths username sever names, IP addresses, API keys, etc.    \n                                                                                       \nThe files of the archives must not have this information at all. This is not something \n                                                                                       \n we can mask on the frontend, we need to eliminate it completely from the archive      \n                                                                                       \nfails, which starting soon, will be static and never regenerated. Then, we need to     \n                                                                                       \nwork on a different and also important feature for the community suggestions page.     \n                                                                                       \nFirst, it has to look more like a social media feed. The user names had to feed to     \n                                                                                       \ntheir accounts and should appear on top. We can make it look a bit more like threads,  \n                                                                                       \nX, or bluesky. Also, we need to create a page and document that very clearly explain   \n                                                                                       \nthe current rules of the journals. That page should be able to be generated from the   \n                                                                                       \nhistory of prompts and from you doing an inspection to the system and checking all of  \n                                                                                       \nthe rules and processes we have in place to manage papers through the pipeline,        \n                                                                                       \nauthenticate and badge authors, etc. Make the rules page colored and bulleted, so the  \n                                                                                       \nrules are easy to read and in diagrams that explain their flow as necessary. we want to work this into the design in the homepage and in all pages where we use reviewer 3 throughout the site.",
+          "timestamp": "2026-03-20T19:13:50.698Z",
+          "prompt_type": "procedural",
+          "session_index": 36,
+          "global_index": 106
+        },
+        {
+          "text": "The rules page is great, but we need to adjust a few small things. I believe we only require one category per paper. We need to check that against the behavior of the website. At AI screening stage 0 we need to downplay the language of how strong a filter this is. This is a first and simple commonsense filter. Also, 3 rejections and the ORCID ID is blocked for six months. Also, papers that are filtered out can still be deleted by their authors, but we keep in their [REDACTED] \"Deleted Paper\" with the date of submission and withdrawal. This to be implemented in the code and described in the rules. Erased papers still get a tile on the screened out section, but designed to be smaller than the ones that are not deleted (which still can be read). They are empty graveyards of former submissions. The Rules page should have the title Rules, and should be next to the prompt word in the top navigation. The page should also have all of the collapsable elements open by default, so it is easy for a first time reader to read the rules. The Human Peer Review and the Editorial Decision need to appear at forthcoming.",
+          "timestamp": "2026-03-20T19:26:02.192Z",
+          "prompt_type": "procedural",
+          "session_index": 37,
+          "global_index": 107
+        },
+        {
+          "text": "The Human Peer Review and Editorial Decision only says forthcoming. No details.",
+          "timestamp": "2026-03-20T19:32:56.461Z",
+          "prompt_type": "procedural",
+          "session_index": 38,
+          "global_index": 108
+        },
+        {
+          "text": "It should be simpler. Just forthcoming.",
+          "timestamp": "2026-03-20T19:34:12.348Z",
+          "prompt_type": "procedural",
+          "session_index": 39,
+          "global_index": 109
+        },
+        {
+          "text": "Add simple icons next to all navigation elements and make sure the navigation scrolls together with the page, so it remains visible no matter where in the page a user is at. Also, here is a URL from where you can download the reviewer 3 logo. Work it into the reviewer 3 section and edit the section in its style. https://reviewer3.com/Logo.png",
+          "timestamp": "2026-03-20T19:36:25.691Z",
+          "prompt_type": "procedural",
+          "session_index": 40,
+          "global_index": 110
+        },
+        {
+          "text": "In the rules page, and everywhere in the website, we need to make sure that the stage 1 is never indicated as published, but only indicated as screened.",
+          "timestamp": "2026-03-20T19:39:10.551Z",
+          "prompt_type": "procedural",
+          "session_index": 41,
+          "global_index": 111
+        },
+        {
+          "text": "In the rules section, the AI powered by reviewer 3 still has to use light colored background. Now it is too contrasting. Also, we need to work the reviewer 3 logo and white bacground and black letters into its homepage section, and to its boxes in the papers section, and all of the papers involved with the AI review process. Also, the AI review process should never be said as AI peer review. It is AI review or AI powered review, depending on what works better in the sentence.",
+          "timestamp": "2026-03-20T19:42:06.328Z",
+          "prompt_type": "procedural",
+          "session_index": 42,
+          "global_index": 112
+        },
+        {
+          "text": "Now for the tagline in the homepage let's use: where humans and machines are welcomed.",
+          "timestamp": "2026-03-20T19:46:29.431Z",
+          "prompt_type": "procedural",
+          "session_index": 43,
+          "global_index": 113
+        },
+        {
+          "text": "Now below that, and in smaller fornt we include: An open exploration of what AI-generated research can be — and what it means to review it.",
+          "timestamp": "2026-03-20T19:47:10.701Z",
+          "prompt_type": "procedural",
+          "session_index": 44,
+          "global_index": 114
+        },
+        {
+          "text": "In the prompt page, de-emphasize the archive. The Suggest a Prompt is the main feature. We should also explain that prompts that are accepted to be run are not expected to one-shot a solution, but will be passed on and implemented by the team behind the journal. Now let's do a few more audits. First, let's completely test the site so it works well on mobile and across various screen sizes. Including adapting it well for very large screens as a special case. We should also up our game as much as possible on readeability of the font and its sizes. We can borrow ideas from sites like medium that have good readibility. These fonts and readibility improvements need to be passed on completely to the entire site. Let's also hide the Admin menu inside the user menu. And move the about to the end of the menus. Let's sort the menu by home rules prompt browse submit and about. Then the user. The logged in user should show thei blue letter icon, not a generic person icon. Let's also review the full page of the About page, and remove descriptions of the rules from there. Let's just indicate that for a full version of the rules users need to go to the rules page.",
+          "timestamp": "2026-03-20T19:56:41.821Z",
+          "prompt_type": "procedural",
+          "session_index": 45,
+          "global_index": 115
+        },
+        {
+          "text": "Let's rename My Profile to Profile. Let's also create another page next to prompt called discussion. In this page, users can discuss things without necessarily suggesting a prompt. They can point towards the suggested prompts since all suggested prompts had to be trackable by a unique link that displays them in a very simple page. We need to take really good care of the database linking prompts, users, and posts throughout the prompt and discussion pages. Discussions are also a social media type feed.",
+          "timestamp": "2026-03-20T20:03:10.333Z",
+          "prompt_type": "key",
+          "session_index": 46,
+          "global_index": 116
+        },
+        {
+          "text": "Each prompt that is posted can also receive comments from other users. Users can also follow each other, but right now we will have a single feed where we will be showing the posts from all users. The follower feed dynamics will be engineered later.",
+          "timestamp": "2026-03-20T20:09:43.956Z",
+          "prompt_type": "procedural",
+          "session_index": 47,
+          "global_index": 117
+        },
+        {
+          "text": "We can improve the footer a bit by organization the navigation better and by changinge the about text \"\nHome\nAbout\nBrowse\nSubmit\nTerms\nPrivacy\nAbout\nAn open experiment in AI-generated research. AI-powered review by Reviewer3.com.\n\nORCID authenticated. Open access.\" to not give the impression that this is a reviewer 3 project. We can remove them from there and just keep the tagline and the open experiment idea, and a link to the about page.",
+          "timestamp": "2026-03-20T20:14:54.288Z",
+          "prompt_type": "procedural",
+          "session_index": 48,
+          "global_index": 118
+        },
+        {
+          "text": "The Join Us in the about page needs to include pills for the discussion and prompt pages and the about next to explain our Open Prompt philosophy that is about building the journal collaboratively with those who want to participate.",
+          "timestamp": "2026-03-20T20:17:00.188Z",
+          "prompt_type": "procedural",
+          "session_index": 49,
+          "global_index": 119
+        },
+        {
+          "text": "The comments in the prompts page and the discussion page should also have up and downvotes.",
+          "timestamp": "2026-03-20T20:18:43.133Z",
+          "prompt_type": "procedural",
+          "session_index": 50,
+          "global_index": 120
+        },
+        {
+          "text": "Now let's make sure that a user can delete its post and comments at any moment. They can also delete their suggested prompts. Also they should have two profile pages, one that is the currently called \"My profile\" which should be called \"My papers\" and a profile where they and others can see all of the prompts they suggested, comments, and discussions they have participated in a tabbed format.",
+          "timestamp": "2026-03-20T20:26:13.959Z",
+          "prompt_type": "procedural",
+          "session_index": 51,
+          "global_index": 121
+        },
+        {
+          "text": "Now let's update the archive of prompts dataset and the last prompt displayed to be this prompt. The last prompt section also has to have an arrow that allows the person to look at the previous prompt. And when in the previous prompt, they can move forward to the next, or backwords to the previous after that.",
+          "timestamp": "2026-03-20T20:31:06.379Z",
+          "prompt_type": "procedural",
+          "session_index": 52,
+          "global_index": 122
+        },
+        {
+          "text": "we need to include also the prompts of this session. Right now, the last prompt shown is claude /logout which was from a previous session. Make sure we include this prompt as the last one, and that the next time I ask you to update, you include that last prompt as the last one.",
+          "timestamp": "2026-03-20T20:34:50.483Z",
+          "prompt_type": "procedural",
+          "session_index": 53,
+          "global_index": 123
+        },
+        {
+          "text": "Noe the big one. we need to make sure that the social media features of the Prompt page and the Discussion page allow users to refresh frequently and smoothly, like in a social media website. We [REDACTED] (no images, no video for now). So the solution for a social media type site should hopefully be rather scalable within the constraints we have.",
+          "timestamp": "2026-03-20T20:40:31.562Z",
+          "prompt_type": "procedural",
+          "session_index": 54,
+          "global_index": 124
+        },
+        {
+          "text": "Now let's update the share image of the journal. let's use a lighted colored background this time, and make sure we update in all pages. Let's include our tagline, and also the fact that this is the world's Open Prompting journal into one thought. Include the URL as jaigp.org too.",
+          "timestamp": "2026-03-20T20:49:22.620Z",
+          "prompt_type": "procedural",
+          "session_index": 55,
+          "global_index": 125
+        },
+        {
+          "text": "Let's also update the text in the hero to include the idea of open prompting and include four CTA buttons. Submit, Browse, and Prompt and Discuss, in a section that states that this is a community managed journal. The concept of Open Prompting and Social Prompting are things we need to own, like we own the concept of AIGPs.",
+          "timestamp": "2026-03-20T20:53:00.144Z",
+          "prompt_type": "procedural",
+          "session_index": 56,
+          "global_index": 126
+        },
+        {
+          "text": "Now in the prompt and discussion we need a summarization feature. For this we will use the API key provided. We will have a button that will say \"Summarize last 100 prompts\" which will generate a summary explaining the purpose of this setof prompts and the actions taken to fulfill those purposes from a high level view (the features being developed and a rationale for why they were developed without using too many superlatives). We should have a button also to sumamrize the last 100 comments in the discussion. Those summaries should be cached, so we do not run them each time, and should only update as the conversation updates. In the case of the discussion page we will allow a new summary every 10 minutes and in the prompt page we will have an option to summarize the suggested prompts that is separate from the summary of the prompts that have runned themselves. The title that says Suggest a Prompt in the Open Prompt page should say only Suggest and be much larger. We should also bring the readability improvements and fonts we brought to the About page, to the other pages of the jounal. the prompt page, the rules page, the home, the pages for papers, discussion, admin panels, submission funnels, etc. We should keep an organized CSS for the whole site to make sure that these stylistic changes are easy to keep on improving without having to edit to many pages separately.",
+          "timestamp": "2026-03-20T21:01:58.854Z",
+          "prompt_type": "key",
+          "session_index": 57,
+          "global_index": 127
+        }
+      ]
+    },
+    {
+      "id": "5c5d3acd-542a-4cdd-8ea0-d23c36dc0524",
+      "title": "Paper Presentation Refinements",
+      "started_at": "2026-03-17T10:30:30.226Z",
+      "prompt_count": 2,
+      "prompts": [
+        {
+          "text": "We are working on dev, doing some improvements to the way in which papers are presented. We would like to allow TEX formatting in all of a paper's metadata (title and abstracts throught the site). Also on the paper page (e.g. [dev_url] we should put the abstract above the paper PDF.",
+          "timestamp": "2026-03-17T10:30:30.226Z",
+          "prompt_type": "procedural",
+          "session_index": 1,
+          "global_index": 69
+        },
+        {
+          "text": "We need to apply these changes (tex text support and abstract) to the dev version of the server.",
+          "timestamp": "2026-03-17T11:29:03.718Z",
+          "prompt_type": "procedural",
+          "session_index": 2,
+          "global_index": 70
+        }
+      ]
+    },
+    {
+      "id": "d235d863-d710-47b2-aa62-bff0d1d5e638",
+      "title": "Archive Sanitization, Social Feed & Rules Page",
+      "started_at": "2026-03-20T18:56:42.621Z",
+      "prompt_count": 1,
+      "prompts": [
+        {
+          "text": "claude /logout",
+          "timestamp": "2026-03-20T18:56:42.621Z",
+          "prompt_type": "procedural",
+          "session_index": 1,
+          "global_index": 104
+        }
+      ]
+    },
+    {
+      "id": "91f51b23-55c0-4337-b57c-591cb390505a",
+      "title": "Typography, Summarization & Browse Improvements",
+      "started_at": "2026-03-20T21:13:28.530Z",
+      "prompt_count": 106,
+      "prompts": [
+        {
+          "text": "The font of the posts should also be much more readable on mobile. For posts in the prompts and discussion pages, as well as comments. Also, we need to improve the pages of the Browse tree and feature. When looking at a month a user should be able to immediatly see the papers by the stage of the filter, with the default being the papers that made it further down the filter than month sorted first by likes, and then in reverse temporal order.",
+          "timestamp": "2026-03-20T21:13:28.530Z",
+          "prompt_type": "procedural",
+          "session_index": 1,
+          "global_index": 128
+        },
+        {
+          "text": "In both the prompt page and the discussion page we need to make sure that the summary applies to all of the recent posts based on the window defined. The summary should mention how many posts are being summarized (e.g. summary of last 10 posts). There should also be an option to summarize the last prompts run in the archive. This will be including even the latest prompt (this one). For that we need to run a process that keeps the archive up to date and appends any new activity from the logs of the project once a minute. We should state in the archive that it is updated once a minute. We need to [REDACTED] summary option is available at the top of the Open Prompt page and that the process that runs it once a minute and appends it is not a big burden on the server.",
+          "timestamp": "2026-03-20T21:18:52.507Z",
+          "prompt_type": "procedural",
+          "session_index": 2,
+          "global_index": 129
+        },
+        {
+          "text": "On the browse page feature we need to make sure that we name the AI reviewed papers AI reviewed, not peer review (we made a mistake here https://jaigp.org/issues/2026/February?stage=4) and that we show them at the most advanced stage they achieved during that month, not the overall final stage they achieved. So a paper that was submitted in February can only be submitted, and starting at march they can be screened out, screened, or more.",
+          "timestamp": "2026-03-20T21:28:14.869Z",
+          "prompt_type": "procedural",
+          "session_index": 3,
+          "global_index": 130
+        },
+        {
+          "text": "In the open prompt version we should show the latest summary by default and pusg the last prompt with arrows to the sides box to the Archive side of the page. This should help us bring the Suggest section and the dialogue higher up the page. Also, let's change Suggest to Suggest a Prompt, Rule, or Feature, and move the smaller archive section to the right hand side of that section, so it is separate and more secondary to the main suggest feature. The summary section should run every ten minutes, but if no new prompts have been produced since the last summary, it should not estimate a new summary and keep the latest summary it has cached.",
+          "timestamp": "2026-03-20T21:42:47.285Z",
+          "prompt_type": "procedural",
+          "session_index": 4,
+          "global_index": 131
+        },
+        {
+          "text": "I cannot get the hamburger menu to work on mobile. I am using brave  on an iphone.",
+          "timestamp": "2026-03-20T21:51:02.386Z",
+          "prompt_type": "procedural",
+          "session_index": 5,
+          "global_index": 132
+        },
+        {
+          "text": "Now it works. Thanks. We also need to make the box that a person uses to type a suggested prompt expandable, since it is now to small for someone trying to write a longer prompt. The same for the discussion box.",
+          "timestamp": "2026-03-20T21:52:55.884Z",
+          "prompt_type": "procedural",
+          "session_index": 6,
+          "global_index": 133
+        },
+        {
+          "text": "In the discussion page, the prompt that summarizes should not complaint that the posts are not provided if we only have one prompt. It should just understand that this is the summary of one prompt. On the AI summary boxes we need to disclose which model we are using to summarize, I think it is Haiku, but you need to verify.",
+          "timestamp": "2026-03-20T21:57:03.108Z",
+          "prompt_type": "procedural",
+          "session_index": 7,
+          "global_index": 134
+        },
+        {
+          "text": "In the discussion page the link that say \"suggested prompt\" goes to a page that says Rate limit exceeded. Please try again later. at https://jaigp.org/prompts",
+          "timestamp": "2026-03-20T21:59:34.333Z",
+          "prompt_type": "procedural",
+          "session_index": 8,
+          "global_index": 135
+        },
+        {
+          "text": "Now https://jaigp.org/ completely says rate limit exceeded, try again later. The whole site is down.",
+          "timestamp": "2026-03-20T22:02:14.175Z",
+          "prompt_type": "procedural",
+          "session_index": 9,
+          "global_index": 136
+        },
+        {
+          "text": "I am surprised about 120 requests a minutes. I am actively developing the site, but I must reload at most a few times a minute, and generate a few summaries. The sumamries should be cached as well. So how can I be getting 120 requests per minute (that is two a second). Maybe we are making some unnecessary requests somewhere, or have some runway requests. Let's make an audit of when and where requests are happening.",
+          "timestamp": "2026-03-20T22:04:23.723Z",
+          "prompt_type": "procedural",
+          "session_index": 10,
+          "global_index": 137
+        },
+        {
+          "text": "Now let's clean up the archive page from the Open Prompt section. Instead of showing an accordeon of sections (eg Building JAIGP from Scratch 2026-02-14\n78 prompts\n\n5-Stage Peer Review Pipeline 2026-02-24\n8 prompts\n\nPaper Presentation & UI Improvements 2026-03-02\n10 prompts\n\nMulti-Email User Support 2026-03-02\n4 prompts\n\nPaper Locking & Review Stages 2026-03-03\n38 prompts\n\nAI Review Response Form & Draft Saving 2026-03-03\n) we should simply have prompts from the latest to the newest in reverse chronological order with pagination, with a default of 20 prompts per page, and navigation for the pagination that allows searching for text inside the prompts, and easily getting to any page, or change the number of prompts per page. The top of the page should still lead with the summary, but it should be a summary of the last 100 prompts.",
+          "timestamp": "2026-03-20T22:18:22.884Z",
+          "prompt_type": "procedural",
+          "session_index": 11,
+          "global_index": 138
+        },
+        {
+          "text": "Great Job Today! Thanks!",
+          "timestamp": "2026-03-20T22:24:52.687Z",
+          "prompt_type": "procedural",
+          "session_index": 12,
+          "global_index": 139
+        },
+        {
+          "text": "I will go to sleep now. Can you run an audit of the full website checking for potential broken links, or crossed routes, or other defects. Also, let's think about the security of the site and check again the terms and the onboading, so we can use the data and text provided by the users freely and creatively. Also, make sure the site is protected from attacks that could easily impersonate it as a way to get user data by malicious actors.",
+          "timestamp": "2026-03-20T22:27:37.256Z",
+          "prompt_type": "procedural",
+          "session_index": 13,
+          "global_index": 140
+        },
+        {
+          "text": "Great. Here are a few more issues and improvements. First, the user Jayson Harshbarge appears with a badge as new, but he has 14 works https://jaigp.org/auth/profile?user_id=129 . we need to revise the logic throughout the site and make sure it is consistent with the rules on the rules and the about page. Second, let's add basic formatting options for posts, such as bold and italics, in both the discussion pgae and the prompt page. Third Add reviewer 3 branding and logo to AI review Summary pages https://jaigp.org/paper/28/ai-review/summary and make sure that no section of this page, like Author response, is truncated. We need to make sure we keep a copy of the full text of each of these reviews each time we receive them, not only the text we include in this html.",
+          "timestamp": "2026-03-21T07:15:28.586Z",
+          "prompt_type": "procedural",
+          "session_index": 14,
+          "global_index": 141
+        },
+        {
+          "text": "When posting a reply on the prompts page after pressing post, the post doesn't show the posted reply automatically, making the user continue to click on the reply button multiple times. Upon reloading, the user sees it has posted the same comment many times. This is far from what the behavior should be. Pressing post should push the post and show it as published as a post or comment.",
+          "timestamp": "2026-03-21T07:24:13.099Z",
+          "prompt_type": "procedural",
+          "session_index": 15,
+          "global_index": 142
+        },
+        {
+          "text": "Now we need to add a comprehensive notification logic, so when a reply is sent to a user, or they receive an up or down vote, they get a red bubble with the number of notifications pending next to their icon on the top right. This should also include a notifications page, where they can see all of their recent notifications.Also, on the feeds, when there is a comment, the first comment or the most popular comment should be shown displayed right under the post that it is commenting, slightly indented to the right, to show it is a comment.",
+          "timestamp": "2026-03-21T07:32:40.944Z",
+          "prompt_type": "procedural",
+          "session_index": 16,
+          "global_index": 143
+        },
+        {
+          "text": "This is a good plan, but we would like to also change the icons for voting up and down to be a heart and a broken heart.",
+          "timestamp": "2026-03-21T07:42:42.343Z",
+          "prompt_type": "procedural",
+          "session_index": 17,
+          "global_index": 144
+        },
+        {
+          "text": "The broken heart icon is unclear. Looks like a heart with a dot in the middle.",
+          "timestamp": "2026-03-21T07:52:38.980Z",
+          "prompt_type": "procedural",
+          "session_index": 18,
+          "global_index": 145
+        },
+        {
+          "text": "Let's discuss about the prompt and the discussion pages. Do we need to have both separate social feeds? Or would it be simpler for us, and our users, to keep just one social feed in the site? For instance, by allowing general comments on the open prompt section of the site. How do we keep these organized, while not making it a burden for users. Maybe, in the suggest a prompt dialogue the have an option like I am suggesting a prompt, a rule, or submitting a general comment, with a very simple interface that works well also on mobile. And we assign different colors to each type of post by using a thing line around the post (e.g. prompts blue, comments light blue, rules yellow). Let's discuss this, since this is a key feature and change.",
+          "timestamp": "2026-03-21T08:03:17.324Z",
+          "prompt_type": "key",
+          "session_index": 19,
+          "global_index": 146
+        },
+        {
+          "text": "It is ok that we have no traffic or comments, since we have not announced this yet. But I agree on the merge. Let's eliminate discussion and keep only the Prompt page. For 1, let's keep it as /prompts since it makes this more modern (social feels dated). 2. We can eliminate the discussion posts. 3. It is ok to have a default, but the default should be comment, with the placeholder vanishing text \"What's on your mind?\" and for 4, we should add the suggested filters (all, prompts, rules, comments) and also we need to bring in the summarize feature from the discussion section here, so a user can build a summary of the feed, not just the prompts.",
+          "timestamp": "2026-03-21T08:08:18.258Z",
+          "prompt_type": "procedural",
+          "session_index": 20,
+          "global_index": 147
+        },
+        {
+          "text": "Can we change the two comments we have so far, the one from Jayson and the one from Cesar to the Comment category.",
+          "timestamp": "2026-03-21T08:16:57.260Z",
+          "prompt_type": "procedural",
+          "session_index": 21,
+          "global_index": 148
+        },
+        {
+          "text": "The summarize feed feature needs to incorporate both, the posts and the replies they received. That way, it is a summary of several threaded discussions.",
+          "timestamp": "2026-03-21T08:18:38.828Z",
+          "prompt_type": "procedural",
+          "session_index": 22,
+          "global_index": 149
+        },
+        {
+          "text": "It should include all replies, no need to be stingy here. We can use votes and engagement as signals that can help improve the summary, but we should keep the summary context as comprehensive as possible.",
+          "timestamp": "2026-03-21T08:21:00.271Z",
+          "prompt_type": "procedural",
+          "session_index": 23,
+          "global_index": 150
+        },
+        {
+          "text": "The AI Summary of the last 100 prompts should automatically refresh every 20 new prompts. It should mention that in the box, so users can understand that as well. This is not a time thing, but an event thing, so the logic for the refreshing is triggered every time there are 20 new prompts from the last time the summary was generated.  At the bottom of the box, it should have a link to the archive that says: read the latest prompts.",
+          "timestamp": "2026-03-21T08:24:28.167Z",
+          "prompt_type": "procedural",
+          "session_index": 24,
+          "global_index": 151
+        },
+        {
+          "text": "We should keep an archive of all the prompt summaries in the backend.",
+          "timestamp": "2026-03-21T08:26:18.646Z",
+          "prompt_type": "procedural",
+          "session_index": 25,
+          "global_index": 152
+        },
+        {
+          "text": "Great. Let's now bring all of these changes to our hithub repo. https://github.com/cesifoti/jaigp also, we need to make sure that on top of the readme, we explain that the journal is being managed directly by prompting in the command line, and that the repository is for those wanting to reuse the project and for archival and backup purposes.",
+          "timestamp": "2026-03-21T08:30:43.343Z",
+          "prompt_type": "procedural",
+          "session_index": 26,
+          "global_index": 153
+        },
+        {
+          "text": "We have made the repository public at https://github.com/cesifoti/jaigp/ we need to indicate that in the about page, and on the footer of the website. Also, in the about page text, we need to rework back in the idea that AI generated papers need a separate venue, and that JAIGP's creation was motivated by that idea.",
+          "timestamp": "2026-03-21T08:40:05.335Z",
+          "prompt_type": "procedural",
+          "session_index": 27,
+          "global_index": 154
+        },
+        {
+          "text": "We have made the repository public at https://github.com/cesifoti/jaigp/ we need to  \nindicate that in the about page, and on the footer of the website. Also, in the about  \npage text, we need to rework back in the idea that AI generated papers need a separate \n venue, and that JAIGP's creation was motivated by that idea.",
+          "timestamp": "2026-03-21T08:40:37.493Z",
+          "prompt_type": "procedural",
+          "session_index": 28,
+          "global_index": 155
+        },
+        {
+          "text": "We have made the repository public at https://github.com/cesifoti/jaigp/ we need to  \nindicate that in the about page, and on the footer of the website. Also, in the about  \npage text, we need to rework back in the idea that AI generated papers need a separate \n venue, and that JAIGP's creation was motivated by that idea.",
+          "timestamp": "2026-03-21T08:41:22.179Z",
+          "prompt_type": "procedural",
+          "session_index": 29,
+          "global_index": 156
+        },
+        {
+          "text": "We have made the repository public at https://github.com/cesifoti/jaigp/ we need to  \n                                                                                       \nindicate that in the about page, and on the footer of the website. Also, in the about  \n                                                                                       \npage text, we need to rework back in the idea that AI generated papers need a separate \n                                                                                       \n venue, and that JAIGP's creation was motivated by that idea.",
+          "timestamp": "2026-03-21T08:43:22.103Z",
+          "prompt_type": "procedural",
+          "session_index": 30,
+          "global_index": 157
+        },
+        {
+          "text": "We have made the repository public at https://github.com/cesifoti/jaigp/ we need to\nindicate that in the about page, and on the footer of the website. Also, in the about\npage text, we need to rework back in the idea that AI generated papers need a separate\nvenue, and that JAIGP's creation was motivated by that idea.",
+          "timestamp": "2026-03-21T08:45:32.872Z",
+          "prompt_type": "procedural",
+          "session_index": 31,
+          "global_index": 160
+        },
+        {
+          "text": "The prompt archive contains a full API key [REDACTED] in iterm #123 we need to be very careful at removing any URLs to dropbox API Keys usernames passwords or other senstive infomration. This information must not exist on the files we are using to create this archive. they are sensitive information. Let's think hard about this. It should be applied to all archive elements, including this prompt and all future and past prompts.",
+          "timestamp": "2026-03-21T08:49:49.439Z",
+          "prompt_type": "procedural",
+          "session_index": 32,
+          "global_index": 161
+        },
+        {
+          "text": "Let's make sure this logic works for all types of API keys, not just from Anthropic, but reviewer3 api, google APIs, open AI apis, etc.",
+          "timestamp": "2026-03-21T08:53:32.886Z",
+          "prompt_type": "procedural",
+          "session_index": 33,
+          "global_index": 162
+        },
+        {
+          "text": "We still have a few small things on the browse page https://jaigp.org/issues/2026/March the page still says 14 papers published but these papers are not published. Papers only count as published if they make it to the final stage of the process. Otherwise, they are submissions being processed. Also, in March we should have the papers that advanced stages in march, for example, the paper from johannes wachs was AI reviewed in March and should appear as AI reviewed in March.",
+          "timestamp": "2026-03-21T10:44:44.719Z",
+          "prompt_type": "procedural",
+          "session_index": 34,
+          "global_index": 163
+        },
+        {
+          "text": "In the homepage, when clicking across tabs, the whole page reloads, so the user loses where they are in the page. Ideally the tabs change in a way that doesn't force going back to the top of the page each time.",
+          "timestamp": "2026-03-21T10:48:36.828Z",
+          "prompt_type": "procedural",
+          "session_index": 35,
+          "global_index": 164
+        },
+        {
+          "text": "The text for the AI review should be changed in the homepage as well. It now says: AI-powered review by Reviewer3.com. Every endorsed paper goes through a panel of 6+ AI reviewers providing independent feedback. But AI review is an option, so the language should be that every endorsed paper is eligible for AI review and we do not need to go into details about how many AI reviewers, since that can change. Also, we need to mention that \"AI reviews are free while supplies last.\"",
+          "timestamp": "2026-03-21T10:51:30.601Z",
+          "prompt_type": "procedural",
+          "session_index": 36,
+          "global_index": 165
+        },
+        {
+          "text": "Now let me help reconcile the number of papers in the system. When I look at the homepage I see 14 screened out, 24 screened and 2 AI reviewed, for a total of 40 papers. But when I go to browse issues it says only 26 submissions https://jaigp.org/issues so something is not adding up well in the browse page. Let's really review that logic and ask me any questions if you are unsure about the intended behavior.",
+          "timestamp": "2026-03-21T11:11:44.221Z",
+          "prompt_type": "procedural",
+          "session_index": 37,
+          "global_index": 166
+        },
+        {
+          "text": "Great. That's much better. Now, let's explore the communication strategy for this announcement. We should think about what we can do on the website to communicate the changes, and what content we can generate for social media. I could do a video for X and LinkedIn, or focus on doing a post. What do you think will be more effective?",
+          "timestamp": "2026-03-21T11:15:05.341Z",
+          "prompt_type": "procedural",
+          "session_index": 38,
+          "global_index": 167
+        },
+        {
+          "text": "The website banner is unnecessary since the journal has been open for submissions for a bit more than an month by now. Maybe, we can create an about/history page by making about a collapsable menu and write a brief history of the journal. This should be partitioned into milestones and sections and should be authored by Claude. The first milestone is the creation of the journal on Feb 14, 2026. We had a lot of conversations on that day about the journal and the ideas. The second big milestone is today, which includes the launch of the review pipeline, including the AI review integration, and the social features. I can take care of the video.",
+          "timestamp": "2026-03-21T11:18:44.226Z",
+          "prompt_type": "procedural",
+          "session_index": 39,
+          "global_index": 168
+        },
+        {
+          "text": "This is great. A few notes to take in. Conceptually, the framing is that JAIGP was not about building a website or a journal, but about an open exploration focused on figuring out the rules of publishing in a world where AI can author papers in collaboration with humans. For the Journal is born section, I don't think we need to start from the Python not being installed. that's a throw away prompt. I think the real prompts we used to start the project are lost, and preceed that (should be from around 7am that day, not 8am). Let's work this into the history. Once you are done with that, give me an idea of how I should communicate this on the video by providing a script.",
+          "timestamp": "2026-03-21T11:25:52.296Z",
+          "prompt_type": "procedural",
+          "session_index": 40,
+          "global_index": 169
+        },
+        {
+          "text": "We should now do a few improvements to the archive. We want to go through all of the prompts we have and classify them as \"key\" prompt or \"procedural\" prompts. Key prompts embody ideas, and often take several procedural prompts to get executed, so if we look at the history, not all prompts matter equally. Some, embody ideas and purpose, others are about debugging. For example, prompt #19 is substantial and prompt number #20 is procedual. Read all the prompts and come up with a method to classifiy them as key or procedural. Include this disctintion in the filters used to search and browse prompts in the prompt archive, and present key pronts differently, with a bit bigger font and number, since these are highlighted.",
+          "timestamp": "2026-03-21T11:30:07.155Z",
+          "prompt_type": "procedural",
+          "session_index": 41,
+          "global_index": 170
+        },
+        {
+          "text": "I think we are being a bit too generous with what we are counting as key. For example, #242 is a very minor feature (making sure the page doesn't reload as a user changes tabs) #233 is about adding a few things into the footer. #196 is about footer organization. #164 is just a deployment. A good example of a key prompt is #166, which actually embodies an idea (Open Promp). #58 is about creating the admin console, so it is also a starting point.  Maybe we can use an LLM to classify each of these instead of a regex, embodying the idea and the examples shared here.",
+          "timestamp": "2026-03-21T11:57:10.289Z",
+          "prompt_type": "procedural",
+          "session_index": 42,
+          "global_index": 171
+        },
+        {
+          "text": "I did the updates. Now let's run the archive classification script. Also, let's make sure these env variables are never leaked into github.",
+          "timestamp": "2026-03-21T12:07:37.669Z",
+          "prompt_type": "procedural",
+          "session_index": 43,
+          "global_index": 172
+        },
+        {
+          "text": "Did we updated the github with these changes?",
+          "timestamp": "2026-03-21T12:12:50.267Z",
+          "prompt_type": "procedural",
+          "session_index": 44,
+          "global_index": 173
+        },
+        {
+          "text": "Now let's work on our github license. we want the license to give permisive use, but with attribution. It is ok to use the code for commercial purposes as well. What license gives us this?",
+          "timestamp": "2026-03-21T12:14:36.154Z",
+          "prompt_type": "procedural",
+          "session_index": 45,
+          "global_index": 174
+        },
+        {
+          "text": "Yes please.",
+          "timestamp": "2026-03-21T12:15:13.308Z",
+          "prompt_type": "procedural",
+          "session_index": 46,
+          "global_index": 175
+        },
+        {
+          "text": "Now let's look at the archive classification again. Here many minor things are still considered key. We need to be much more selective. Also, when something is redacted, we should not say what is redacted \"REDACTED_PASSWORD\" should be just \"REDACTED\". My intuition is that we should have only a handful of key prompts. No more than 10. These are the ones that got a feature started.",
+          "timestamp": "2026-03-21T12:18:26.432Z",
+          "prompt_type": "procedural",
+          "session_index": 47,
+          "global_index": 176
+        },
+        {
+          "text": "Let's now improve the submit page https://jaigp.org/submit to match the better aesthetics developed in the newer pages, like the homepage, rules page, or about page.",
+          "timestamp": "2026-03-21T16:10:45.945Z",
+          "prompt_type": "procedural",
+          "session_index": 48,
+          "global_index": 177
+        },
+        {
+          "text": "Now let's read the rules, about, history, and home pages to check for any inconsistencies in our story. Let's bring any finding here so that I can make a decision in case we need changes.",
+          "timestamp": "2026-03-21T16:13:34.919Z",
+          "prompt_type": "procedural",
+          "session_index": 49,
+          "global_index": 178
+        },
+        {
+          "text": "I think 1 is fine, since the stage 0 is before the screen. So we are just ommitting stage 0 on the homepage, which makes it easier. I would say maybe we need to update the rules page, and put AI screening as a movement from stage 0 to 1, with stage zero being submitting a paper. 2 is fine as well. 3. is a good catch, can we make those statistics dynamic? 4. Is fine. 5. Technically my name is César A. Hidalgo, so this is what we should use everywhere for the right spelling. 6. This is a good catch, let's remove community and keep prompt. Also, let's highlight prompt more since is the social feature we want people to use now. 7. We an bring in the \"Free while supplies last\" disclaimer to other places in the platform that mention the AI review. 8. I prefer forthcoming to future in this context. 9. Eligibility is fine. Author is not forced to submit, but has to if they want to get reviewed. 10. We have been using different models (Sonnet and Opus) so I think it is ok to keep it vague, or to use Claude Code to signal that we are using the CLI environment. 11. The weekend project idea is important for us, and we do put more work on the weekends, so it is ok to have the started as. Thanks!",
+          "timestamp": "2026-03-21T16:24:04.995Z",
+          "prompt_type": "procedural",
+          "session_index": 50,
+          "global_index": 179
+        },
+        {
+          "text": "In the rules page, for consitency, it would be good that every item is a transition between stages. So AI Review, should be presented as a movement from Stage 2 to 3 and Peer Review from 3 to 4.",
+          "timestamp": "2026-03-21T16:44:06.974Z",
+          "prompt_type": "procedural",
+          "session_index": 51,
+          "global_index": 180
+        },
+        {
+          "text": "Great. Now let's prepare an email we can send to all our authors, including those with papers that are pending verification, to communicate that all of the changes are live and provide a summary of the changes. Prepare a draft and show it to me here first.",
+          "timestamp": "2026-03-21T16:46:29.998Z",
+          "prompt_type": "procedural",
+          "session_index": 52,
+          "global_index": 181
+        },
+        {
+          "text": "Great, a few things. Let's say that these are changes [REDACTED] weekend, to be more precise. Also, for those with pending verification, we can resend the verification link again today. For the signature we should include Claude as well.",
+          "timestamp": "2026-03-21T16:48:52.528Z",
+          "prompt_type": "procedural",
+          "session_index": 53,
+          "global_index": 182
+        },
+        {
+          "text": "We are getting ready to launch the journal, let's do a final check of the features and text to make sure we are ready to go.",
+          "timestamp": "2026-03-22T08:12:38.947Z",
+          "prompt_type": "procedural",
+          "session_index": 54,
+          "global_index": 183
+        },
+        {
+          "text": "Let's fix 1 and 3. It is important the journal pages have unique titles and are easy to find with search or that are clear when shared in social media. For instance, a paper page when shared in social media should include the title and abstract of the paper, not be just a generic share. The sharing function is important, so we need to make the pages descriptive for sharing on whastapp, facebook, X, LinkedIn, etc.",
+          "timestamp": "2026-03-22T08:49:58.018Z",
+          "prompt_type": "procedural",
+          "session_index": 55,
+          "global_index": 184
+        },
+        {
+          "text": "Let's make the prompt archive (reading and downloading) available only to people that have logged in with an ORCID.",
+          "timestamp": "2026-03-22T09:05:12.147Z",
+          "prompt_type": "procedural",
+          "session_index": 56,
+          "global_index": 185
+        },
+        {
+          "text": "Let's check the terms and see if we can add anything saying that using the prompts available in the journal to attack the jourbal (find vulnerabilities to go against it, sabbotage it, etc.) is not allowed. Let's make this comprehensive.",
+          "timestamp": "2026-03-22T12:25:37.575Z",
+          "prompt_type": "procedural",
+          "session_index": 57,
+          "global_index": 186
+        },
+        {
+          "text": "I just finished creating a video. I ad-libbed the text, which is captured in the following captions: <?xml version=\"1.0\"?>\n<tt xmlns:vt=\"http://namespace.itunes.apple.com/itt/ttml-extension#vertical\" xmlns:ttp=\"http://www.w3.org/ns/ttml#parameter\" xmlns:ittp=\"http://www.w3.org/ns/ttml/profile/imsc1#parameter\" xmlns:tt_feature=\"http://www.w3.org/ns/ttml/feature/\" xmlns:ebutts=\"urn:ebu:tt:style\" xmlns:tts=\"http://www.w3.org/ns/ttml#styling\" xmlns:tt_extension=\"http://www.w3.org/ns/ttml/extension/\" xmlns:tt_profile=\"http://www.w3.org/ns/ttml/profile/\" xmlns:ttm=\"http://www.w3.org/ns/ttml#metadata\" xmlns:ry=\"http://namespace.itunes.apple.com/itt/ttml-extension#ruby\" xmlns:itts=\"http://www.w3.org/ns/ttml/profile/imsc1#styling\" xmlns=\"http://www.w3.org/ns/ttml\" xml:lang=\"en-US\" ttp:dropMode=\"nonDrop\" ttp:frameRate=\"25\" ttp:frameRateMultiplier=\"1 1\" ttp:timeBase=\"smpte\" xmlns:tt=\"http://www.w3.org/ns/ttml\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <head>\n    <styling>\n      <style xml:id=\"normal\" tts:color=\"white\" tts:fontFamily=\"sansSerif\" tts:fontSize=\"100%\" tts:fontStyle=\"normal\" tts:fontWeight=\"normal\"/>\n    </styling>\n    <layout>\n      <region xml:id=\"bottom\" tts:displayAlign=\"after\" tts:extent=\"100% 15%\" tts:origin=\"0% 85%\" tts:writingMode=\"lrtb\"/>\n    </layout>\n  </head>\n  <body tts:color=\"rgba(255,254,249,255)\" tts:fontWeight=\"bold\" region=\"bottom\" style=\"normal\">\n    <div>\n      <p begin=\"00:00:00:13\" end=\"00:00:03:16\" region=\"bottom\">Today we are introducing two important innovations to the Journal</p>\n      <p begin=\"00:00:03:16\" end=\"00:00:05:23\" region=\"bottom\">of AI Generated Papers or JAIGP.</p>\n      <p begin=\"00:00:06:02\" end=\"00:00:08:24\" region=\"bottom\">The first one is an AI review process.</p>\n      <p begin=\"00:00:08:24\" end=\"00:00:11:24\" region=\"bottom\">This is part of a pipeline in which a paper that is submitted</p>\n      <p begin=\"00:00:11:24\" end=\"00:00:15:19\" region=\"bottom\">gets first AI screened, then endorsed by other</p>\n      <p begin=\"00:00:15:19\" end=\"00:00:19:07\" region=\"bottom\">authors that have an ORCID, making it eligible for AI review</p>\n      <p begin=\"00:00:19:07\" end=\"00:00:22:04\" region=\"bottom\">and then moves into this AI review process.</p>\n      <p begin=\"00:00:22:15\" end=\"00:00:24:16\" region=\"bottom\">How does the AI review process work?</p>\n      <p begin=\"00:00:24:16\" end=\"00:00:28:00\" region=\"bottom\">First, you submit the paper to an AI reviewer in</p>\n      <p begin=\"00:00:28:00\" end=\"00:00:30:18\" region=\"bottom\">this case a reviewer powered by reviewer3.com</p>\n      <p begin=\"00:00:30:23\" end=\"00:00:33:23\" region=\"bottom\">And you're gonna get a structured list of comments</p>\n      <p begin=\"00:00:33:23\" end=\"00:00:38:24\" region=\"bottom\">that are gonna be criticizing your paper, like you would get from a normal peer-review</p>\n      <p begin=\"00:00:38:24\" end=\"00:00:42:01\" region=\"bottom\">Now you have to produce a new version of the paper that</p>\n      <p begin=\"00:00:42:01\" end=\"00:00:46:16\" region=\"bottom\">addresses those comments together with a response letter that you would resubmit to the journal</p>\n      <p begin=\"00:00:46:16\" end=\"00:00:49:18\" region=\"bottom\">You have three chances to go past the AI reviewer</p>\n      <p begin=\"00:00:50:00\" end=\"00:00:53:11\" region=\"bottom\">and the AI reviewer now is gonna check, whether you have addressed</p>\n      <p begin=\"00:00:53:11\" end=\"00:00:57:11\" region=\"bottom\">those comments or at least acknowledged them as limitations in your paper.</p>\n      <p begin=\"00:00:57:11\" end=\"00:01:00:11\" region=\"bottom\">If you did well, then the paper is gonna be</p>\n      <p begin=\"00:01:00:11\" end=\"00:01:05:05\" region=\"bottom\">accepted by the AI reviewer and it's gonna be eligible for human peer-review.</p>\n      <p begin=\"00:01:05:17\" end=\"00:01:08:20\" region=\"bottom\">The second innovation that we're introducing is that we're making</p>\n      <p begin=\"00:01:08:20\" end=\"00:01:12:02\" region=\"bottom\">this journal an Open Prompt journal.</p>\n      <p begin=\"00:01:12:02\" end=\"00:01:14:02\" region=\"bottom\">What do I mean by that?</p>\n      <p begin=\"00:01:14:02\" end=\"00:01:17:00\" region=\"bottom\">Well, the journal was built by prompting Claude.</p>\n      <p begin=\"00:01:17:05\" end=\"00:01:20:11\" region=\"bottom\">Basically, … it's not something that I programmed manually, but</p>\n      <p begin=\"00:01:20:11\" end=\"00:01:23:16\" region=\"bottom\">that I programmed by introducing prompts into the system</p>\n      <p begin=\"00:01:23:16\" end=\"00:01:27:15\" region=\"bottom\">and therefore defining the rules of how this journal should operate.</p>\n      <p begin=\"00:01:27:16\" end=\"00:01:30:19\" region=\"bottom\">So I'm making all of those prompts open, but I'm</p>\n      <p begin=\"00:01:30:19\" end=\"00:01:34:18\" region=\"bottom\">also allowing anybody to suggest a new prompt or suggest a new rule.</p>\n      <p begin=\"00:01:34:18\" end=\"00:01:38:02\" region=\"bottom\">So we open a section in the site that is called /prompt and</p>\n      <p begin=\"00:01:38:02\" end=\"00:01:40:23\" region=\"bottom\">that allows you to suggest new ideas.</p>\n      <p begin=\"00:01:40:23\" end=\"00:01:45:11\" region=\"bottom\">So this is a journal that has institutions that can evolve, because in reality,</p>\n      <p begin=\"00:01:45:18\" end=\"00:01:48:24\" region=\"bottom\">JAIGP is not an effort just to create a journal</p>\n      <p begin=\"00:01:48:24\" end=\"00:01:52:04\" region=\"bottom\">for AI generated papers, but it's an effort to figure out the rules</p>\n      <p begin=\"00:01:52:04\" end=\"00:01:57:10\" region=\"bottom\">that we need in a word in which AI- generated papers are a possibility.</p>\n      <p begin=\"00:01:58:05\" end=\"00:02:01:08\" region=\"bottom\">So if you're interested in these ideas, well,</p>\n      <p begin=\"00:02:01:08\" end=\"00:02:04:17\" region=\"bottom\">come to JAIGP, …, leave us a comment, suggest a rule, suggest</p>\n      <p begin=\"00:02:04:17\" end=\"00:02:09:09\" region=\"bottom\">a prompt, or even submit a paper and see how it does through the AI review system.</p>\n      <p begin=\"00:02:09:09\" end=\"00:02:12:12\" region=\"bottom\">We're looking forward to continue this open experiment and to</p>\n      <p begin=\"00:02:12:12\" end=\"00:02:15:15\" region=\"bottom\">help us understand how AI and humans</p>\n      <p begin=\"00:02:16:02\" end=\"00:02:18:02\" region=\"bottom\">can build science together.</p>\n    </div>\n  </body>\n</tt>\n I would like now to get a suggestion for a social media post that I can use together with the video. The key of the message is the introduction of the AI review system and the idea of Open Prompting, which is very new. This cannot be buried.",
+          "timestamp": "2026-03-22T12:28:35.583Z",
+          "prompt_type": "procedural",
+          "session_index": 58,
+          "global_index": 187
+        },
+        {
+          "text": "Check the archive of prompts one last time for any information that might be considered sensitive, and to classify prompts as key prompts or procedural prompts. Use an LLM for both tasks.",
+          "timestamp": "2026-03-22T12:35:08.924Z",
+          "prompt_type": "procedural",
+          "session_index": 59,
+          "global_index": 188
+        },
+        {
+          "text": "Check if there have been any new submissions, and if they have not been screened, screen them.",
+          "timestamp": "2026-03-22T15:16:30.913Z",
+          "prompt_type": "procedural",
+          "session_index": 60,
+          "global_index": 189
+        },
+        {
+          "text": "Can you check the daily traffic for this project for the last five days? This is traffic to jaigp.com or jaigp.org",
+          "timestamp": "2026-03-22T17:36:24.357Z",
+          "prompt_type": "procedural",
+          "session_index": 61,
+          "global_index": 190
+        },
+        {
+          "text": "Can you give me a full go access command line command I can use on the command lin, using bash, to get the traffic?",
+          "timestamp": "2026-03-22T17:38:38.391Z",
+          "prompt_type": "procedural",
+          "session_index": 62,
+          "global_index": 191
+        },
+        {
+          "text": "<bash-input> echo \"=== JAIGP Daily Traffic (last 7 days) ===\" && echo \"\" && for i in 0\n   1 2 3 4 5 6; do d=$(date -d \"$i days ago\" +%d/%b/%Y); label=$(date -d\n  \"$i days ago\" +%Y-%m-%d); reqs=0; ips=\"\"; for f in\n  /var/log/nginx/jaip_access.log /var/log/nginx/jaip_access.log.1; do [ -f\n  \"$f\" ] && { r=$(grep -c \"$d\" \"$f\" 2>/dev/null); reqs=$((reqs+r));\n  ips=\"$ips $(grep \"$d\" \"$f\" 2>/dev/null | awk '{print $1}')\"; }; done; for\n   f in /var/log/nginx/jaip_access.log.{2,3,4,5,6,7}.gz; do [ -f \"$f\" ] &&\n  { r=$(zgrep -c \"$d\" \"$f\" 2>/dev/null); reqs=$((reqs+r)); ips=\"$ips\n  $(zgrep \"$d\" \"$f\" 2>/dev/null | awk '{print $1}')\"; }; done; uniq=$(echo\n  \"$ips\" | tr ' ' '\\n' | sort -u | grep -c . 2>/dev/null); echo \"$label:</bash-input>",
+          "timestamp": "2026-03-22T17:39:24.839Z",
+          "prompt_type": "key",
+          "session_index": 63,
+          "global_index": 192
+        },
+        {
+          "text": "<bash-stdout></bash-stdout><bash-stderr>/bin/bash: eval: line 11: syntax error near unexpected token `1'\n/bin/bash: eval: line 11: `   1 2 3 4 5 6; do d=$(date -d \"$i days ago\" +%d/%b/%Y); label=$(date -d'\n</bash-stderr>",
+          "timestamp": "2026-03-22T17:39:24.890Z",
+          "prompt_type": "procedural",
+          "session_index": 64,
+          "global_index": 193
+        },
+        {
+          "text": "let's make sure the entire website has a favico and that we have the right robots.txt file with what is needed for a project like this. Ask me any questions if you have doubts.",
+          "timestamp": "2026-03-22T17:51:37.582Z",
+          "prompt_type": "key",
+          "session_index": 65,
+          "global_index": 194
+        },
+        {
+          "text": "Create the sitemap and make sure this stays up to date as new papers are added.",
+          "timestamp": "2026-03-22T17:56:29.288Z",
+          "prompt_type": "procedural",
+          "session_index": 66,
+          "global_index": 195
+        },
+        {
+          "text": "We need to check that the prompt social posting features are working. A colleague just tried to post and was unable to. He got this error in the console. Content-Security-Policy: The page's settings blocked a style (style-src-elem) at https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css from being applied because it violates the following directive: \"style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com\" prompts\nContent-Security-Policy: The page's settings blocked a script (script-src-elem) at https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js from being executed because it violates the following directive: \"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://unpkg.com https://fonts.googleapis.com\" prompts\nContent-Security-Policy: The page's settings blocked a script (script-src-elem) at https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js from being executed because it violates the following directive: \"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://unpkg.com https://fonts.googleapis.com\" prompts",
+          "timestamp": "2026-03-22T18:05:48.649Z",
+          "prompt_type": "key",
+          "session_index": 67,
+          "global_index": 196
+        },
+        {
+          "text": "Again, I cannot post a comment. When I post the comment, it doesn't go through right away. The page stays fixed, but when I reload, the comment is there. We are doing a poor job at updating the feed as it should in a social media site, where pressing post should update the feed right away. Also, we need to allow the reply box to be multiple lines, and expandable.",
+          "timestamp": "2026-03-22T18:10:11.054Z",
+          "prompt_type": "key",
+          "session_index": 68,
+          "global_index": 197
+        },
+        {
+          "text": "Still... when I post a comment as a reply to another comment, the page remains the same until I reload.",
+          "timestamp": "2026-03-22T18:15:26.559Z",
+          "prompt_type": "procedural",
+          "session_index": 69,
+          "global_index": 198
+        },
+        {
+          "text": "No. Still the same. Don't we need something like React to make this truly dynamic?",
+          "timestamp": "2026-03-22T18:19:51.785Z",
+          "prompt_type": "key",
+          "session_index": 70,
+          "global_index": 199
+        },
+        {
+          "text": "Now, pressing post reloads the page and the reply to the comment is no longer there.",
+          "timestamp": "2026-03-22T18:23:15.108Z",
+          "prompt_type": "procedural",
+          "session_index": 71,
+          "global_index": 200
+        },
+        {
+          "text": "No. It doesn't work at all. It works well when posting a comment, but not when posting a reply to a post. That's where the issue is.",
+          "timestamp": "2026-03-22T18:26:03.106Z",
+          "prompt_type": "procedural",
+          "session_index": 72,
+          "global_index": 201
+        },
+        {
+          "text": "Again, I only see the reply to a post after reloading the page.",
+          "timestamp": "2026-03-22T18:28:02.944Z",
+          "prompt_type": "procedural",
+          "session_index": 73,
+          "global_index": 202
+        },
+        {
+          "text": "Nope. We are having the same problem. Replies don't work. Let's stop for a second and think whether it might be better to use an open source library or package focused on social features, instead of trying to develop one from scratch. After all, we want people to be able to create posts and replies in this page, and for our users to have a follower dynamics, where they can follow others, and get notifications on their posts and actions in the journal. Maybe, it makes more sense to do this with a package that already supports these behaviors. Let's discuss this before we explore any more edits to the code.",
+          "timestamp": "2026-03-22T18:32:22.929Z",
+          "prompt_type": "key",
+          "session_index": 74,
+          "global_index": 203
+        },
+        {
+          "text": "Let's try with Alpine.",
+          "timestamp": "2026-03-22T18:34:10.286Z",
+          "prompt_type": "procedural",
+          "session_index": 75,
+          "global_index": 204
+        },
+        {
+          "text": "When I reply to a reply of a reply I still have to reload to see it.",
+          "timestamp": "2026-03-22T18:37:45.264Z",
+          "prompt_type": "procedural",
+          "session_index": 76,
+          "global_index": 205
+        },
+        {
+          "text": "When I click post on a reply to \"And now\" with the text  \"And now\" I get an Status 500 error on the browser and the following error in the console. Failed to load resource: the server responded with a status of 500 ()\nVM468:26 Reply failed: Error: Status 500\n    at eval (eval at <anonymous> (cdn.min.js:5:738), <anonymous>:14:42)\neval    @    VM468:26",
+          "timestamp": "2026-03-22T18:41:55.676Z",
+          "prompt_type": "procedural",
+          "session_index": 77,
+          "global_index": 206
+        },
+        {
+          "text": "Yes it worked!",
+          "timestamp": "2026-03-22T18:43:57.265Z",
+          "prompt_type": "procedural",
+          "session_index": 78,
+          "global_index": 207
+        },
+        {
+          "text": "Now we need to add a follower graph to teh system. When clicking on a username in the social feed on the prompt page, we should have the option to follow a user. This is a standard followers and following social graph we will start building starting from this page. Also, make the post button for the replies look more like a pill.",
+          "timestamp": "2026-03-22T18:48:34.307Z",
+          "prompt_type": "key",
+          "session_index": 79,
+          "global_index": 208
+        },
+        {
+          "text": "We should then allow users to delete their own posts (and only their own posts) directly from the feed. Not onlt from their activity panel. And we should allow DM (direct messages) among users who follow each other. This should be a simple messaging system within the site. Also, when a user gets a message they should see a notification. Users can be \"open to messaging\" if they so choose so, by selecting that option (with an on/off toggle on their profile pages). If they are open to messaging, anyone can message them privately in the site. Otherwise, only mutual followers. We need to add a section to the rules page explaining these social features and rules. At the bottom, in a separate section from the rules to submit papers.",
+          "timestamp": "2026-03-22T18:52:36.904Z",
+          "prompt_type": "key",
+          "session_index": 80,
+          "global_index": 209
+        },
+        {
+          "text": "Now. Let's make sure that a user's profile page includes the option to follow a user and shows their followers and following counts. Also, messaging by default is turned on for everyone, but users can turn it off using a setting on their profile page (below the message button).",
+          "timestamp": "2026-03-22T19:04:33.306Z",
+          "prompt_type": "key",
+          "session_index": 81,
+          "global_index": 210
+        },
+        {
+          "text": "We need to add an option for a user to see their messages. That is a little envelope that also works with a notification system next to the bell for the other notifications.",
+          "timestamp": "2026-03-22T19:06:43.871Z",
+          "prompt_type": "key",
+          "session_index": 82,
+          "global_index": 211
+        },
+        {
+          "text": "The messaging feature is too minimalistic. Messages should allow multiple lines, not a single line in a box. They are more like messaging systems in slack or whatsapp that allow multiple lines in a message.",
+          "timestamp": "2026-03-22T19:10:33.600Z",
+          "prompt_type": "procedural",
+          "session_index": 83,
+          "global_index": 212
+        },
+        {
+          "text": "Thanks. The messaging bubble, being black or [REDACTED], is not very readeable. Let's make it more readable, using soft colors and well sized fonts, with the text being darker than the bubble background.",
+          "timestamp": "2026-03-22T19:13:22.147Z",
+          "prompt_type": "procedural",
+          "session_index": 84,
+          "global_index": 213
+        },
+        {
+          "text": "Now. When a user gets a message at JAIGP, we should send them an email to let them know they got a new message.",
+          "timestamp": "2026-03-22T19:16:37.464Z",
+          "prompt_type": "key",
+          "session_index": 85,
+          "global_index": 214
+        },
+        {
+          "text": "In my profile page (https://jaigp.org/auth/profile), and that of each author, we need to include a link to the messages and the option to turn messaging from open to closed right in the hero.",
+          "timestamp": "2026-03-22T19:18:41.218Z",
+          "prompt_type": "key",
+          "session_index": 86,
+          "global_index": 215
+        },
+        {
+          "text": "We now need to add a search on the site, that will allow anyone to search for authors and papers. This is a big feature, since the list of authors and papers should expand over time.",
+          "timestamp": "2026-03-22T19:22:28.128Z",
+          "prompt_type": "procedural",
+          "session_index": 87,
+          "global_index": 216
+        },
+        {
+          "text": "The search icon in the dialogue for the search overlaps the text put as an input.",
+          "timestamp": "2026-03-22T19:28:33.848Z",
+          "prompt_type": "procedural",
+          "session_index": 88,
+          "global_index": 217
+        },
+        {
+          "text": "I jsut published a prompt as a rule at https://jaigp.org/prompts but it appeared twice. Once, after I placed post, as it should, and then, I saw a blue pill saying that a new prompt had been submitted (this should say a new post, so it is more generic). Anyways, that second posting was unnecessary. We might have some redundacy here.",
+          "timestamp": "2026-03-22T19:44:38.565Z",
+          "prompt_type": "key",
+          "session_index": 89,
+          "global_index": 218
+        },
+        {
+          "text": "Great. Can we allow authors to edit their posts and comments? Let's think about this. Since that might involve keeping track of the edit history of each post which would be quite problematic. Would it be easier to allow edits within the first hour, and then leave it as is? Let's discuss the idea of letting people edit their posts and comments.",
+          "timestamp": "2026-03-22T19:48:19.000Z",
+          "prompt_type": "key",
+          "session_index": 90,
+          "global_index": 219
+        },
+        {
+          "text": "Yes. Let's implement. And if a post was edited, we should show \"edited.\" Also, we need to revise the community & messaging section of https://jaigp.org/rules to make sure if matches the rules we have been coding more recently.",
+          "timestamp": "2026-03-22T19:49:50.976Z",
+          "prompt_type": "key",
+          "session_index": 91,
+          "global_index": 220
+        },
+        {
+          "text": "My comment and rule post from today (march 22) dissapear from production. I see the post, but it has no text inside it.",
+          "timestamp": "2026-03-22T19:54:09.037Z",
+          "prompt_type": "procedural",
+          "session_index": 92,
+          "global_index": 221
+        },
+        {
+          "text": "In the rule post I made today (March 22), there is a runaway line in italics and with no space between words it reads: We could set a fixed rate per review (e.g. \n300\np\ne\nr\nr\ne\nv\ni\ne\nw\n)\n.\nT\nh\ni\ns\ni\ns\ns\ni\nm\np\nl\ne\na\nn\nd\np\nr\ne\nd\ni\nc\nt\na\nb\nl\ne\n.\nI\nt\nc\no\nu\nl\nd\na\nl\ns\no\nl\ne\na\nd\nt\no\ns\no\nm\ne\ns\nc\nh\no\nl\na\nr\ns\nb\ne\nc\no\nm\ni\nn\ng\np\nr\no\nf\ne\ns\ns\ni\no\nn\na\nl\nr\ne\nv\ni\ne\nw\ne\nr\ns\n(\na\nt\n12\nr\ne\nv\ni\ne\nw\ne\nr\ns\na\nm\no\nn\nt\nh\n,\na\np\ne\nr\ns\no\nn\nc\na\nn\nt\na\nk\ne\nh\no\nm\ne\n300perreview).Thisissimpleandpredictable.[REDACTED](at12reviewersamonth,apersoncantakehome3600, which is good in many countries).. Don't understand how that can be misformatted since all of the post was just plain text. Maybe, we are not handling the post length properly.",
+          "timestamp": "2026-03-22T19:59:08.179Z",
+          "prompt_type": "procedural",
+          "session_index": 93,
+          "global_index": 222
+        },
+        {
+          "text": "Great. Under the suggest a prompt, rule, or feature we can say (supports Latex display math with $$..$$). So users now Latex is supported here.",
+          "timestamp": "2026-03-22T20:04:36.365Z",
+          "prompt_type": "procedural",
+          "session_index": 94,
+          "global_index": 223
+        },
+        {
+          "text": "Can we add a small dynamic number showing how many users are online right now? Is that something we can do without chugging the system? We should design this into the nav bar.",
+          "timestamp": "2026-03-22T20:06:16.831Z",
+          "prompt_type": "key",
+          "session_index": 95,
+          "global_index": 224
+        },
+        {
+          "text": "On the homepage, let's create one more tab called \"Recent movements\" which sits separetely from all others (before Screened Out and Separated by a subtle vertical line | ) where we show up to 9 papers in reverse chronological order based on which papers were the latest ones to receive an action. For instance, if a paper was recently AI reviewed, their AI review timestamp is the one that counts. If a paper was recently endorsed, their endorsement time stamp is the one that countes. If a paper was screened out, it screened out time stamp is the one that counts. Etc.",
+          "timestamp": "2026-03-23T07:43:08.198Z",
+          "prompt_type": "key",
+          "session_index": 96,
+          "global_index": 225
+        },
+        {
+          "text": "Let's remove the like (thumbs up or down) feature on paper posts. We do not need to remove the under the hood dynamics. Just remove it from the front-end, so the papers don't like so much like social media posts.",
+          "timestamp": "2026-03-23T07:49:41.815Z",
+          "prompt_type": "key",
+          "session_index": 97,
+          "global_index": 226
+        },
+        {
+          "text": "For the homepage, let's do a first tab before recent called All, showing all papers in reverse order of how advanced they are in the pipeline and make this the default. Let's change Recent Movements Papers to Recent Movements.",
+          "timestamp": "2026-03-23T08:00:43.816Z",
+          "prompt_type": "key",
+          "session_index": 98,
+          "global_index": 227
+        },
+        {
+          "text": "Next to All in the homepage, we need the number of papers e.g. All (47) whatever that number is.",
+          "timestamp": "2026-03-23T08:06:31.247Z",
+          "prompt_type": "key",
+          "session_index": 99,
+          "global_index": 228
+        },
+        {
+          "text": "The All tab should be paginated after the first 9 papers.",
+          "timestamp": "2026-03-23T08:11:57.904Z",
+          "prompt_type": "procedural",
+          "session_index": 100,
+          "global_index": 229
+        },
+        {
+          "text": "Let's make the little green dot that shows the number of people that are online next to the logo a feature only visible to editors with admin panel access.",
+          "timestamp": "2026-03-23T08:13:07.172Z",
+          "prompt_type": "key",
+          "session_index": 101,
+          "global_index": 230
+        },
+        {
+          "text": "Who has admin access right now? Only me, or all editors? Ideally, everyone who is editor of higher (editor and editor in chief) should have access to the admin panel. So we do not hardcode this access level to an orcid, but make it relative to these roles.",
+          "timestamp": "2026-03-23T08:15:27.901Z",
+          "prompt_type": "key",
+          "session_index": 102,
+          "global_index": 231
+        },
+        {
+          "text": "Now, for permissions. Editor in Chief has authority to appoint editors. Editors have authority to appoint/add associate editors.",
+          "timestamp": "2026-03-23T08:19:24.663Z",
+          "prompt_type": "procedural",
+          "session_index": 103,
+          "global_index": 232
+        },
+        {
+          "text": "On the author profile page, we need to add an option for an author to delete all of their data. When activating this option, we need to ask if they are realy sure, since this action cannot be undone. When an author deletes their data all of their papers and profile information are completely eliminated from all of the databases in the system. Plan this carefully.",
+          "timestamp": "2026-03-23T16:06:00.186Z",
+          "prompt_type": "key",
+          "session_index": 104,
+          "global_index": 233
+        },
+        {
+          "text": "We now have a nice working version of the site in production. We should update our github repo with this new version, making sure that we do not leak any API keys, secrets, or other sensitive information. We should also update the dev server to match our production environment.",
+          "timestamp": "2026-03-26T17:41:26.974Z",
+          "prompt_type": "key",
+          "session_index": 105,
+          "global_index": 239
+        },
+        {
+          "text": "Let's proceed with this plan and the force push.",
+          "timestamp": "2026-03-27T09:18:38.823Z",
+          "prompt_type": "procedural",
+          "session_index": 106,
+          "global_index": 240
+        }
+      ]
+    },
+    {
+      "id": "a0d0b515-1d28-4092-8708-98a8eff0d91d",
+      "title": "Notifications, Feed Merge & Security Audit",
+      "started_at": "2026-03-21T08:44:07.255Z",
+      "prompt_count": 2,
+      "prompts": [
+        {
+          "text": "We have made the repository public at https://github.com/cesifoti/jaigp/ we need to  \n                                                                                       \nindicate that in the about page, and on the footer of the website. Also, in the about  \n                                                                                       \npage text, we need to rework back in the idea that AI generated papers need a separate \n                                                                                       \n venue, and that JAIGP's creation was motivated by that idea.",
+          "timestamp": "2026-03-21T08:44:07.255Z",
+          "prompt_type": "procedural",
+          "session_index": 1,
+          "global_index": 158
+        },
+        {
+          "text": "claude /logout",
+          "timestamp": "2026-03-21T08:44:20.588Z",
+          "prompt_type": "procedural",
+          "session_index": 2,
+          "global_index": 159
+        }
+      ]
+    },
+    {
+      "id": "8332c6c2-2e51-42cb-b5c8-385cf3b38937",
+      "title": "Session 8332c6c2",
+      "started_at": "2026-03-24T07:57:02.737Z",
+      "prompt_count": 5,
+      "prompts": [
+        {
+          "text": "We have a few things to improve on the social feature of the journal https://jaigp.org/prompts First, when you see a long reply to a post, like my recent reply to Kobie Janse, you need a show more link to see the full posts (and include the edit option with the same rule as in the posts). Also, when writing a reply in mobile, the text input field is unnecessarily small and narrow (there is quite a bit of width left on the screen that would make this writing more comfortable). Also, we when trying to delete a reply to a post from the activity page on mobile (https://jaigp.org/activity/1) the link doesn't work (probably because in desktop there is a pop up).  We also need to check the routes between activity and the posts. For example, when clicking on the post that a comment was made at https://jaigp.org/activity/1?tab=comments we should be able to go to that comment in the page of the post. And also, the page for a post (e.g. https://jaigp.org/prompts/6)  needs to include also its comments and the ability to vote on it, like it does in the timeline (https://jaigp.org/prompts).",
+          "timestamp": "2026-03-24T07:57:02.737Z",
+          "prompt_type": "key",
+          "session_index": 1,
+          "global_index": 234
+        },
+        {
+          "text": "I still don't see a show more on the first reply to Kobie Janse van Rensburg's post here https://jaigp.org/prompts . This is a longer reply than what is being shown.",
+          "timestamp": "2026-03-24T08:11:37.185Z",
+          "prompt_type": "procedural",
+          "session_index": 2,
+          "global_index": 235
+        },
+        {
+          "text": "Alsom I notice the first reply to a post doesn't have the option to vote on it (e.g. hearts). But those replies that come after do. That's odd. All of the replies to a post should abide by the same behavior.",
+          "timestamp": "2026-03-24T08:13:57.323Z",
+          "prompt_type": "key",
+          "session_index": 3,
+          "global_index": 236
+        },
+        {
+          "text": "I would like to add a new page to the admin panel focused on activity throughout the site. This is to help editors understand which papers are getting comments, or what activity is happening. It should be a new [REDACTED] us keep that view and get to the right place and help as needed.",
+          "timestamp": "2026-03-24T17:03:42.230Z",
+          "prompt_type": "procedural",
+          "session_index": 4,
+          "global_index": 237
+        },
+        {
+          "text": "If an author gets a comment on one of their papers, they should get a notification as well. If a comment is added into a paper that an author has commented on, that author should also be notified (since they sort of subscribed to the activity of that paper). Also, when posting a second or third comment on a paper page, sometimes we need to reload to see the comment. Finally, authors should be able to delete the comments they make directly on the pages they made them.",
+          "timestamp": "2026-03-24T17:27:28.139Z",
+          "prompt_type": "key",
+          "session_index": 5,
+          "global_index": 238
+        }
+      ]
+    }
+  ]
+}

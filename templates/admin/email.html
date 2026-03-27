@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Email Authors - Admin - JAIGP{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <a href="/admin" class="text-primary hover:text-blue-700 text-sm font-medium mb-2 inline-block">&larr; Dashboard</a>
+        <h1 class="text-2xl font-bold text-secondary mb-2">Email Authors</h1>
+        <p class="text-slate-600">Send an email to all registered authors or those at a specific pipeline stage. Emails are sent from <strong>{{ from_email }}</strong>.</p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+        <form hx-post="/admin/email/send"
+              hx-target="#send-result"
+              hx-swap="outerHTML"
+              hx-indicator="#send-spinner"
+              class="space-y-5">
+
+            <!-- Audience -->
+            <div>
+                <label class="block text-sm font-semibold text-secondary mb-2">Audience</label>
+                <select name="audience" id="audience-select"
+                        class="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:ring-primary focus:border-primary">
+                    <option value="all">All registered users with email ({{ total_with_email }})</option>
+                    {% for s in range(0, 6) %}
+                    <option value="stage_{{ s }}">Stage {{ s }}: {{ stage_names[s] }} ({{ stage_counts.get(s, 0) }} authors)</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Subject -->
+            <div>
+                <label class="block text-sm font-semibold text-secondary mb-1">Subject</label>
+                <input type="text" name="subject" required maxlength="200" placeholder="e.g. Important Update from JAIGP"
+                       class="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:ring-primary focus:border-primary">
+            </div>
+
+            <!-- Body -->
+            <div>
+                <label class="block text-sm font-semibold text-secondary mb-1">Message Body</label>
+                <p class="text-xs text-slate-500 mb-2">Plain text. A JAIGP header, footer, and unsubscribe link are added automatically.</p>
+                <textarea name="body" rows="12" required placeholder="Write your message here..."
+                          class="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:ring-primary focus:border-primary font-mono"></textarea>
+            </div>
+
+            <!-- Preview note -->
+            <div class="bg-slate-50 border border-slate-200 rounded-md p-4">
+                <p class="text-xs text-slate-600">
+                    <strong>Note:</strong> Emails will be wrapped in the standard JAIGP branded template and sent individually to each recipient.
+                    There is no undo once sent.
+                </p>
+            </div>
+
+            <!-- Submit -->
+            <div class="flex items-center gap-4">
+                <button type="submit" id="send-btn"
+                        onclick="return confirm('Send this email to the selected audience? This cannot be undone.')"
+                        class="px-6 py-2.5 bg-primary text-white rounded-md hover:bg-blue-700 transition font-medium text-sm flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    Send Email
+                    <svg id="send-spinner" class="htmx-indicator animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            </div>
+        </form>
+
+        <div id="send-result"></div>
+    </div>
+</div>
+{% endblock %}

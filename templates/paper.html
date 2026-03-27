@@ -1,0 +1,821 @@
+{% extends "base.html" %}
+
+{% block title %}{{ paper.title|smart_title }} - {{ app_name }}{% endblock %}
+
+{% block og_title %}{{ paper.title|smart_title }} — JAIGP{% endblock %}
+{% block twitter_title %}{{ paper.title|smart_title }} — JAIGP{% endblock %}
+{% block og_description %}{{ paper.abstract[:200] }}...{% endblock %}
+{% block twitter_description %}{{ paper.abstract[:200] }}...{% endblock %}
+{% block meta_description %}{{ paper.abstract[:200] }}...{% endblock %}
+{% block og_image %}{% if paper.image_filename %}https://jaigp.org/paper/{{ paper.id }}/image{% else %}https://jaigp.org/static/images/og-image.png{% endif %}{% endblock %}
+{% block twitter_image %}{% if paper.image_filename %}https://jaigp.org/paper/{{ paper.id }}/image{% else %}https://jaigp.org/static/images/og-image.png{% endif %}{% endblock %}
+
+{% block extra_head %}
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="{{ paper.published_date.isoformat() }}">
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Paper Header -->
+    <div class="mb-8">
+        <div class="flex items-start justify-between mb-4">
+            <div class="flex-1">
+                <h1 class="text-4xl font-bold text-secondary mb-2">{{ paper.title|smart_title }}</h1>
+
+                <!-- Author byline -->
+                <div class="text-base text-slate-600 mb-2">
+                    {% if paper.ai_authors %}
+                        {% for ai in paper.ai_authors[:2] %}{{ ai.ai_name }}{% if ai.ai_version %} {{ ai.ai_version }}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}{% if paper.ai_authors|length > 2 %} +{{ paper.ai_authors|length - 2 }}{% endif %}
+                        {% if paper.human_authors %} · {% endif %}
+                    {% endif %}
+                    {% if paper.human_authors %}
+                        {% for author in paper.human_authors[:3] %}<a href="/auth/profile?user_id={{ author.user.id }}" class="hover:text-primary">{{ author.user.name }}</a>{% if not loop.last %}, {% endif %}{% endfor %}{% if paper.human_authors|length > 3 %} et al.{% endif %}
+                    {% endif %}
+                </div>
+
+                <!-- Status Badge (non-published states only) -->
+                {% if paper.status in ('pending_verification', 'pending_screening', 'ai_screen_rejected') %}
+                <div class="mb-3">
+                    {% include 'components/paper_status_badge.html' %}
+                    {% if paper.status == 'pending_verification' and user %}
+                        {% for author in paper.human_authors %}
+                            {% if author.user_id == user.id %}
+                            <span id="resend-verification">
+                                <button hx-post="/submit/{{ paper.id }}/resend-verification"
+                                        hx-target="#resend-verification"
+                                        hx-swap="outerHTML"
+                                        class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-500 text-white hover:bg-amber-600 transition cursor-pointer">
+                                    Resend Verification Email
+                                </button>
+                            </span>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Meta info -->
+                <div class="flex flex-wrap items-center gap-4 text-sm text-slate-600">
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        Published {{ paper.published_date|format_date }}
+                    </span>
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                        </svg>
+                        Version {{ paper.current_version }}
+                    </span>
+                    {% if paper.comments %}
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                        </svg>
+                        {{ paper.comments|length }} comments
+                    </span>
+                    {% endif %}
+                </div>
+
+                <!-- Inline Pipeline Progress -->
+                {% if paper.status not in ('pending_verification',) and paper.review_stage is defined and paper.review_stage is not none and paper.status != 'ai_screen_rejected' %}
+                {% set pipeline_stages = [
+                    (1, "Screened"),
+                    (2, "Endorsed"),
+                    (3, "AI Review"),
+                    (4, "Peer Review"),
+                    (5, "Accepted"),
+                ] %}
+                <div class="flex items-center gap-1.5 mt-3 flex-wrap">
+                    {% for snum, slabel in pipeline_stages %}
+                        {% if paper.review_stage > snum %}
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            {{ slabel }}
+                        </span>
+                        {% elif paper.review_stage == snum %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary ring-1 ring-primary/20">
+                            {{ slabel }}
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-50 text-slate-400">
+                            {{ slabel }}
+                        </span>
+                        {% endif %}
+                        {% if not loop.last %}
+                        <svg class="w-3 h-3 text-slate-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% elif paper.status == 'ai_screen_rejected' %}
+                <div class="flex items-center gap-1.5 mt-3">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 ring-1 ring-red-200">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        Did not pass AI screening
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Actions -->
+            <div class="flex gap-2 flex-shrink-0">
+                <a href="/paper/{{ paper.id }}/pdf" target="_blank"
+                   class="px-4 py-2 bg-slate-100 text-slate-700 rounded-md hover:bg-slate-200 transition text-sm font-medium">
+                    Download PDF
+                </a>
+                {% if user and not paper.is_locked %}
+                    {% for author in paper.human_authors %}
+                        {% if author.user_id == user.id %}
+                        <a href="/submit/{{ paper.id }}/update"
+                           class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition text-sm font-medium">
+                            Submit New Version
+                        </a>
+                        {% if paper.status != 'ai_screen_rejected' %}
+                        <form action="/paper/{{ paper.id }}/delete" method="POST"
+                              onsubmit="return confirm('Are you sure you want to delete this paper? This action cannot be undone.')"
+                              style="display: inline;">
+                            <button type="submit"
+                                    class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition text-sm font-medium">
+                                Delete Paper
+                            </button>
+                        </form>
+                        {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# Stage-specific details now live in the sidebar #}
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-8">
+            <!-- Abstract -->
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                <h2 class="text-2xl font-bold text-secondary mb-4">Abstract</h2>
+                <p class="text-slate-700 leading-relaxed whitespace-pre-line">{{ paper.abstract }}</p>
+            </div>
+
+            <!-- PDF Viewer -->
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden" id="pdf-viewer-wrapper">
+                <div class="pdf-viewer-container" id="pdf-viewer-container">
+                    <!-- Loading Indicator -->
+                    <div id="pdf-loading" class="absolute inset-0 flex items-center justify-center bg-slate-50 z-20">
+                        <div class="text-center">
+                            <svg class="animate-spin h-12 w-12 text-primary mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <p class="text-slate-600 font-medium">Loading PDF...</p>
+                            <p class="text-sm text-slate-500 mt-2">This may take a moment for large files</p>
+                        </div>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div id="pdf-error" class="hidden absolute inset-0 flex items-center justify-center bg-slate-50 z-20">
+                        <div class="text-center max-w-md px-4">
+                            <svg class="w-16 h-16 text-slate-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">PDF Viewer Issue</h3>
+                            <p class="text-slate-600 mb-4">The PDF couldn't be displayed in the browser viewer. Please try one of the options below:</p>
+                            <div class="flex flex-col gap-2">
+                                <a href="/paper/{{ paper.id }}/pdf" target="_blank"
+                                   class="bg-primary text-white px-6 py-3 rounded-md hover:bg-blue-700 transition font-medium">
+                                    Open PDF in New Tab
+                                </a>
+                                <a href="/paper/{{ paper.id }}/html"
+                                   class="bg-accent text-white px-6 py-3 rounded-md hover:bg-green-700 transition font-medium">
+                                    View HTML Version
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fullscreen/Expand Button (Desktop/Mobile aware) -->
+                    <button
+                        id="fullscreen-btn"
+                        onclick="handleExpandPDF()"
+                        class="absolute top-4 right-4 z-10 bg-slate-900/75 hover:bg-slate-900 text-white px-3 py-2 md:px-4 md:py-2 rounded-md shadow-lg transition flex items-center gap-2 text-sm font-medium"
+                        aria-label="Expand PDF viewer"
+                    >
+                        <svg id="fullscreen-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+                        </svg>
+                        <span id="fullscreen-text" class="hidden sm:inline">Fullscreen</span>
+                    </button>
+                    <iframe
+                        src="/paper/{{ paper.id }}/pdf#view=FitH"
+                        title="{{ paper.title }}"
+                        type="application/pdf"
+                        class="w-full h-full"
+                        id="pdf-iframe"
+                        onload="handlePDFLoad()"
+                        onerror="handlePDFError()"
+                    ></iframe>
+                </div>
+                <div class="p-4 bg-slate-50 border-t border-slate-200">
+                    <!-- Mobile-first button layout -->
+                    <div class="flex flex-col items-center gap-3">
+                        <!-- Primary actions -->
+                        <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+                            <a href="/paper/{{ paper.id }}/pdf"
+                               target="_blank"
+                               class="w-full sm:w-auto bg-primary text-white px-6 py-3 rounded-md hover:bg-blue-700 transition font-medium text-center inline-flex items-center justify-center md:hidden">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
+                                Open PDF Fullscreen
+                            </a>
+                            <a href="/paper/{{ paper.id }}/pdf"
+                               download="{{ paper.title }}.pdf"
+                               class="text-sm text-primary hover:text-blue-700 font-medium inline-flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                </svg>
+                                Download PDF
+                            </a>
+                            <a href="/paper/{{ paper.id }}/pdf"
+                               target="_blank"
+                               class="hidden md:inline-flex text-sm text-primary hover:text-blue-700 font-medium items-center">
+                                Open in new tab →
+                            </a>
+                        </div>
+
+                        <!-- Alternative formats -->
+                        <div class="flex items-center gap-2 text-xs text-slate-600">
+                            <span>Also available as:</span>
+                            <a href="/paper/{{ paper.id }}/html"
+                               class="text-accent hover:text-green-700 font-medium inline-flex items-center hover:underline">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                                </svg>
+                                HTML
+                            </a>
+                            <span>•</span>
+                            <a href="/paper/{{ paper.id }}/markdown"
+                               class="text-accent hover:text-green-700 font-medium inline-flex items-center hover:underline">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                </svg>
+                                Markdown
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                <h2 class="text-2xl font-bold text-secondary mb-4">Comments</h2>
+
+                {% if user %}
+                <!-- Comment Form -->
+                <form hx-post="/paper/{{ paper.id }}/comment"
+                      hx-target="#comments-list"
+                      hx-swap="afterbegin"
+                      hx-on::after-request="if(event.detail.successful) { this.reset(); var p=document.getElementById('no-comments-msg'); if(p) p.remove(); }"
+                      class="mb-6">
+                    <textarea
+                        name="content"
+                        required
+                        rows="3"
+                        placeholder="Add your comment..."
+                        class="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-primary focus:border-primary mb-2"
+                    ></textarea>
+                    <button type="submit"
+                            class="bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm font-medium">
+                        Post Comment
+                    </button>
+                </form>
+                {% else %}
+                <div class="mb-6 p-4 bg-slate-50 rounded-md text-center">
+                    <p class="text-sm text-slate-600 mb-2">You must be logged in to comment</p>
+                    <a href="/auth/login" class="text-primary hover:text-blue-700 font-medium">
+                        Login with ORCID
+                    </a>
+                </div>
+                {% endif %}
+
+                <!-- Comments List -->
+                <div id="comments-list" class="space-y-4">
+                    {% if paper.comments %}
+                        {% for comment in paper.comments|sort(attribute='created_at', reverse=True) %}
+                            {% include 'components/comment.html' %}
+                        {% endfor %}
+                    {% else %}
+                        <p id="no-comments-msg" class="text-sm text-slate-500 text-center py-8">No comments yet. Be the first to comment!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+
+            <!-- Review Status Card -->
+            {% if paper.status not in ('pending_verification',) and paper.review_stage is defined and paper.review_stage is not none %}
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-5">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wide">Review Status</h3>
+                    {% if paper.review_stage is defined and paper.review_stage is not none and paper.status == 'published' %}
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold
+                        {% if paper.review_stage == 1 %}bg-blue-100 text-blue-700
+                        {% elif paper.review_stage == 2 %}bg-indigo-100 text-indigo-700
+                        {% elif paper.review_stage == 3 %}bg-purple-100 text-purple-700
+                        {% elif paper.review_stage == 4 %}bg-amber-100 text-amber-700
+                        {% elif paper.review_stage == 5 %}bg-green-100 text-green-700
+                        {% else %}bg-slate-100 text-slate-600{% endif %}
+                    ">Stage {{ paper.review_stage }}</span>
+                    {% endif %}
+                </div>
+
+                {% if paper.status == 'pending_screening' %}
+                <div class="flex items-start gap-2">
+                    <svg class="w-4 h-4 text-sky-500 mt-0.5 flex-shrink-0 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                    <div>
+                        <p class="text-sm font-medium text-sky-800">Awaiting AI Quality Screen</p>
+                        <p class="text-xs text-slate-500 mt-1">Being evaluated by our AI screening system.</p>
+                    </div>
+                </div>
+
+                {% elif paper.status == 'ai_screen_rejected' %}
+                <div class="flex items-start gap-2">
+                    <svg class="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    <div>
+                        <p class="text-sm font-medium text-red-800">Did Not Pass AI Screen</p>
+                        <p class="text-xs text-slate-500 mt-1">Authors may revise and resubmit.</p>
+                    </div>
+                </div>
+
+                {% elif paper.review_stage == 1 %}
+                <div class="flex items-start gap-2">
+                    <svg class="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div>
+                        <p class="text-sm font-medium text-blue-800">Awaiting Endorsement</p>
+                        <p class="text-xs text-slate-500 mt-1">Needs a Bronze+ ORCID scholar endorsement to advance.</p>
+                    </div>
+                </div>
+
+                {% elif paper.review_stage == 2 %}
+                <div class="flex items-start gap-2">
+                    <svg class="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                    <div>
+                        <p class="text-sm font-medium text-purple-800">Ready for AI Review</p>
+                        <p class="text-xs text-slate-500 mt-1">Endorsed and eligible for review via <a href="https://reviewer3.com" target="_blank" class="text-purple-600 hover:underline">Reviewer3.com</a>.</p>
+                        {% if user %}
+                            {% for author in paper.human_authors %}
+                                {% if author.user_id == user.id %}
+                                <a href="/paper/{{ paper.id }}/ai-review"
+                                   class="inline-flex items-center gap-1.5 mt-2 px-3 py-1.5 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition text-xs font-medium">
+                                    Submit for AI Review &rarr;
+                                </a>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% elif paper.review_stage == 3 %}
+                    {% if latest_ai_review and latest_ai_review.status == 'completed' and not latest_ai_review.approved %}
+                    <div class="flex items-start gap-2">
+                        <svg class="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        <div>
+                            <p class="text-sm font-medium text-amber-800">Response Required</p>
+                            <p class="text-xs text-slate-500 mt-1">
+                                {% set comment_count = latest_ai_review.review_data.get('comments', [])|length if latest_ai_review.review_data is mapping else 0 %}
+                                Round {{ latest_ai_review.review_round }}: {{ comment_count }} comment{{ 's' if comment_count != 1 else '' }} to address.
+                            </p>
+                            {% if user %}
+                                {% for author in paper.human_authors %}
+                                    {% if author.user_id == user.id %}
+                                    <a href="/paper/{{ paper.id }}/ai-review"
+                                       class="inline-flex items-center gap-1.5 mt-2 px-3 py-1.5 bg-amber-600 text-white rounded-md hover:bg-amber-700 transition text-xs font-medium">
+                                        Respond to Review &rarr;
+                                    </a>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% elif latest_ai_review and latest_ai_review.status in ('submitted', 'in_progress') %}
+                    <div class="flex items-start gap-2">
+                        <svg class="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                        <div>
+                            <p class="text-sm font-medium text-purple-800">
+                                AI Review In Progress
+                                {% if latest_ai_review.review_round > 1 %} (Round {{ latest_ai_review.review_round }}){% endif %}
+                            </p>
+                            <p class="text-xs text-slate-500 mt-1">Reviewers are evaluating this paper.</p>
+                            {% if user %}
+                                {% for author in paper.human_authors %}
+                                    {% if author.user_id == user.id %}
+                                    <a href="/paper/{{ paper.id }}/ai-review" class="inline-flex items-center gap-1 mt-2 text-xs text-purple-700 hover:underline font-medium">Check status &rarr;</a>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="flex items-start gap-2">
+                        <svg class="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                        <div>
+                            <p class="text-sm font-medium text-purple-800">AI Review Stage</p>
+                            {% if user %}
+                                {% for author in paper.human_authors %}
+                                    {% if author.user_id == user.id %}
+                                    <a href="/paper/{{ paper.id }}/ai-review" class="inline-flex items-center gap-1 mt-1 text-xs text-purple-700 hover:underline font-medium">Go to AI Review &rarr;</a>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                {% elif paper.review_stage == 4 %}
+                <div class="flex items-start gap-2">
+                    <svg class="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div>
+                        <p class="text-sm font-medium text-amber-800">Awaiting Human Peer Review</p>
+                        <p class="text-xs text-slate-500 mt-1">AI review passed. Human peer review coming in the future.</p>
+                    </div>
+                </div>
+
+                {% elif paper.review_stage == 5 %}
+                <div class="flex items-start gap-2">
+                    <svg class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div>
+                        <p class="text-sm font-medium text-green-800">Accepted</p>
+                        <p class="text-xs text-slate-500 mt-1">Accepted by the editorial board.</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- AI Review Card (for papers with reviews) -->
+            {% if all_ai_reviews is defined and all_ai_reviews %}
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-5">
+                <div class="flex items-center gap-2 mb-3">
+                    <img src="/static/images/reviewer3-logo.png" alt="R3" class="w-5 h-5">
+                    <h3 class="text-sm font-semibold text-secondary" style="font-family: Georgia, serif;">AI Review</h3>
+                    {% set last_review = all_ai_reviews[-1] %}
+                    {% if last_review.approved %}
+                    <span class="ml-auto inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-green-100 text-green-800">Passed</span>
+                    {% elif last_review.desk_rejected %}
+                    <span class="ml-auto inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-100 text-red-800">Rejected</span>
+                    {% elif last_review.status == 'completed' %}
+                    <span class="ml-auto inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-800">Action Needed</span>
+                    {% else %}
+                    <span class="ml-auto inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-100 text-purple-800">In Progress</span>
+                    {% endif %}
+                </div>
+                <div class="text-xs text-slate-600 mb-3">
+                    {{ all_ai_reviews|length }} round{{ 's' if all_ai_reviews|length != 1 else '' }}
+                    &middot; Powered by <a href="https://reviewer3.com" target="_blank" class="text-secondary hover:underline font-medium">Reviewer3.com</a>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <a href="/paper/{{ paper.id }}/ai-review/summary"
+                       class="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition text-xs font-medium">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
+                        View Full Review
+                    </a>
+                    <a href="/paper/{{ paper.id }}/ai-review/export/pdf"
+                       class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white border border-purple-200 text-purple-700 rounded-md hover:bg-purple-50 transition text-xs font-medium">
+                        <svg class="w-3.5 h-3.5 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM6 20V4h7v5h5v11H6z"/>
+                        </svg>
+                        Export PDF
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Authors -->
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                <h3 class="text-lg font-bold text-secondary mb-4">Authors</h3>
+
+                <!-- Human Authors -->
+                {% if paper.human_authors %}
+                <div class="mb-4">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-2">Human Prompters</h4>
+                    <div class="space-y-2">
+                        {% for author in paper.human_authors|sort(attribute='author_order') %}
+                        <div class="flex items-start space-x-2">
+                            <span class="text-xs text-slate-500 mt-1">{{ author.author_order }}.</span>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-1">
+                                    <a href="/auth/profile?user_id={{ author.user.id }}"
+                                       class="text-sm font-medium text-primary hover:text-blue-700">
+                                        {{ author.user.name }}
+                                    </a>
+                                    {% set badge = author.user.badge or 'noob' %}
+                                    {% set works_count = author.user.works_count or 0 %}
+                                    {% include 'components/badge_icon.html' %}
+                                </div>
+                                <p class="text-xs text-slate-500">
+                                    <a href="https://orcid.org/{{ author.user.orcid_id }}"
+                                       target="_blank"
+                                       class="hover:text-primary">
+                                        ORCID: {{ author.user.orcid_id }}
+                                    </a>
+                                </p>
+                                {% if author.contribution %}
+                                <p class="text-xs text-slate-600 mt-1">{{ author.contribution }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- AI Authors -->
+                {% if paper.ai_authors %}
+                <div>
+                    <h4 class="text-sm font-semibold text-accent mb-2">AI Co-Authors</h4>
+                    <div class="space-y-2">
+                        {% for ai in paper.ai_authors|sort(attribute='author_order') %}
+                        <div class="flex items-start space-x-2">
+                            <span class="text-xs text-slate-500 mt-1">{{ ai.author_order }}.</span>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-slate-900">{{ ai.ai_name }}</p>
+                                {% if ai.ai_version %}
+                                <p class="text-xs text-slate-500">Version: {{ ai.ai_version }}</p>
+                                {% endif %}
+                                {% if ai.ai_role %}
+                                <p class="text-xs text-slate-600">Role: {{ ai.ai_role }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Endorsements (stage 1 only) -->
+            {% if paper.review_stage == 1 %}
+            {% include 'components/endorsement_button.html' %}
+            {% endif %}
+
+            <!-- Research Fields -->
+            {% if paper.fields %}
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                <h3 class="text-lg font-bold text-secondary mb-4">Research Fields</h3>
+                <div class="flex flex-wrap gap-2">
+                    {% for field in paper.fields %}
+                    <span class="inline-block bg-slate-100 text-slate-700 text-xs px-3 py-1 rounded-full">
+                        {{ field.display_name }}
+                    </span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Academic Categories -->
+            {% if paper.categories %}
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                <h3 class="text-lg font-bold text-secondary mb-4">Academic Categories</h3>
+                <div class="space-y-3">
+                    {% for category in paper.categories|sort(attribute='leaf_category') %}
+                    <div class="border-l-4 border-primary pl-3">
+                        <p class="text-sm font-semibold text-slate-900">{{ category.leaf_category }}</p>
+                        <p class="text-xs text-slate-500 mt-1">{{ category.category_path }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Version History -->
+            {% if paper.versions|length > 1 %}
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                <h3 class="text-lg font-bold text-secondary mb-4">Version History</h3>
+                {# Build a map: version_number -> AI review info #}
+                {% set version_reviews = {} %}
+                {% if all_ai_reviews is defined %}
+                    {% for rev in all_ai_reviews %}
+                        {% if rev.paper_version %}
+                            {% if rev.review_round == 1 %}
+                                {% set _ = version_reviews.update({rev.paper_version: {'label': 'Submitted for AI review', 'color': 'purple'}}) %}
+                            {% elif rev.approved %}
+                                {% set _ = version_reviews.update({rev.paper_version: {'label': 'Passed AI review', 'color': 'green'}}) %}
+                            {% elif rev.desk_rejected %}
+                                {% set _ = version_reviews.update({rev.paper_version: {'label': 'Desk rejected (round ' ~ rev.review_round ~ ')', 'color': 'red'}}) %}
+                            {% else %}
+                                {% set _ = version_reviews.update({rev.paper_version: {'label': 'AI review revision (round ' ~ rev.review_round ~ ')', 'color': 'amber'}}) %}
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                <div class="space-y-3">
+                    {% for version in paper.versions|sort(attribute='version_number', reverse=True) %}
+                    <div class="border-l-4 {{ 'border-primary' if version.version_number == paper.current_version else 'border-slate-200' }} pl-3">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-sm font-bold text-slate-900">
+                                v{{ version.version_number }}
+                                {% if version.version_number == paper.current_version %}
+                                <span class="text-xs text-primary">(current)</span>
+                                {% endif %}
+                            </span>
+                            <span class="text-xs text-slate-500">
+                                {{ version.created_at|format_date("%b %d, %Y") }}
+                            </span>
+                        </div>
+                        {% if version.change_log %}
+                        <p class="text-xs text-slate-600">{{ version.change_log }}</p>
+                        {% endif %}
+                        {# Stage annotation for this version #}
+                        {% set vr = version_reviews.get(version.version_number) %}
+                        {% if vr %}
+                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-{{ vr.color }}-100 text-{{ vr.color }}-700 mt-1">
+                            {{ vr.label }}
+                        </span>
+                        {% elif version.version_number == 1 %}
+                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-700 mt-1">
+                            Initial submission
+                        </span>
+                        {% endif %}
+                        {% if version.version_number != paper.current_version %}
+                        <a href="/paper/{{ paper.id }}/pdf?version={{ version.version_number }}"
+                           target="_blank"
+                           class="text-xs text-primary hover:text-blue-700 mt-1 inline-block">
+                            View this version &rarr;
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Paper Stats -->
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                <h3 class="text-lg font-bold text-secondary mb-4">Stats</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-slate-600">Versions</span>
+                        <span class="text-sm font-bold text-slate-900">{{ paper.current_version }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-slate-600">Comments</span>
+                        <span class="text-sm font-bold text-slate-900">{{ paper.comments|length }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-slate-600">Authors</span>
+                        <span class="text-sm font-bold text-slate-900">
+                            {{ (paper.human_authors|length) + (paper.ai_authors|length) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// PDF Loading management
+let pdfLoadTimeout;
+let pdfLoaded = false;
+
+// Detect if device is mobile
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+}
+
+// Handle PDF load success
+function handlePDFLoad() {
+    pdfLoaded = true;
+    clearTimeout(pdfLoadTimeout);
+    document.getElementById('pdf-loading').style.display = 'none';
+}
+
+// Handle PDF load error
+function handlePDFError() {
+    clearTimeout(pdfLoadTimeout);
+    document.getElementById('pdf-loading').style.display = 'none';
+    document.getElementById('pdf-error').classList.remove('hidden');
+}
+
+// Set timeout for PDF loading (30 seconds)
+pdfLoadTimeout = setTimeout(() => {
+    if (!pdfLoaded) {
+        console.warn('PDF load timeout - might be a large file or browser issue');
+        document.getElementById('pdf-loading').style.display = 'none';
+        // Don't show error automatically - PDF might still be loading
+    }
+}, 30000);
+
+// Handle PDF expansion - mobile opens in new tab, desktop uses fullscreen
+function handleExpandPDF() {
+    const pdfUrl = '/paper/{{ paper.id }}/pdf';
+
+    // On mobile devices, open PDF in new tab (better experience)
+    if (isMobileDevice()) {
+        window.open(pdfUrl, '_blank');
+        return;
+    }
+
+    // On desktop, use fullscreen API
+    const container = document.getElementById('pdf-viewer-container');
+
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        // Enter fullscreen
+        if (container.requestFullscreen) {
+            container.requestFullscreen().catch(err => {
+                console.log('Fullscreen failed, opening in new tab instead');
+                window.open(pdfUrl, '_blank');
+            });
+        } else if (container.webkitRequestFullscreen) {
+            container.webkitRequestFullscreen();
+        } else if (container.mozRequestFullScreen) {
+            container.mozRequestFullScreen();
+        } else if (container.msRequestFullscreen) {
+            container.msRequestFullscreen();
+        } else {
+            // Fallback: open in new tab
+            window.open(pdfUrl, '_blank');
+        }
+    } else {
+        // Exit fullscreen
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+    }
+}
+
+// Update button appearance when fullscreen changes (desktop only)
+document.addEventListener('fullscreenchange', updateFullscreenButton);
+document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
+document.addEventListener('mozfullscreenchange', updateFullscreenButton);
+document.addEventListener('msfullscreenchange', updateFullscreenButton);
+
+function updateFullscreenButton() {
+    const icon = document.getElementById('fullscreen-icon');
+    const text = document.getElementById('fullscreen-text');
+    const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement ||
+                        document.mozFullScreenElement || document.msFullscreenElement;
+
+    if (isFullscreen) {
+        // Show exit fullscreen icon
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
+        text.textContent = 'Exit';
+    } else {
+        // Show fullscreen icon
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>';
+        text.textContent = 'Fullscreen';
+    }
+}
+
+// Update button text on page load for mobile
+if (isMobileDevice()) {
+    const text = document.getElementById('fullscreen-text');
+    if (text) text.textContent = 'Open';
+}
+
+// Delete a paper comment
+async function deletePaperComment(commentId, btn) {
+    if (!confirm('Delete this comment?')) return;
+    try {
+        const res = await fetch('/comment/' + commentId + '/delete', { method: 'POST' });
+        if (res.ok) {
+            var el = document.getElementById('comment-' + commentId);
+            if (el) { el.style.opacity = '0.3'; el.style.pointerEvents = 'none'; }
+        }
+    } catch (e) { console.error(e); }
+}
+</script>
+{% endblock %}

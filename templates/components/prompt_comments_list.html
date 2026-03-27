@@ -1,0 +1,54 @@
+<!-- Comments list for a prompt -->
+<div class="divide-y divide-slate-50">
+    {% for comment in prompt.comments %}
+        {% include 'components/prompt_comment.html' %}
+    {% endfor %}
+</div>
+{% if user %}
+<div x-data="{ content: '', posting: false, error: '', posted: false }" class="mt-2 pt-2 border-t border-slate-50" id="pcf-{{ prompt.id }}">
+    <div class="flex gap-2">
+        <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-1 hidden sm:flex">
+            <span class="text-[10px] font-bold text-white">{{ user.name[0] }}</span>
+        </div>
+        <div class="flex-1 min-w-0">
+            <textarea x-model="content" placeholder="Reply..." maxlength="2000" rows="2"
+                      x-on:input="$el.style.height='auto';$el.style.height=$el.scrollHeight+'px'"
+                      x-on:keydown.enter.prevent="if(!$event.shiftKey) $refs.postBtn.click()"
+                      class="w-full text-sm sm:text-xs px-3 py-2 sm:py-1.5 border border-slate-200 rounded-lg focus:ring-1 focus:ring-primary/20 focus:border-primary focus:outline-none resize-none leading-relaxed"></textarea>
+        </div>
+        <button type="button" x-ref="postBtn" class="text-[11px] px-3 py-1 bg-primary text-white font-medium rounded-full hover:bg-blue-700 transition self-end flex-shrink-0"
+                x-bind:disabled="posting || !content.trim()"
+                x-on:click="
+                    if (!content.trim() || posting) return;
+                    posting = true;
+                    error = '';
+                    fetch('/prompts/{{ prompt.id }}/comment', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                        body: 'content=' + encodeURIComponent(content)
+                    })
+                    .then(r => {
+                        if (r.status === 401) { window.location.href = '/auth/login'; return; }
+                        if (!r.ok) throw new Error('Status ' + r.status);
+                        return r.text();
+                    })
+                    .then(html => {
+                        if (!html) return;
+                        document.getElementById('pcf-{{ prompt.id }}').insertAdjacentHTML('beforebegin', html);
+                        content = '';
+                        let c = document.getElementById('prompt-comment-count-{{ prompt.id }}');
+                        if (c) c.textContent = parseInt(c.textContent || 0) + 1;
+                        posted = true;
+                        setTimeout(() => posted = false, 2000);
+                    })
+                    .catch(e => { error = e.message; console.error('Reply failed:', e); })
+                    .finally(() => posting = false);
+                ">
+            <span x-show="!posting && !posted">Post</span>
+            <span x-show="posting" x-cloak>Posting...</span>
+            <span x-show="posted" x-cloak class="text-green-600">Done!</span>
+        </button>
+    </div>
+    <p x-show="error" x-text="error" class="text-[10px] text-red-500 mt-1 ml-8" x-cloak></p>
+</div>
+{% endif %}

@@ -1,0 +1,60 @@
+{# Stage Progress Bar Component - 6-stage horizontal pipeline (0–5) #}
+{% set stages = [
+    (0, "Submitted", "Email verified; awaiting AI quality screening"),
+    (1, "AI Screened", "Passed AI quality screening"),
+    (2, "Endorsed", "Endorsed by a bronze+ ORCID scholar"),
+    (3, "AI Review", "AI review via Reviewer3.com"),
+    (4, "Peer Review", "Human peer review by 2 reviewers"),
+    (5, "Accepted", "Accepted by editorial board"),
+] %}
+
+<div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 mb-6">
+    <div class="flex items-center justify-between">
+        {% for stage_num, stage_label, stage_desc in stages %}
+            <div class="flex-1 flex flex-col items-center relative group">
+                {# Connector line #}
+                {% if not loop.first %}
+                <div class="absolute left-0 top-4 w-1/2 h-0.5
+                    {% if paper.review_stage >= stage_num %}bg-accent{% else %}bg-slate-200{% endif %}
+                " style="transform: translateX(-50%);"></div>
+                {% endif %}
+                {% if not loop.last %}
+                <div class="absolute right-0 top-4 w-1/2 h-0.5
+                    {% if paper.review_stage > stage_num %}bg-accent{% else %}bg-slate-200{% endif %}
+                " style="transform: translateX(50%);"></div>
+                {% endif %}
+
+                {# Stage circle #}
+                <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold z-10 relative
+                    {% if paper.review_stage == stage_num %}
+                        bg-primary text-white ring-2 ring-primary/30
+                    {% elif paper.review_stage > stage_num %}
+                        bg-accent text-white
+                    {% else %}
+                        bg-slate-200 text-slate-500
+                    {% endif %}
+                ">
+                    {% if paper.review_stage > stage_num %}
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                    {% else %}
+                        {{ stage_num }}
+                    {% endif %}
+                </div>
+
+                {# Stage label #}
+                <span class="text-xs mt-1 text-center font-medium
+                    {% if paper.review_stage == stage_num %}text-primary
+                    {% elif paper.review_stage > stage_num %}text-accent
+                    {% else %}text-slate-400{% endif %}
+                ">{{ stage_label }}</span>
+
+                {# Tooltip #}
+                <div class="hidden group-hover:block absolute top-full mt-2 px-3 py-2 bg-slate-800 text-white text-xs rounded-md shadow-lg z-20 whitespace-nowrap">
+                    {{ stage_desc }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>

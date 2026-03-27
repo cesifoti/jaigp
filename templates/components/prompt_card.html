@@ -1,0 +1,130 @@
+<!-- Community Prompt Card — social media feed style -->
+{% set ptype = prompt.post_type if prompt.post_type is defined else 'prompt' %}
+{% set type_border = {'prompt': 'border-l-blue-400', 'rule': 'border-l-amber-400', 'comment': 'border-l-slate-300'} %}
+{% set type_label = {'prompt': 'Prompt', 'rule': 'Rule', 'comment': 'Comment'} %}
+{% set type_label_color = {'prompt': 'text-blue-600 bg-blue-50', 'rule': 'text-amber-700 bg-amber-50', 'comment': 'text-slate-500 bg-slate-100'} %}
+<article class="py-5 border-l-[3px] pl-4 -ml-1 {% if is_new %}bg-green-50/50{% endif %} {{ type_border.get(ptype, 'border-l-slate-300') }}" id="prompt-{{ prompt.id }}">
+    <div class="flex gap-3">
+        <!-- Avatar -->
+        <div class="flex-shrink-0">
+            <a href="/auth/profile?user_id={{ prompt.user_id }}" class="block">
+                <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <span class="text-sm font-bold text-primary">{{ prompt.user.name[0] }}{{ prompt.user.name.split()[-1][0] if prompt.user.name.split()|length > 1 else '' }}</span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Content -->
+        <div class="flex-1 min-w-0">
+            <!-- Header: name, badge, follow, time -->
+            <div class="flex items-center gap-2 mb-0.5 flex-wrap">
+                <a href="/auth/profile?user_id={{ prompt.user_id }}" class="font-semibold text-secondary hover:underline text-sm truncate">
+                    {{ prompt.user.name }}
+                </a>
+                <span class="flex-shrink-0">
+                    {% set badge = prompt.user.badge or 'new' %}
+                    {% set works_count = prompt.user.works_count or 0 %}
+                    {% include 'components/badge_icon.html' %}
+                </span>
+                {% if user and user.id != prompt.user_id %}
+                <span x-data="{ following: {{ 'true' if user_following is defined and prompt.user_id in user_following else 'false' }} }" class="flex-shrink-0">
+                    <button type="button"
+                            x-on:click="
+                                fetch('/user/{{ prompt.user_id }}/follow', {method:'POST'})
+                                .then(r => r.json())
+                                .then(d => { if(d.success) following = d.following; })
+                                .catch(e => console.error(e));
+                            "
+                            class="text-[10px] px-2 py-0.5 rounded-full border transition"
+                            x-bind:class="following ? 'bg-primary/10 text-primary border-primary/30' : 'bg-slate-50 text-slate-400 border-slate-200 hover:border-primary/30 hover:text-primary'">
+                        <span x-text="following ? 'Following' : 'Follow'"></span>
+                    </button>
+                </span>
+                {% endif %}
+                <span class="text-xs text-slate-400 flex-shrink-0">&middot; {{ prompt.created_at|format_date("%b %d") }}</span>
+                {% if prompt.edited_at %}<span class="text-[10px] text-slate-400 italic">edited</span>{% endif %}
+                <span class="text-[10px] font-medium px-1.5 py-0.5 rounded-full {{ type_label_color.get(ptype, 'text-slate-500 bg-slate-100') }}">{{ type_label.get(ptype, 'Post') }}</span>
+            </div>
+
+            <!-- Body -->
+            <div class="text-sm sm:text-base text-slate-700 leading-relaxed whitespace-pre-line" id="prompt-text-{{ prompt.id }}">{% if prompt.prompt_text|length > 400 %}{{ prompt.prompt_text[:400]|format_post }}...<button onclick="expandPrompt({{ prompt.id }})" class="text-primary hover:underline ml-1 text-xs">show more</button>{% else %}{{ prompt.prompt_text|format_post }}{% endif %}</div>
+            <div class="hidden text-sm sm:text-base text-slate-700 leading-relaxed whitespace-pre-line" id="prompt-full-{{ prompt.id }}">{{ prompt.prompt_text|format_post }}<button onclick="collapsePrompt({{ prompt.id }})" class="text-primary hover:underline ml-1 text-xs">show less</button></div>
+            {% if user and user.id == prompt.user_id %}
+            <!-- Edit (1-hour window) -->
+            <div id="prompt-edit-{{ prompt.id }}" class="hidden mt-2">
+                <textarea id="prompt-edit-input-{{ prompt.id }}" rows="3" class="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none resize-y leading-relaxed mb-2"></textarea>
+                <div class="flex items-center gap-2">
+                    <button onclick="savePromptEdit({{ prompt.id }})" class="text-[11px] px-3 py-1 bg-primary text-white rounded-full hover:bg-blue-700 transition">Save</button>
+                    <button onclick="cancelPromptEdit({{ prompt.id }})" class="text-[11px] text-slate-500 hover:text-slate-700">Cancel</button>
+                    <span id="prompt-edit-error-{{ prompt.id }}" class="text-[10px] text-red-500"></span>
+                </div>
+            </div>
+            <button onclick="startPromptEdit({{ prompt.id }})" id="prompt-edit-btn-{{ prompt.id }}" class="text-[10px] text-slate-400 hover:text-primary mt-1">Edit</button>
+            {% endif %}
+
+            {% if prompt.context %}
+            <div class="text-xs text-slate-500 italic mt-2 pl-3 border-l-2 border-slate-200">{{ prompt.context }}</div>
+            {% endif %}
+
+            <!-- Engagement row -->
+            <div class="flex items-center gap-5 mt-3 -ml-1.5">
+                <!-- Like -->
+                <button onclick="votePrompt({{ prompt.id }}, 'upvote')"
+                        class="flex items-center gap-1 px-1.5 py-1 rounded-full hover:bg-pink-50 transition group"
+                        id="upvote-{{ prompt.id }}" title="Like">
+                    <svg class="w-[18px] h-[18px] {% if user_votes.get(prompt.id) == 'upvote' %}text-pink-500{% else %}text-slate-400 group-hover:text-pink-400{% endif %}"
+                         fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    <span class="text-xs font-medium {% if user_votes.get(prompt.id) == 'upvote' %}text-pink-500{% else %}text-slate-400{% endif %}" id="upcount-{{ prompt.id }}">{{ prompt.upvote_count }}</span>
+                </button>
+
+                <!-- Dislike -->
+                <button onclick="votePrompt({{ prompt.id }}, 'downvote')"
+                        class="flex items-center gap-1 px-1.5 py-1 rounded-full hover:bg-red-50 transition group"
+                        id="downvote-{{ prompt.id }}" title="Dislike">
+                    <svg class="w-[18px] h-[18px] {% if user_votes.get(prompt.id) == 'downvote' %}text-red-500{% else %}text-slate-400 group-hover:text-red-400{% endif %}"
+                         fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" opacity="0.15"/><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="8" y1="7" x2="16" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <span class="text-xs font-medium {% if user_votes.get(prompt.id) == 'downvote' %}text-red-500{% else %}text-slate-400{% endif %}" id="downcount-{{ prompt.id }}">{{ prompt.downvote_count }}</span>
+                </button>
+
+                <!-- Net score -->
+                <span class="text-xs font-semibold {% if prompt.net_votes > 0 %}text-green-600{% elif prompt.net_votes < 0 %}text-red-600{% else %}text-slate-400{% endif %}" id="score-{{ prompt.id }}">
+                    {% if prompt.net_votes > 0 %}+{% endif %}{{ prompt.net_votes }} net
+                </span>
+
+                <!-- Comment toggle -->
+                <button onclick="togglePromptComments({{ prompt.id }})"
+                        class="flex items-center gap-1 px-1.5 py-1 rounded-full hover:bg-slate-100 transition group ml-2">
+                    <svg class="w-[16px] h-[16px] text-slate-400 group-hover:text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    <span class="text-xs text-slate-400" id="prompt-comment-count-{{ prompt.id }}">{{ prompt.comment_count }}</span>
+                </button>
+
+                <!-- Permalink -->
+                <a href="/prompts/{{ prompt.id }}" class="text-xs text-slate-400 hover:text-primary ml-1" title="Permalink">
+                    <svg class="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                </a>
+
+                {% if user and user.id == prompt.user_id %}
+                <button onclick="deletePrompt({{ prompt.id }}, this)" class="text-xs text-slate-300 hover:text-red-500 ml-1" title="Delete">
+                    <svg class="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+                {% endif %}
+            </div>
+
+            <!-- View replies link (when comments exist but section not expanded yet) -->
+            {% if prompt.comment_count > 0 %}
+            <button onclick="togglePromptComments({{ prompt.id }})" class="text-[10px] text-primary hover:underline mt-2 ml-4" id="prompt-view-replies-{{ prompt.id }}">
+                View {{ prompt.comment_count }} {% if prompt.comment_count == 1 %}reply{% else %}replies{% endif %}
+            </button>
+            {% endif %}
+
+            <!-- Comments section -->
+            <div class="hidden mt-3 pl-1" id="prompt-comments-{{ prompt.id }}">
+                <div id="prompt-comments-list-{{ prompt.id }}"></div>
+            </div>
+        </div>
+    </div>
+</article>

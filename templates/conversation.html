@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Message {{ other_user.name }} - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Header -->
+    <div class="flex items-center gap-3 mb-6">
+        <a href="/messages" class="text-slate-400 hover:text-primary transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <a href="/auth/profile?user_id={{ other_user.id }}" class="flex items-center gap-2 hover:opacity-80 transition">
+            <div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
+                <span class="text-sm font-bold text-primary">{{ other_user.name[0] }}</span>
+            </div>
+            <div>
+                <p class="text-sm font-semibold text-secondary">{{ other_user.name }}</p>
+                <p class="text-[10px] text-slate-400">{{ other_user.affiliation or other_user.orcid_id }}</p>
+            </div>
+        </a>
+    </div>
+
+    <!-- Messages thread -->
+    <div class="bg-white rounded-xl border border-slate-200 p-5 mb-4 space-y-3 min-h-[200px] max-h-[60vh] overflow-y-auto" id="msg-thread">
+        {% if messages %}
+            {% for msg in messages %}
+                {% include 'components/message_bubble.html' with context %}
+            {% endfor %}
+        {% else %}
+            <p class="text-center text-sm text-slate-400 py-8">No messages yet. Start the conversation!</p>
+        {% endif %}
+    </div>
+
+    <!-- Compose -->
+    {% if can_send %}
+    <div x-data="{ content: '', sending: false, sent: false, error: '' }" class="bg-white rounded-xl border border-slate-200 p-4">
+        <div class="flex-1 mb-2">
+            <textarea x-model="content" placeholder="Write a message... (Shift+Enter for new line)" maxlength="5000" rows="3"
+                      x-on:input="if($el.scrollHeight > 200) { $el.style.height = '200px'; $el.style.overflowY = 'auto'; } else { $el.style.height='auto'; $el.style.height=$el.scrollHeight+'px'; $el.style.overflowY='hidden'; }"
+                      x-on:keydown.enter="if(!$event.shiftKey) { $event.preventDefault(); $refs.sendBtn.click(); }"
+                      class="w-full text-sm px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none resize-none leading-relaxed" style="min-height: 80px; max-height: 200px;"></textarea>
+        </div>
+        <div class="flex items-center justify-between">
+            <p class="text-[10px] text-slate-400">Shift+Enter for new line</p>
+            <button type="button" x-ref="sendBtn"
+                    x-bind:disabled="sending || !content.trim()"
+                    class="px-5 py-2 bg-primary text-white text-sm font-medium rounded-full hover:bg-blue-700 transition flex-shrink-0 disabled:opacity-50"
+                    x-on:click="
+                        if (!content.trim() || sending) return;
+                        sending = true;
+                        error = '';
+                        fetch('/messages/{{ other_user.id }}/send', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                            body: 'content=' + encodeURIComponent(content)
+                        })
+                        .then(r => {
+                            if (r.status === 401) { window.location.href = '/auth/login'; return; }
+                            if (!r.ok) return r.json().then(d => { throw new Error(d.detail || 'Failed'); });
+                            return r.text();
+                        })
+                        .then(html => {
+                            if (!html) return;
+                            document.getElementById('msg-thread').insertAdjacentHTML('beforeend', html);
+                            content = '';
+                            // Reset textarea height
+                            var ta = $el.closest('[x-data]').querySelector('textarea');
+                            if (ta) { ta.style.height = '80px'; ta.style.overflowY = 'hidden'; }
+                            // Scroll to bottom
+                            var thread = document.getElementById('msg-thread');
+                            thread.scrollTop = thread.scrollHeight;
+                            // Remove empty state
+                            var empty = thread.querySelector('.text-center.text-slate-400');
+                            if (empty) empty.remove();
+                            sent = true;
+                            setTimeout(() => sent = false, 1500);
+                        })
+                        .catch(e => { error = e.message; })
+                        .finally(() => sending = false);
+                    ">
+                <span x-show="!sending">Send</span>
+                <span x-show="sending" x-cloak>...</span>
+            </button>
+        </div>
+        <p x-show="error" x-text="error" class="text-[10px] text-red-500 mt-1" x-cloak></p>
+    </div>
+    {% else %}
+    <div class="bg-slate-50 rounded-xl border border-slate-200 p-4 text-center">
+        <p class="text-sm text-slate-500">You can't message this user. They only accept messages from mutual followers.</p>
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+// Scroll to bottom on load
+document.addEventListener('DOMContentLoaded', function() {
+    var thread = document.getElementById('msg-thread');
+    if (thread) thread.scrollTop = thread.scrollHeight;
+});
+</script>
+{% endblock %}

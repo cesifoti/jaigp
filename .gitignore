@@ -1,0 +1,95 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Environment Variables (SENSITIVE - never commit!)
+.env
+.env.dev
+.env.local
+.env.production
+
+# Database files (SENSITIVE - contains user data!)
+data/*.db
+data/*.db-shm
+data/*.db-wal
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+*.out
+
+# Session data
+sessions/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+tmp/
+
+# Redis dumps
+dump.rdb
+
+# Conversation logs (large JSONL files — archive extract is committed instead)
+data/conversations/*.jsonl
+
+# Environment backup files (contain old secrets)
+.env.backup*
+
+# Claude settings
+.claude/settings.local.json
+
+# Nginx cache
+/var/cache/
+
+# pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# MyPy
+.mypy_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Paper uploads (large files - can be backed up separately)
+data/papers/**/*.pdf
+data/papers/**/*.jpg
+data/papers/**/*.jpeg
+data/papers/**/*.png
+
+# Keep directory structure but ignore contents
+data/papers/**/*.html
+data/papers/**/*.md
+
+# Test files
+/tmp/
+
+# Backup files
+*.sql
+*.dump

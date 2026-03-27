@@ -1,0 +1,63 @@
+<!-- Comment Component -->
+<div class="comment bg-slate-50 rounded-lg p-4 border-l-4 border-slate-200" id="comment-{{ comment.id }}">
+    <div class="flex items-start justify-between mb-2">
+        <div class="flex items-center space-x-3">
+            <!-- Avatar -->
+            <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                {{ comment.user.name[0].upper() }}
+            </div>
+
+            <!-- User Info -->
+            <div>
+                <a href="/auth/profile?user_id={{ comment.user.id }}"
+                   class="text-sm font-medium text-slate-900 hover:text-primary">
+                    {{ comment.user.name }}
+                </a>
+                <p class="text-xs text-slate-500">
+                    {{ comment.created_at|format_date("%B %d, %Y at %I:%M %p") }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Vote & Delete Buttons -->
+        {% if user %}
+        <div class="flex items-center space-x-2">
+            <button
+                hx-post="/comment/{{ comment.id }}/vote"
+                hx-vals='{"vote_type": "upvote"}'
+                hx-swap="outerHTML"
+                hx-target="#vote-count-{{ comment.id }}"
+                class="vote-btn text-slate-400 hover:text-accent transition"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                </svg>
+            </button>
+            <span id="vote-count-{{ comment.id }}" class="text-sm font-medium text-slate-700">
+                {{ comment.vote_count }}
+            </span>
+            <button
+                hx-post="/comment/{{ comment.id }}/vote"
+                hx-vals='{"vote_type": "downvote"}'
+                hx-swap="outerHTML"
+                hx-target="#vote-count-{{ comment.id }}"
+                class="vote-btn text-slate-400 hover:text-red-500 transition"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+            {% if user.id == comment.user_id %}
+            <button onclick="deletePaperComment({{ comment.id }}, this)" class="text-slate-300 hover:text-red-500 transition ml-1" title="Delete comment">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Comment Content -->
+    <div class="ml-11">
+        <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{{ comment.content }}</p>
+    </div>
+</div>

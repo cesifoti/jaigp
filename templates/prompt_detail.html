@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+
+{% block title %}Prompt #{{ prompt.id }} - JAIGP{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Back link -->
+    <a href="/prompts" class="text-sm text-slate-500 hover:text-primary mb-4 inline-flex items-center gap-1">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Back to prompts
+    </a>
+
+    {% set ptype = prompt.post_type if prompt.post_type is defined else 'prompt' %}
+    {% set type_label_color = {'prompt': 'text-blue-600 bg-blue-50', 'rule': 'text-amber-700 bg-amber-50', 'comment': 'text-slate-500 bg-slate-100'} %}
+    {% set type_label = {'prompt': 'Prompt', 'rule': 'Rule', 'comment': 'Comment'} %}
+
+    <!-- Prompt card -->
+    <div class="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 mb-6">
+        <div class="flex gap-3">
+            <div class="flex-shrink-0">
+                <a href="/auth/profile?user_id={{ prompt.user_id }}">
+                    <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <span class="text-sm font-bold text-primary">{{ prompt.user.name[0] }}{{ prompt.user.name.split()[-1][0] if prompt.user.name.split()|length > 1 else '' }}</span>
+                    </div>
+                </a>
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1 flex-wrap">
+                    <a href="/auth/profile?user_id={{ prompt.user_id }}" class="font-semibold text-secondary hover:underline text-sm">{{ prompt.user.name }}</a>
+                    <span class="flex-shrink-0">
+                        {% set badge = prompt.user.badge or 'new' %}
+                        {% set works_count = prompt.user.works_count or 0 %}
+                        {% include 'components/badge_icon.html' %}
+                    </span>
+                    {% if user and user.id != prompt.user_id %}
+                    <span x-data="{ following: {{ 'true' if user_following is defined and prompt.user_id in user_following else 'false' }} }" class="flex-shrink-0">
+                        <button type="button"
+                                x-on:click="
+                                    fetch('/user/{{ prompt.user_id }}/follow', {method:'POST'})
+                                    .then(r => r.json())
+                                    .then(d => { if(d.success) following = d.following; })
+                                    .catch(e => console.error(e));
+                                "
+                                class="text-[10px] px-2 py-0.5 rounded-full border transition"
+                                x-bind:class="following ? 'bg-primary/10 text-primary border-primary/30' : 'bg-slate-50 text-slate-400 border-slate-200 hover:border-primary/30 hover:text-primary'">
+                            <span x-text="following ? 'Following' : 'Follow'"></span>
+                        </button>
+                    </span>
+                    {% endif %}
+                    <span class="text-xs text-slate-400">&middot; {{ prompt.created_at|format_date("%b %d, %Y") }}</span>
+                    {% if prompt.edited_at %}<span class="text-[10px] text-slate-400 italic">edited</span>{% endif %}
+                    <span class="text-[10px] font-medium px-1.5 py-0.5 rounded-full {{ type_label_color.get(ptype, 'text-slate-500 bg-slate-100') }}">{{ type_label.get(ptype, 'Post') }}</span>
+                </div>
+
+                <!-- Body -->
+                <div class="text-sm sm:text-base text-slate-700 leading-relaxed whitespace-pre-line mt-2" id="prompt-text-{{ prompt.id }}">{{ prompt.prompt_text|format_post }}</div>
+
+                {% if user and user.id == prompt.user_id %}
+                <!-- Edit (1-hour window) -->
+                <div id="prompt-edit-{{ prompt.id }}" class="hidden mt-2">
+                    <textarea id="prompt-edit-input-{{ prompt.id }}" rows="3" class="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none resize-y leading-relaxed mb-2"></textarea>
+                    <div class="flex items-center gap-2">
+                        <button onclick="savePromptEdit({{ prompt.id }})" class="text-[11px] px-3 py-1 bg-primary text-white rounded-full hover:bg-blue-700 transition">Save</button>
+                        <button onclick="cancelPromptEdit({{ prompt.id }})" class="text-[11px] text-slate-500 hover:text-slate-700">Cancel</button>
+                        <span id="prompt-edit-error-{{ prompt.id }}" class="text-[10px] text-red-500"></span>
+                    </div>
+                </div>
+                <button onclick="startPromptEdit({{ prompt.id }})" id="prompt-edit-btn-{{ prompt.id }}" class="text-[10px] text-slate-400 hover:text-primary mt-1">Edit</button>
+                {% endif %}
+
+                <!-- Engagement row -->
+                <div class="flex items-center gap-5 mt-4 pt-3 border-t border-slate-100 -ml-1.5">
+                    <!-- Like -->
+                    <button onclick="votePrompt({{ prompt.id }}, 'upvote')"
+                            class="flex items-center gap-1 px-1.5 py-1 rounded-full hover:bg-pink-50 transition group"
+                            id="upvote-{{ prompt.id }}" title="Like">
+                        <svg class="w-[18px] h-[18px] {% if user_vote == 'upvote' %}text-pink-500{% else %}text-slate-400 group-hover:text-pink-400{% endif %}"
+                             fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                        <span class="text-xs font-medium {% if user_vote == 'upvote' %}text-pink-500{% else %}text-slate-400{% endif %}" id="upcount-{{ prompt.id }}">{{ prompt.upvote_count }}</span>
+                    </button>
+
+                    <!-- Dislike -->
+                    <button onclick="votePrompt({{ prompt.id }}, 'downvote')"
+                            class="flex items-center gap-1 px-1.5 py-1 rounded-full hover:bg-red-50 transition group"
+                            id="downvote-{{ prompt.id }}" title="Dislike">
+                        <svg class="w-[18px] h-[18px] {% if user_vote == 'downvote' %}text-red-500{% else %}text-slate-400 group-hover:text-red-400{% endif %}"
+                             fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" opacity="0.15"/><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="8" y1="7" x2="16" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <span class="text-xs font-medium {% if user_vote == 'downvote' %}text-red-500{% else %}text-slate-400{% endif %}" id="downcount-{{ prompt.id }}">{{ prompt.downvote_count }}</span>
+                    </button>
+
+                    <!-- Net score -->
+                    <span class="text-xs font-semibold {% if prompt.net_votes > 0 %}text-green-600{% elif prompt.net_votes < 0 %}text-red-600{% else %}text-slate-400{% endif %}" id="score-{{ prompt.id }}">
+                        {% if prompt.net_votes > 0 %}+{% endif %}{{ prompt.net_votes }} net
+                    </span>
+
+                    <!-- Comment count -->
+                    <span class="flex items-center gap-1 text-slate-400">
+                        <svg class="w-[16px] h-[16px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                        <span class="text-xs" id="prompt-comment-count-{{ prompt.id }}">{{ prompt.comment_count }}</span>
+                    </span>
+
+                    {% if user and user.id == prompt.user_id %}
+                    <button onclick="deletePrompt({{ prompt.id }})" class="text-xs text-slate-300 hover:text-red-500 ml-auto" title="Delete">
+                        <svg class="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comments section -->
+    <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">Comments ({{ prompt.comment_count }})</h2>
+    <div class="bg-white rounded-xl border border-slate-200 p-4 sm:p-5">
+        <div id="prompt-comments-list-{{ prompt.id }}">
+            {% include 'components/prompt_comments_list.html' %}
+        </div>
+    </div>
+
+    <!-- Related discussion posts -->
+    {% if related_posts %}
+    <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3 mt-6">Discussion referencing this prompt</h2>
+    <div class="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100 px-5">
+        {% for post in related_posts %}
+        <div class="py-4">
+            <div class="flex gap-3">
+                <a href="/auth/profile?user_id={{ post.user_id }}">
+                    <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                        <span class="text-xs font-bold text-primary">{{ post.user.name[0] }}</span>
+                    </div>
+                </a>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-0.5">
+                        <a href="/auth/profile?user_id={{ post.user_id }}" class="font-semibold text-secondary hover:underline text-xs">{{ post.user.name }}</a>
+                        <span class="text-xs text-slate-400">&middot; {{ post.created_at|format_date("%b %d") }}</span>
+                    </div>
+                    <div class="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{{ post.content }}</div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Link to community -->
+    <div class="mt-6 text-center">
+        <a href="/prompts" class="text-sm text-primary hover:underline">Back to community &rarr;</a>
+    </div>
+
+</div>
+
+<script>
+// Vote on a community prompt
+async function votePrompt(promptId, voteType) {
+    try {
+        const form = new FormData();
+        form.append('vote_type', voteType);
+        const res = await fetch('/prompts/' + promptId + '/vote', { method: 'POST', body: form });
+        if (res.status === 401) { window.location.href = '/auth/login'; return; }
+        const data = await res.json();
+        if (!data.success) return;
+
+        const scoreEl = document.getElementById('score-' + promptId);
+        const prefix = data.net_votes > 0 ? '+' : '';
+        scoreEl.textContent = prefix + data.net_votes + ' net';
+        scoreEl.className = 'text-xs font-semibold ' +
+            (data.net_votes > 0 ? 'text-green-600' : data.net_votes < 0 ? 'text-red-600' : 'text-slate-400');
+
+        document.getElementById('upcount-' + promptId).textContent = data.upvotes;
+        document.getElementById('downcount-' + promptId).textContent = data.downvotes;
+
+        const upBtn = document.getElementById('upvote-' + promptId).querySelector('svg');
+        const downBtn = document.getElementById('downvote-' + promptId).querySelector('svg');
+        upBtn.className = 'w-[18px] h-[18px] ' + (data.user_vote === 'upvote' ? 'text-pink-500' : 'text-slate-400 group-hover:text-pink-400');
+        downBtn.className = 'w-[18px] h-[18px] ' + (data.user_vote === 'downvote' ? 'text-red-500' : 'text-slate-400 group-hover:text-red-400');
+
+        var upCountEl = document.getElementById('upcount-' + promptId);
+        upCountEl.className = 'text-xs font-medium ' + (data.user_vote === 'upvote' ? 'text-pink-500' : 'text-slate-400');
+        var downCountEl = document.getElementById('downcount-' + promptId);
+        downCountEl.className = 'text-xs font-medium ' + (data.user_vote === 'downvote' ? 'text-red-500' : 'text-slate-400');
+    } catch (e) { console.error('Vote failed:', e); }
+}
+
+// Vote on a comment
+async function voteComment(type, commentId, voteType) {
+    const prefix = type === 'discussion' ? 'dcv' : 'pcv';
+    const url = type === 'discussion'
+        ? '/discussion/comment/' + commentId + '/vote'
+        : '/prompts/comment/' + commentId + '/vote';
+    try {
+        const form = new FormData();
+        form.append('vote_type', voteType);
+        const res = await fetch(url, { method: 'POST', body: form });
+        if (res.status === 401) { window.location.href = '/auth/login'; return; }
+        const data = await res.json();
+        if (!data.success) return;
+        document.getElementById(prefix + '-upc-' + commentId).textContent = data.upvotes;
+        document.getElementById(prefix + '-downc-' + commentId).textContent = data.downvotes;
+        const upSvg = document.getElementById(prefix + '-up-' + commentId).querySelector('svg');
+        const downSvg = document.getElementById(prefix + '-down-' + commentId).querySelector('svg');
+        upSvg.className = 'w-3 h-3 ' + (data.user_vote === 'upvote' ? 'text-pink-500' : 'text-slate-300 group-hover:text-pink-400');
+        downSvg.className = 'w-3 h-3 ' + (data.user_vote === 'downvote' ? 'text-red-500' : 'text-slate-300 group-hover:text-red-400');
+        let netEl = document.getElementById(prefix + '-net-' + commentId);
+        if (data.net_votes !== 0) {
+            const netText = (data.net_votes > 0 ? '+' : '') + data.net_votes;
+            const netClass = 'text-[10px] font-semibold ' + (data.net_votes > 0 ? 'text-green-600' : 'text-red-600');
+            if (netEl) { netEl.textContent = netText; netEl.className = netClass; }
+        } else if (netEl) { netEl.remove(); }
+    } catch (e) { console.error('Comment vote failed:', e); }
+}
+
+// Delete prompt
+async function deletePrompt(promptId) {
+    if (!confirm('Delete this prompt permanently?')) return;
+    try {
+        const res = await fetch('/prompts/' + promptId + '/delete', { method: 'POST' });
+        if (res.ok) { window.location.href = '/prompts'; }
+    } catch (e) { console.error(e); }
+}
+
+// Post edit
+function startPromptEdit(id) {
+    var textEl = document.getElementById('prompt-text-' + id);
+    var editDiv = document.getElementById('prompt-edit-' + id);
+    var input = document.getElementById('prompt-edit-input-' + id);
+    var btn = document.getElementById('prompt-edit-btn-' + id);
+    input.value = textEl.innerText.trim();
+    textEl.classList.add('hidden');
+    editDiv.classList.remove('hidden');
+    btn.classList.add('hidden');
+    input.focus();
+    input.style.height = 'auto';
+    input.style.height = input.scrollHeight + 'px';
+}
+function cancelPromptEdit(id) {
+    document.getElementById('prompt-text-' + id).classList.remove('hidden');
+    document.getElementById('prompt-edit-' + id).classList.add('hidden');
+    document.getElementById('prompt-edit-btn-' + id).classList.remove('hidden');
+    document.getElementById('prompt-edit-error-' + id).textContent = '';
+}
+function savePromptEdit(id) {
+    var input = document.getElementById('prompt-edit-input-' + id);
+    var errorEl = document.getElementById('prompt-edit-error-' + id);
+    errorEl.textContent = '';
+    fetch('/prompts/' + id + '/edit', {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:'content=' + encodeURIComponent(input.value)})
+    .then(function(r) { if (!r.ok) return r.json().then(function(d) { throw new Error(d.detail || 'Failed'); }); return r.json(); })
+    .then(function(d) { location.reload(); })
+    .catch(function(e) { errorEl.textContent = e.message; });
+}
+
+// Scroll to comment anchor if present
+if (window.location.hash && window.location.hash.startsWith('#pcomment-')) {
+    setTimeout(function() {
+        var el = document.querySelector(window.location.hash);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.style.backgroundColor = '#eff6ff';
+            setTimeout(function() { el.style.backgroundColor = ''; }, 3000);
+        }
+    }, 300);
+}
+</script>
+{% endblock %}

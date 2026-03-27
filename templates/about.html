@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}About - {{ app_name }}{% endblock %}
+{% block og_title %}About JAIGP — Why AI Research Needs Its Own Journal{% endblock %}
+{% block og_description %}AI-generated research needs a dedicated venue. JAIGP is an open experiment in building the rules and processes for AI-authored scholarly work.{% endblock %}
+{% block twitter_title %}About JAIGP — Why AI Research Needs Its Own Journal{% endblock %}
+{% block twitter_description %}AI-generated research needs a dedicated venue. JAIGP is an open experiment in building the rules for AI-authored scholarly work.{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <h1 class="text-4xl md:text-5xl font-bold text-secondary mb-4">
+            About JAIGP
+        </h1>
+        <p class="text-xl text-slate-600">
+            An open experiment in AI-generated research and AI-powered review
+        </p>
+    </div>
+
+    <!-- Sub-navigation -->
+    <div class="flex justify-center gap-4 mb-10 border-b border-slate-200">
+        <a href="/about" class="pb-3 text-sm font-semibold border-b-2 border-primary text-primary">About</a>
+        <a href="/about/history" class="pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition">History</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="mb-12">
+        <div class="font-serif text-body text-slate-700 space-y-6">
+            <p class="text-lg leading-relaxed">
+                AI-generated research papers are coming whether the academic world is ready or not. As large language models become increasingly capable of producing structured arguments, analyzing data, and synthesizing literature, the volume of AI-assisted and AI-generated scholarly work will only grow. Traditional journals aren't designed for this — they lack the frameworks, disclosure requirements, and review processes needed to evaluate work where an AI is a primary author.
+            </p>
+            <p>
+                The Journal for AI Generated Papers (JAIGP) was created to fill that gap. We believe AI-generated research needs its own venue — one purpose-built for transparency about how papers were produced, with review processes adapted to the unique challenges of evaluating machine-generated scholarship. JAIGP is that venue: an open experiment in building the infrastructure that AI-generated science requires.
+            </p>
+
+            <h2 class="text-2xl font-bold text-secondary font-sans mt-10 mb-3">Our Mission</h2>
+            <p>
+                To provide a dedicated, transparent platform where human prompters and AI systems collaborate to advance knowledge — with clear attribution, structured review, and honest acknowledgment that we are all learning what AI-generated research can be.
+            </p>
+
+            <!-- Link to Rules -->
+            <div class="bg-slate-50 border border-slate-200 rounded-lg p-5 my-8">
+                <p class="text-sm text-slate-600">
+                    Every submission passes through a structured multi-stage review pipeline. For a full description of how papers are screened, endorsed, reviewed, and accepted, see the <a href="/rules" class="text-primary hover:text-blue-700 font-semibold">Rules page</a>.
+                    AI reviews via <a href="https://reviewer3.com" target="_blank" rel="noopener" class="text-primary hover:text-blue-700 font-semibold">Reviewer3.com</a> are free while supplies last.
+                </p>
+            </div>
+
+            <div class="bg-gradient-to-r from-primary/5 to-accent/5 rounded-lg border border-primary/20 p-6 my-8">
+                <h3 class="text-xl font-bold text-secondary font-sans mb-3">A Multidisciplinary Journal for Ideas That Deserve Exploration</h3>
+                <p class="mb-3">
+                    JAIGP is a <strong>multidisciplinary journal</strong> that welcomes contributions from <strong>all fields of science</strong>. Whether your research spans physics, biology, computer science, engineering, social sciences, humanities, mathematics, or any other domain of inquiry, we embrace the diversity of AI-assisted research across all disciplines.
+                </p>
+                <p>
+                    We also recognize that many researchers have <strong>side project ideas</strong> — hypotheses to test, questions to explore, connections to investigate — that never get implemented due to time, resource, or institutional constraints. JAIGP provides an outlet for these ideas. By collaborating with AI, you can bring your research questions to life and contribute to scientific discourse even when traditional research pathways aren't available.
+                </p>
+            </div>
+
+            <h2 class="text-2xl font-bold text-secondary font-sans mt-10 mb-3">Why a Separate Venue?</h2>
+            <p>
+                Submitting AI-generated work to traditional journals creates problems for everyone. Reviewers don't know how to evaluate it, editors don't have policies for it, and authors face stigma for disclosing AI involvement. The result is that AI-generated research either goes underground (submitted without disclosure) or doesn't get shared at all. Neither outcome serves science.
+            </p>
+            <p>
+                A dedicated journal solves this by making AI authorship the norm, not the exception. At JAIGP, every paper is expected to involve AI. This removes the stigma and lets us focus on the real questions: Is the research sound? Are the methods transparent? Does the work contribute something useful? JAIGP is, to our knowledge, the first journal to integrate AI-powered review into a formal publication pipeline — not because we think we've figured it all out, but because we think the best way to learn is to try, transparently, and iterate.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-8">
+                <div class="bg-slate-50 rounded-lg p-6 border border-slate-200">
+                    <h3 class="text-lg font-bold text-primary font-sans mb-2">Transparency</h3>
+                    <p class="text-sm">
+                        Clear attribution of human prompters and AI models, with every review decision visible
+                    </p>
+                </div>
+                <div class="bg-slate-50 rounded-lg p-6 border border-slate-200">
+                    <h3 class="text-lg font-bold text-accent font-sans mb-2">Iteration</h3>
+                    <p class="text-sm">
+                        Version control that tracks how papers evolve through review and revision
+                    </p>
+                </div>
+                <div class="bg-slate-50 rounded-lg p-6 border border-slate-200">
+                    <h3 class="text-lg font-bold text-secondary font-sans mb-2">Collaboration</h3>
+                    <p class="text-sm">
+                        Community comments, endorsements, and structured review — human and AI
+                    </p>
+                </div>
+                <div class="bg-slate-50 rounded-lg p-6 border border-slate-200">
+                    <h3 class="text-lg font-bold text-primary font-sans mb-2">Exploration</h3>
+                    <p class="text-sm">
+                        A place to try things out, learn what works, and contribute to an evolving understanding of AI research
+                    </p>
+                </div>
+            </div>
+
+            <h2 class="text-2xl font-bold text-secondary font-sans mt-10 mb-3">Our Philosophy</h2>
+            <p>
+                At the heart of JAIGP lies a commitment to <strong>learning through collaborative exploration</strong>. We believe that understanding emerges not from perfect knowledge, but from thoughtful inquiry conducted in partnership with both humans and AI systems.
+            </p>
+            <p>
+                In this space, we embrace productive uncertainty. We recognize that AI-generated research challenges traditional notions of authorship, creativity, and expertise. Rather than pretending to have all the answers, we invite researchers, thinkers, and curious minds to join us in exploring these questions together.
+            </p>
+
+            <h2 class="text-2xl font-bold text-secondary font-sans mt-10 mb-3">Credits & Source Code</h2>
+            <p>
+                JAIGP was built entirely through conversational prompting — <a href="https://chidalgo.com" target="_blank" class="text-primary hover:text-blue-700 font-medium">César A. Hidalgo</a> instructs an AI coding assistant (Claude) via the command line, and the AI implements features, fixes bugs, and manages the infrastructure. Every prompt used to build the journal is publicly archived on the <a href="/prompts?tab=archive" class="text-primary hover:text-blue-700 font-medium">Open Prompt</a> page.
+            </p>
+            <p>
+                The full source code is open and available on <a href="https://github.com/cesifoti/jaigp" target="_blank" rel="noopener" class="text-primary hover:text-blue-700 font-medium">GitHub</a>. Anyone can fork the project to run their own AI-generated paper journal, or browse the code for reference.
+            </p>
+
+            <h2 class="text-2xl font-bold text-secondary font-sans mt-10 mb-3">Join Us</h2>
+            <p>
+                JAIGP is built collaboratively with its community through what we call <strong>Open Prompt</strong> — anyone can suggest what the journal should build, change, or improve next. Accepted prompts are passed to the team and implemented over time. This isn't just a journal you read; it's one you help shape.
+            </p>
+            <p>
+                Whether you're a researcher, an AI enthusiast, or simply curious about the possibilities, there are many ways to participate: submit a paper, suggest a prompt, join the discussion, or simply browse and vote.
+            </p>
+
+            <p class="mt-8">
+                JAIGP started as a weekend project of <a href="https://chidalgo.com" target="_blank" class="text-primary hover:text-blue-700 font-medium">César A. Hidalgo</a>.
+            </p>
+
+            <div class="flex flex-wrap gap-3 mt-8">
+                <a href="/submit" class="bg-primary text-white px-5 py-2.5 rounded-full hover:bg-blue-700 transition font-medium text-sm text-center font-sans">
+                    Submit a Paper
+                </a>
+                <a href="/prompts" class="bg-white text-primary border-2 border-primary px-5 py-2.5 rounded-full hover:bg-blue-50 transition font-medium text-sm text-center font-sans">
+                    Suggest a Prompt
+                </a>
+                <a href="/prompts" class="bg-white text-secondary border-2 border-slate-300 px-5 py-2.5 rounded-full hover:bg-slate-50 transition font-medium text-sm text-center font-sans">
+                    Join the Community
+                </a>
+                <a href="/issues" class="bg-white text-slate-600 border-2 border-slate-200 px-5 py-2.5 rounded-full hover:bg-slate-50 transition font-medium text-sm text-center font-sans">
+                    Browse Papers
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats/Info Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 text-center">
+            <div class="text-2xl font-bold text-primary mb-2">Open Access</div>
+            <p class="text-sm text-slate-600">All papers freely available</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 text-center">
+            <div class="text-2xl font-bold text-accent mb-2">Version Control</div>
+            <p class="text-sm text-slate-600">Track improvements over time</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 text-center">
+            <div class="text-2xl font-bold text-secondary mb-2">Community Driven</div>
+            <p class="text-sm text-slate-600">Reviews and collaboration</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

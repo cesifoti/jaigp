@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}{{ profile_user.name }} — Activity{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Profile header -->
+    <div class="flex items-start gap-4 mb-8">
+        <div class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <span class="text-xl font-bold text-primary">{{ profile_user.name[0] }}{{ profile_user.name.split()[-1][0] if profile_user.name.split()|length > 1 else '' }}</span>
+        </div>
+        <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+                <h1 class="text-xl font-bold text-secondary">{{ profile_user.name }}</h1>
+                <span class="flex-shrink-0">
+                    {% set badge = profile_user.badge or 'new' %}
+                    {% set works_count = profile_user.works_count or 0 %}
+                    {% include 'components/badge_icon.html' %}
+                </span>
+            </div>
+            {% if profile_user.affiliation %}
+            <p class="text-sm text-slate-500 mt-0.5">{{ profile_user.affiliation }}</p>
+            {% endif %}
+            <div class="flex items-center gap-4 mt-2 text-xs text-slate-500">
+                <span><strong class="text-secondary">{{ follower_count }}</strong> followers</span>
+                <span><strong class="text-secondary">{{ following_count }}</strong> following</span>
+                <a href="/auth/profile?user_id={{ profile_user.id }}" class="text-primary hover:underline">Papers</a>
+            </div>
+        </div>
+        {% if user and not is_own %}
+        <button onclick="followUser({{ profile_user.id }})" id="follow-btn"
+                class="flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition
+                {% if is_following %}bg-slate-200 text-slate-700 hover:bg-red-50 hover:text-red-600{% else %}bg-primary text-white hover:bg-blue-700{% endif %}">
+            {{ 'Following' if is_following else 'Follow' }}
+        </button>
+        {% endif %}
+    </div>
+
+    <!-- Tabs -->
+    <div class="border-b border-slate-200 mb-6">
+        <nav class="flex gap-6">
+            {% for t, label, count in [('posts', 'Posts', post_count), ('comments', 'Comments', comment_count)] %}
+            <a href="/activity/{{ profile_user.id }}?tab={{ t }}"
+               class="pb-3 text-sm font-semibold border-b-2 transition {% if tab == t %}border-primary text-primary{% else %}border-transparent text-slate-500 hover:text-slate-700{% endif %}">
+                {{ label }}
+                {% if count %}<span class="ml-1 text-xs px-1.5 py-0.5 rounded-full {% if tab == t %}bg-primary/10 text-primary{% else %}bg-slate-100 text-slate-500{% endif %}">{{ count }}</span>{% endif %}
+            </a>
+            {% endfor %}
+        </nav>
+    </div>
+
+    <!-- Content -->
+    <div class="space-y-0">
+        {% if not items %}
+        <div class="text-center py-12 text-slate-500">
+            <p>No {{ tab }} yet.</p>
+        </div>
+        {% elif tab == 'posts' %}
+        <div class="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100 px-5">
+            {% for prompt in items %}
+            <div class="py-4" id="activity-post-{{ prompt.id }}">
+                {% set ptype = prompt.post_type if prompt.post_type is defined else 'prompt' %}
+                {% set type_label_color = {'prompt': 'text-blue-600 bg-blue-50', 'rule': 'text-amber-700 bg-amber-50', 'comment': 'text-slate-500 bg-slate-100'} %}
+                <div class="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{% if prompt.prompt_text|length > 300 %}{{ prompt.prompt_text[:300] }}... <a href="/prompts/{{ prompt.id }}" class="text-primary text-xs hover:underline">read more</a>{% else %}{{ prompt.prompt_text }}{% endif %}</div>
+                <div class="flex items-center gap-3 mt-2 text-xs text-slate-400 flex-wrap">
+                    <span class="text-[10px] font-medium px-1.5 py-0.5 rounded-full {{ type_label_color.get(ptype, 'bg-slate-100 text-slate-500') }}">{{ ptype|capitalize }}</span>
+                    <span>{{ prompt.created_at|format_date("%b %d, %Y") }}</span>
+                    <span class="{% if prompt.net_votes > 0 %}text-green-600{% elif prompt.net_votes < 0 %}text-red-600{% endif %}">{% if prompt.net_votes > 0 %}+{% endif %}{{ prompt.net_votes }} votes</span>
+                    <span>{{ prompt.comment_count }} comments</span>
+                    <a href="/prompts/{{ prompt.id }}" class="text-primary hover:underline">permalink</a>
+                    {% if is_own %}
+                    <span class="inline-flex items-center gap-1" id="del-post-{{ prompt.id }}">
+                        <button onclick="confirmDelete('post', {{ prompt.id }})" class="text-red-400 hover:text-red-600 px-1 py-1">delete</button>
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% elif tab == 'comments' %}
+        <div class="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100 px-5">
+            {% for comment in items %}
+            <div class="py-4" id="activity-comment-{{ comment.id }}">
+                <div class="text-xs text-slate-400 mb-1">
+                    on <a href="/prompts/{{ comment.prompt_id }}#pcomment-{{ comment.id }}" class="text-primary hover:underline">Post #{{ comment.prompt_id }}</a>
+                    &middot; {{ comment.created_at|format_date("%b %d, %Y") }}
+                </div>
+                <div class="text-sm text-slate-700 leading-relaxed">{% if comment.content|length > 300 %}{{ comment.content[:300] }}... <a href="/prompts/{{ comment.prompt_id }}#pcomment-{{ comment.id }}" class="text-primary text-xs hover:underline">read more</a>{% else %}{{ comment.content }}{% endif %}</div>
+                <div class="flex items-center gap-3 mt-1 text-xs text-slate-400">
+                    <span class="{% if comment.net_votes > 0 %}text-green-600{% elif comment.net_votes < 0 %}text-red-600{% endif %}">{% if comment.net_votes > 0 %}+{% endif %}{{ comment.net_votes }} votes</span>
+                    {% if is_own %}
+                    <span class="inline-flex items-center gap-1" id="del-comment-{{ comment.id }}">
+                        <button onclick="confirmDelete('comment', {{ comment.id }})" class="text-red-400 hover:text-red-600 px-1 py-1">delete</button>
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<script>
+function confirmDelete(type, id) {
+    var container = document.getElementById('del-' + type + '-' + id);
+    container.innerHTML = '<span class="text-xs text-slate-500">Delete?</span>' +
+        '<button onclick="doDelete(\'' + type + '\',' + id + ')" class="text-red-500 hover:text-red-700 font-medium px-2 py-1">Yes</button>' +
+        '<button onclick="cancelDelete(\'' + type + '\',' + id + ')" class="text-slate-400 hover:text-slate-600 px-2 py-1">No</button>';
+}
+
+function cancelDelete(type, id) {
+    var container = document.getElementById('del-' + type + '-' + id);
+    container.innerHTML = '<button onclick="confirmDelete(\'' + type + '\',' + id + ')" class="text-red-400 hover:text-red-600 px-1 py-1">delete</button>';
+}
+
+async function doDelete(type, id) {
+    try {
+        var url = type === 'comment' ? '/prompts/comment/' + id + '/delete' : '/prompts/' + id + '/delete';
+        var elId = type === 'comment' ? 'activity-comment-' + id : 'activity-post-' + id;
+        var res = await fetch(url, { method: 'POST' });
+        if (res.ok) {
+            var el = document.getElementById(elId);
+            if (el) { el.style.opacity = '0.3'; el.style.pointerEvents = 'none'; }
+        }
+    } catch (e) { console.error(e); }
+}
+
+async function followUser(userId) {
+    try {
+        const res = await fetch('/user/' + userId + '/follow', { method: 'POST' });
+        if (res.status === 401) { window.location.href = '/auth/login'; return; }
+        const data = await res.json();
+        if (!data.success) return;
+        const btn = document.getElementById('follow-btn');
+        if (data.following) {
+            btn.textContent = 'Following';
+            btn.className = 'flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition bg-slate-200 text-slate-700 hover:bg-red-50 hover:text-red-600';
+        } else {
+            btn.textContent = 'Follow';
+            btn.className = 'flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition bg-primary text-white hover:bg-blue-700';
+        }
+    } catch (e) { console.error(e); }
+}
+</script>
+{% endblock %}

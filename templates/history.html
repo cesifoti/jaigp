@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}History - {{ app_name }}{% endblock %}
+{% block og_title %}History of JAIGP — Built by Prompting AI from the Command Line{% endblock %}
+{% block og_description %}From a Valentine's Day conversation to a functioning journal with 5-stage review. The full story of how JAIGP was built, written by the AI that built it.{% endblock %}
+{% block twitter_title %}History of JAIGP — Built by Prompting AI from the Command Line{% endblock %}
+{% block twitter_description %}From a Valentine's Day conversation to a functioning journal. The story of JAIGP, written by the AI that built it.{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <h1 class="text-4xl md:text-5xl font-bold text-secondary mb-4">
+            About JAIGP
+        </h1>
+        <p class="text-xl text-slate-600">
+            A brief history of the journal, written by the AI that built it
+        </p>
+    </div>
+
+    <!-- Sub-navigation -->
+    <div class="flex justify-center gap-4 mb-10 border-b border-slate-200">
+        <a href="/about" class="pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition">About</a>
+        <a href="/about/history" class="pb-3 text-sm font-semibold border-b-2 border-primary text-primary">History</a>
+    </div>
+
+    <!-- Author note -->
+    <div class="bg-slate-50 rounded-lg border border-slate-200 p-5 mb-10">
+        <p class="text-sm text-slate-600 italic leading-relaxed">
+            This history was written by Claude, the AI that built JAIGP through conversational prompting with <a href="https://chidalgo.com" target="_blank" class="text-primary hover:text-blue-700">César A. Hidalgo</a>. JAIGP was never primarily about building a website — it was an open exploration into the rules and processes that publishing needs in a world where AI can author research papers. The journal is a byproduct of that exploration. Every instruction used to create it is publicly archived on the <a href="/prompts?tab=archive" class="text-primary hover:text-blue-700">Open Prompt</a> page.
+        </p>
+    </div>
+
+    <!-- Timeline -->
+    <div class="mb-12">
+        <div class="font-serif text-body text-slate-700 space-y-8">
+
+            <!-- Milestone 1: February 14, 2026 -->
+            <div class="relative pl-8 border-l-2 border-primary/30">
+                <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-primary border-2 border-white"></div>
+                <div class="mb-2">
+                    <span class="text-xs font-bold text-primary uppercase tracking-wider">February 14, 2026</span>
+                    <h2 class="text-2xl font-bold text-secondary font-sans mt-1">The Journal Is Born</h2>
+                </div>
+                <p>
+                    JAIGP started with a question, not a codebase. Early on the morning of February 14, 2026, César A. Hidalgo began a conversation with Claude about a problem that had been nagging at him: AI systems were becoming capable enough to produce structured research, but there was nowhere to put it. Traditional journals had no framework for AI-authored work. Submitting AI-generated papers meant either hiding the AI's involvement or facing rejection for disclosing it. Neither outcome served science.
+                </p>
+                <p>
+                    The conversation that followed explored what a journal designed for AI-generated research would actually need. Not just a submission form, but a set of rules: How should authorship work when an AI writes and a human prompts? What kind of review process makes sense for machine-generated scholarship? How do you build trust in a space where the line between author and tool is blurry? These were the founding questions, and the journal was built as a way to work through them — not in theory, but with real papers and real feedback.
+                </p>
+                <p>
+                    The earliest part of that conversation — where the concept was first articulated — predates the archived prompts. By the time the logs begin, the work had already shifted from "should we build this?" to "how do we make it work?" Over the course of that single day and 78 recorded prompts, the journal went from an idea to a functioning platform: ORCID authentication for real academic identities, a submission system requiring explicit AI disclosure, and a paper storage pipeline. The first paper — a quantitative analysis of male social exclusion across species — was submitted that same evening.
+                </p>
+                <p>
+                    By the end of the weekend, the site was live at jaigp.org. It was rough, but it worked. The tagline that emerged captured the spirit: "Where humans and machines are welcomed."
+                </p>
+            </div>
+
+            <!-- Milestone 2: Late February 2026 -->
+            <div class="relative pl-8 border-l-2 border-indigo-300/50">
+                <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-indigo-500 border-2 border-white"></div>
+                <div class="mb-2">
+                    <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">February 24 – 28, 2026</span>
+                    <h2 class="text-2xl font-bold text-secondary font-sans mt-1">The Review Pipeline Takes Shape</h2>
+                </div>
+                <p>
+                    With a working journal, the harder question surfaced: what are the rules? Nobody has a playbook for reviewing AI-generated research. The exploration that followed produced a five-stage pipeline — screening, endorsement, AI review, human peer review, and acceptance — but the process of arriving at those stages was as important as the stages themselves. Each rule was a hypothesis about what AI-generated publishing needs, tested by trying it in practice.
+                </p>
+                <p>
+                    A badge system was introduced, tying user privileges to their ORCID publication record. Researchers with Bronze badges (6+ verified publications) or higher could endorse papers, creating a quality signal from the academic community itself. The endorsement requirement was deliberately set low — one endorsement from a credentialed scholar — to keep the barrier accessible while still filtering for a minimum level of peer validation.
+                </p>
+                <p>
+                    Stage deadlines of 180 days were added to prevent papers from stalling indefinitely in the pipeline, with a 20-day extension mechanism for authors who needed more time.
+                </p>
+            </div>
+
+            <!-- Milestone 3: Early March 2026 -->
+            <div class="relative pl-8 border-l-2 border-purple-300/50">
+                <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-purple-500 border-2 border-white"></div>
+                <div class="mb-2">
+                    <span class="text-xs font-bold text-purple-600 uppercase tracking-wider">March 2 – 7, 2026</span>
+                    <h2 class="text-2xl font-bold text-secondary font-sans mt-1">Refinement and the AI Review Integration</h2>
+                </div>
+                <p>
+                    With the pipeline designed, the focus shifted to making the journal actually usable. Paper presentation was overhauled — PDF viewers, HTML rendering of papers, thumbnail generation, and figure extraction were all built. The multi-email system was added to handle the various ways ORCID users provide contact information.
+                </p>
+                <p>
+                    The most significant development was the integration with <a href="https://reviewer3.com" target="_blank" rel="noopener" class="text-primary hover:text-blue-700">Reviewer3.com</a> for AI-powered peer review. When an endorsed paper is submitted for review, it's sent to Reviewer3, which assembles a panel of AI reviewers to evaluate the work independently. Authors receive structured feedback and can revise their papers up to three times, with each revision scored against the original comments. This created a genuine review loop — not a rubber stamp, but an iterative process where papers are expected to improve.
+                </p>
+                <p>
+                    An AI screening system using Claude Haiku was also deployed: every submission passes through a lightweight quality check to filter out spam and non-academic content before entering the public pipeline. The screen is deliberately lenient — it catches gibberish and promotional material, not papers with unconventional ideas.
+                </p>
+            </div>
+
+            <!-- Milestone 4: Mid-March 2026 -->
+            <div class="relative pl-8 border-l-2 border-emerald-300/50">
+                <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white"></div>
+                <div class="mb-2">
+                    <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">March 15 – 17, 2026</span>
+                    <h2 class="text-2xl font-bold text-secondary font-sans mt-1">First Papers Through the Pipeline</h2>
+                </div>
+                <p>
+                    On March 15, the AI screening system was run retroactively on all existing submissions. 26 papers passed, 14 were screened out. The first endorsement came the same day — a paper on sleep and digital trace data by Johannes Wachs received endorsement from a Bronze-badge scholar and advanced to stage 2.
+                </p>
+                <p>
+                    Two days later, on March 17, the first AI review was completed. A paper on attention inequality on X/Twitter went through the full Reviewer3 pipeline, received detailed feedback from multiple AI reviewers, and the author submitted revisions addressing each comment. The revision was scored, all comments met the threshold, and the paper advanced to stage 4 — the first paper to clear AI review. The entire process, from endorsement to AI-reviewed status, took two days.
+                </p>
+            </div>
+
+            <!-- Milestone 5: March 20-21, 2026 -->
+            <div class="relative pl-8 border-l-2 border-amber-300/50">
+                <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-amber-500 border-2 border-white"></div>
+                <div class="mb-2">
+                    <span class="text-xs font-bold text-amber-600 uppercase tracking-wider">March 20 – 21, 2026</span>
+                    <h2 class="text-2xl font-bold text-secondary font-sans mt-1">Community Features and Public Launch</h2>
+                </div>
+                <p>
+                    The final push before public announcement focused on making JAIGP a place for conversation, not just paper submissions. The Open Prompt system — which had been tracking every instruction used to build the journal — was expanded into a full community feed where users can suggest prompts, propose rules, or post general comments. Voting, commenting, and threaded discussions were added, all with a unified interface using heart and broken-heart icons.
+                </p>
+                <p>
+                    An in-app notification system was built so users know when someone replies to their posts or likes their content. AI-powered summarization was integrated into the feed, generating summaries of the latest community activity using Claude Haiku. The archive of building prompts was made searchable and paginated, updated every minute from the live conversation logs.
+                </p>
+                <p>
+                    A comprehensive security audit was conducted: path traversal vulnerabilities were patched, HTML from PDF rendering was sanitized against XSS, rate limiting was fixed to use real client IPs, and the Terms of Service were expanded to cover AI processing of content and community contributions. A terms acceptance flow was added to the onboarding process.
+                </p>
+                <p>
+                    The source code was published on <a href="https://github.com/cesifoti/jaigp" target="_blank" rel="noopener" class="text-primary hover:text-blue-700">GitHub</a>, making the project fully open. The repository is intended for anyone who wants to fork the project and run their own AI-generated paper journal, or simply browse how it was built.
+                </p>
+            </div>
+
+            <!-- What's next -->
+            <div class="relative pl-8 border-l-2 border-slate-200">
+                <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-slate-300 border-2 border-white"></div>
+                <div class="mb-2">
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">What's Next</span>
+                    <h2 class="text-2xl font-bold text-secondary font-sans mt-1">The Road Ahead</h2>
+                </div>
+                <p>
+                    JAIGP is {{ days_since_launch }} days old. In that time, {{ total_users }} researchers have created accounts, {{ total_papers }} papers have been submitted, and {{ ai_reviewed_papers }} have cleared AI review. The human peer review stage has not yet been activated — it will be introduced once there are enough papers in the pipeline to make it viable. Many of the current rules will likely evolve as we learn what works.
+                </p>
+                <p>
+                    The exploration continues. The questions that motivated JAIGP — What does AI authorship mean? How should AI-generated work be reviewed? What standards should apply? — remain genuinely open. Every decision the journal has made so far is a provisional answer, subject to revision as the community grows and the papers come in. The entire development history is archived and searchable at <a href="/prompts?tab=archive" class="text-primary hover:text-blue-700">/prompts</a>, and the community feed is where the next rules and features will be shaped.
+                </p>
+                <p>
+                    This was never about building a website. It was about figuring out, in practice, what publishing looks like when AI is at the table. We're still figuring it out.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-5 text-center">
+            <div class="text-2xl font-bold text-primary">{{ days_since_launch }}</div>
+            <p class="text-xs text-slate-500 mt-1">Days since launch</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-5 text-center">
+            <div class="text-2xl font-bold text-secondary">{{ total_prompts }}+</div>
+            <p class="text-xs text-slate-500 mt-1">Building prompts</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-5 text-center">
+            <div class="text-2xl font-bold text-accent">{{ total_users }}</div>
+            <p class="text-xs text-slate-500 mt-1">Registered researchers</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-5 text-center">
+            <div class="text-2xl font-bold text-purple-600">{{ total_papers }}</div>
+            <p class="text-xs text-slate-500 mt-1">Papers submitted</p>
+        </div>
+    </div>
+
+    <div class="text-center mb-8">
+        <p class="text-xs text-slate-400 italic">This page was authored by Claude Code, the AI coding environment that built JAIGP.</p>
+    </div>
+</div>
+{% endblock %}

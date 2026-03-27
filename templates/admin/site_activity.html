@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}Site Activity - Admin - JAIGP{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+        <div>
+            <div class="flex items-center gap-3 mb-1">
+                <a href="/admin" class="text-slate-400 hover:text-primary">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                </a>
+                <h1 class="text-2xl font-bold text-secondary">Site Activity</h1>
+            </div>
+            <p class="text-sm text-slate-500 ml-8">All activity across the site — comments, posts, stage changes, new users</p>
+        </div>
+        <div class="flex gap-2">
+            <a href="/admin/papers-pipeline" class="px-3 py-1.5 text-xs font-medium bg-primary text-white rounded-md hover:bg-blue-700 transition">Pipeline</a>
+            <a href="/admin" class="px-3 py-1.5 text-xs font-medium bg-slate-100 text-slate-700 rounded-md hover:bg-slate-200 transition">Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="flex flex-wrap gap-2 mb-6">
+        {% set filters = [
+            ('all', 'All Activity', 'bg-slate-700'),
+            ('paper_comments', 'Paper Comments', 'bg-blue-600'),
+            ('posts', 'Community Posts', 'bg-indigo-600'),
+            ('post_replies', 'Post Replies', 'bg-purple-600'),
+            ('stage_changes', 'Stage Changes', 'bg-amber-600'),
+            ('new_users', 'New Users', 'bg-emerald-600'),
+        ] %}
+        {% for key, label, color in filters %}
+        <a href="/admin/site-activity?filter={{ key }}"
+           class="px-3 py-1.5 rounded-full text-xs font-medium transition
+                  {% if filter == key %}{{ color }} text-white{% else %}bg-slate-100 text-slate-600 hover:bg-slate-200{% endif %}">
+            {{ label }}
+            {% if filter == 'all' and type_counts.get(key.replace('paper_comments','paper_comment').replace('posts','post').replace('post_replies','post_reply').replace('stage_changes','stage_change').replace('new_users','new_user')) %}
+            <span class="ml-1 opacity-75">({{ type_counts.get(key.replace('paper_comments','paper_comment').replace('posts','post').replace('post_replies','post_reply').replace('stage_changes','stage_change').replace('new_users','new_user')) }})</span>
+            {% endif %}
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Event count -->
+    <div class="text-xs text-slate-400 mb-3">{{ total_events }} events{% if filter != 'all' %} (filtered){% endif %}</div>
+
+    <!-- Activity Feed -->
+    {% if events %}
+    <div class="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100 overflow-hidden">
+        {% set current_date = {'val': ''} %}
+        {% for e in events %}
+        {% set event_date = e.time.strftime('%B %d, %Y') %}
+        {% if event_date != current_date.val %}
+        {% if current_date.update({'val': event_date}) %}{% endif %}
+        <div class="px-5 py-2 bg-slate-50 border-b border-slate-100">
+            <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">{{ event_date }}</span>
+        </div>
+        {% endif %}
+
+        <div class="px-5 py-3 hover:bg-slate-50/50 transition">
+            <div class="flex gap-3">
+                <!-- Type icon -->
+                <div class="flex-shrink-0 mt-0.5">
+                    {% if e.type == 'paper_comment' %}
+                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
+                    </div>
+                    {% elif e.type == 'post' %}
+                    <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    </div>
+                    {% elif e.type == 'post_reply' %}
+                    <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                    </div>
+                    {% elif e.type == 'stage_change' %}
+                    <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                    </div>
+                    {% elif e.type == 'new_user' %}
+                    <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Content -->
+                <div class="flex-1 min-w-0">
+                    {% if e.type == 'paper_comment' %}
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <a href="/admin/user/{{ e.user.orcid_id }}" class="text-sm font-semibold text-secondary hover:underline">{{ e.user.name }}</a>
+                        <span class="text-xs text-slate-500">commented on</span>
+                        <a href="/admin/paper/{{ e.paper.id }}/review" class="text-xs font-medium text-blue-600 hover:underline">Paper #{{ e.paper.id }}</a>
+                        <span class="text-xs text-slate-400">&middot; {{ e.time.strftime('%H:%M') }}</span>
+                    </div>
+                    <div class="text-xs text-slate-500 mt-0.5 italic truncate">{{ e.paper.title|smart_title }}</div>
+                    <div class="text-sm text-slate-700 mt-1 leading-relaxed {% if e.content|length > 200 %}line-clamp-2{% endif %}">{{ e.content }}</div>
+                    <a href="{{ e.link }}" class="text-[10px] text-primary hover:underline mt-1 inline-block">View on paper page</a>
+
+                    {% elif e.type == 'post' %}
+                    {% set ptype_colors = {'prompt': 'text-blue-600 bg-blue-50', 'rule': 'text-amber-700 bg-amber-50', 'comment': 'text-slate-500 bg-slate-100'} %}
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <a href="/admin/user/{{ e.user.orcid_id }}" class="text-sm font-semibold text-secondary hover:underline">{{ e.user.name }}</a>
+                        <span class="text-xs text-slate-500">posted</span>
+                        <span class="text-[10px] font-medium px-1.5 py-0.5 rounded-full {{ ptype_colors.get(e.post_type, 'bg-slate-100 text-slate-500') }}">{{ e.post_type|capitalize }}</span>
+                        <span class="text-xs text-slate-400">&middot; {{ e.time.strftime('%H:%M') }}</span>
+                    </div>
+                    <div class="text-sm text-slate-700 mt-1 leading-relaxed {% if e.content|length > 200 %}line-clamp-2{% endif %}">{{ e.content }}</div>
+                    <div class="flex items-center gap-3 mt-1">
+                        <a href="{{ e.link }}" class="text-[10px] text-primary hover:underline">View post</a>
+                        {% if e.votes %}
+                        <span class="text-[10px] {% if e.votes > 0 %}text-green-600{% elif e.votes < 0 %}text-red-600{% else %}text-slate-400{% endif %}">{% if e.votes > 0 %}+{% endif %}{{ e.votes }} votes</span>
+                        {% endif %}
+                        {% if e.comment_count %}
+                        <span class="text-[10px] text-slate-400">{{ e.comment_count }} replies</span>
+                        {% endif %}
+                    </div>
+
+                    {% elif e.type == 'post_reply' %}
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <a href="/admin/user/{{ e.user.orcid_id }}" class="text-sm font-semibold text-secondary hover:underline">{{ e.user.name }}</a>
+                        <span class="text-xs text-slate-500">replied on</span>
+                        <a href="/prompts/{{ e.prompt_id }}" class="text-xs font-medium text-purple-600 hover:underline">Post #{{ e.prompt_id }}</a>
+                        <span class="text-xs text-slate-400">&middot; {{ e.time.strftime('%H:%M') }}</span>
+                    </div>
+                    <div class="text-sm text-slate-700 mt-1 leading-relaxed {% if e.content|length > 200 %}line-clamp-2{% endif %}">{{ e.content }}</div>
+                    <a href="{{ e.link }}" class="text-[10px] text-primary hover:underline mt-1 inline-block">View in context</a>
+
+                    {% elif e.type == 'stage_change' %}
+                    {% set snames = {0: 'Screened Out', 1: 'Submitted', 2: 'Endorsed', 3: 'AI Review', 4: 'Peer Review', 5: 'Accepted'} %}
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <span class="text-sm font-semibold text-secondary">Paper #{{ e.paper.id }}</span>
+                        <span class="text-xs text-slate-500">moved</span>
+                        {% if e.from_stage is not none %}
+                        <span class="text-xs px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">{{ snames.get(e.from_stage, 'Stage ' ~ e.from_stage) }}</span>
+                        <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                        {% endif %}
+                        <span class="text-xs px-1.5 py-0.5 rounded font-medium
+                            {% if e.to_stage == 0 %}bg-red-50 text-red-700
+                            {% elif e.to_stage >= 4 %}bg-green-50 text-green-700
+                            {% else %}bg-blue-50 text-blue-700{% endif %}">{{ snames.get(e.to_stage, 'Stage ' ~ e.to_stage) }}</span>
+                        <span class="text-[10px] text-slate-400">via {{ e.trigger_type }}</span>
+                        <span class="text-xs text-slate-400">&middot; {{ e.time.strftime('%H:%M') }}</span>
+                    </div>
+                    <div class="text-xs text-slate-500 mt-0.5 italic truncate">{{ e.paper.title|smart_title }}</div>
+                    {% if e.notes %}
+                    <div class="text-xs text-slate-600 mt-1 pl-3 border-l-2 border-slate-200">{{ e.notes }}</div>
+                    {% endif %}
+                    {% if e.user %}
+                    <span class="text-[10px] text-slate-400 mt-0.5 inline-block">by {{ e.user.name }}</span>
+                    {% endif %}
+                    <a href="{{ e.link }}" class="text-[10px] text-primary hover:underline ml-2">Manage paper</a>
+
+                    {% elif e.type == 'new_user' %}
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <a href="{{ e.link }}" class="text-sm font-semibold text-secondary hover:underline">{{ e.user.name }}</a>
+                        <span class="text-xs text-slate-500">joined</span>
+                        <span class="text-xs text-slate-400">&middot; {{ e.time.strftime('%H:%M') }}</span>
+                    </div>
+                    {% if e.user.affiliation %}
+                    <div class="text-xs text-slate-500 mt-0.5">{{ e.user.affiliation }}</div>
+                    {% endif %}
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <a href="https://orcid.org/{{ e.user.orcid_id }}" target="_blank" class="text-[10px] text-primary hover:underline font-mono">{{ e.user.orcid_id }}</a>
+                        {% if e.user.badge %}
+                        <span class="text-[10px] px-1.5 py-0.5 rounded-full
+                            {% if e.user.badge == 'gold' %}bg-yellow-100 text-yellow-800
+                            {% elif e.user.badge == 'silver' %}bg-gray-100 text-gray-800
+                            {% elif e.user.badge == 'bronze' %}bg-amber-100 text-amber-800
+                            {% elif e.user.badge == 'copper' %}bg-orange-100 text-orange-800{% endif %}">{{ e.user.badge|capitalize }}</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if total_pages > 1 %}
+    <div class="flex items-center justify-between mt-4">
+        <span class="text-sm text-slate-500">Page {{ page }} of {{ total_pages }}</span>
+        <div class="flex gap-2">
+            {% if page > 1 %}
+            <a href="/admin/site-activity?filter={{ filter }}&page={{ page - 1 }}" class="px-4 py-2 text-sm bg-white border border-slate-300 rounded-md hover:bg-slate-50">Previous</a>
+            {% endif %}
+            {% if page < total_pages %}
+            <a href="/admin/site-activity?filter={{ filter }}&page={{ page + 1 }}" class="px-4 py-2 text-sm bg-primary text-white rounded-md hover:bg-blue-700">Next</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="bg-white rounded-xl border border-slate-200 p-12 text-center">
+        <svg class="w-16 h-16 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <h3 class="text-lg font-bold text-slate-600 mb-1">No activity yet</h3>
+        <p class="text-sm text-slate-500">Activity will appear here as users interact with the site.</p>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

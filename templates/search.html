@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}{% if query %}{{ query }} — Search{% else %}Search{% endif %} - {{ app_name }}{% endblock %}
+{% block og_title %}Search JAIGP — Journal for AI Generated Papers{% endblock %}
+{% block og_description %}Search AI-generated research papers and authors on JAIGP.{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Search box -->
+    <form method="get" action="/search" class="mb-8">
+        <div class="relative">
+            <svg class="w-5 h-5 text-slate-400 absolute left-4 top-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" name="q" value="{{ query }}" autofocus
+                   placeholder="Search papers, authors, topics..."
+                   class="w-full pl-14 pr-4 py-3.5 text-lg border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none">
+        </div>
+    </form>
+
+    {% if query %}
+    <!-- Tabs -->
+    <div class="flex gap-2 mb-6">
+        <a href="/search?q={{ query }}&tab=papers"
+           class="px-4 py-2 text-sm font-medium rounded-full transition {% if tab == 'papers' %}bg-primary text-white{% else %}bg-slate-100 text-slate-600 hover:bg-slate-200{% endif %}">
+            Papers <span class="ml-1 opacity-75">({{ paper_count }})</span>
+        </a>
+        <a href="/search?q={{ query }}&tab=authors"
+           class="px-4 py-2 text-sm font-medium rounded-full transition {% if tab == 'authors' %}bg-primary text-white{% else %}bg-slate-100 text-slate-600 hover:bg-slate-200{% endif %}">
+            Authors <span class="ml-1 opacity-75">({{ author_count }})</span>
+        </a>
+    </div>
+
+    <!-- Results -->
+    {% if tab == 'papers' %}
+        {% if paper_results %}
+        <div class="space-y-4">
+            {% for paper in paper_results %}
+            <a href="/paper/{{ paper.id }}" class="block bg-white rounded-xl border border-slate-200 p-5 hover:shadow-md hover:border-primary/30 transition">
+                <div class="flex items-start gap-4">
+                    <!-- Thumbnail -->
+                    <div class="w-20 h-14 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0 hidden sm:block">
+                        <img src="/paper/{{ paper.id }}/thumbnail" alt="" loading="lazy" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <!-- Title -->
+                        <h3 class="text-base font-semibold text-secondary mb-1 leading-snug">{{ paper.title|smart_title }}</h3>
+                        <!-- Meta -->
+                        <div class="flex items-center gap-2 text-xs text-slate-400 mb-2 flex-wrap">
+                            {% if paper.review_stage is defined and paper.review_stage %}
+                            {% set stage_labels = {1: "Screened", 2: "Endorsed", 3: "In Review", 4: "AI Reviewed", 5: "Accepted"} %}
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600">{{ stage_labels.get(paper.review_stage, "") }}</span>
+                            {% endif %}
+                            {% if paper.published_date %}
+                            <span>{{ paper.published_date|format_date("%b %d, %Y") }}</span>
+                            {% endif %}
+                            {% for author in paper.human_authors[:2] %}
+                            <span>{{ author.user.name }}</span>
+                            {% endfor %}
+                        </div>
+                        <!-- Abstract preview -->
+                        <p class="text-sm text-slate-600 leading-relaxed line-clamp-2">{{ paper.abstract[:200] }}{% if paper.abstract|length > 200 %}...{% endif %}</p>
+                        <!-- Categories -->
+                        {% if paper.categories %}
+                        <div class="flex flex-wrap gap-1 mt-2">
+                            {% for cat in paper.categories[:3] %}
+                            <span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">{{ cat.leaf_category }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-white rounded-xl border border-slate-200 p-12 text-center">
+            <h3 class="text-lg font-bold text-slate-600 mb-1">No papers found for "{{ query }}"</h3>
+            <p class="text-sm text-slate-500">Try a different search term, or <a href="/issues" class="text-primary hover:underline">browse all papers</a>.</p>
+        </div>
+        {% endif %}
+
+    {% elif tab == 'authors' %}
+        {% if author_results %}
+        <div class="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100 overflow-hidden">
+            {% for author in author_results %}
+            <a href="/auth/profile?user_id={{ author.id }}" class="block px-5 py-4 hover:bg-slate-50 transition">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <span class="text-sm font-bold text-primary">{{ author.name[0] }}{{ author.name.split()[-1][0] if author.name.split()|length > 1 else '' }}</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-semibold text-secondary truncate">{{ author.name }}</span>
+                            {% set badge = author.badge or 'new' %}
+                            {% set works_count = author.works_count or 0 %}
+                            {% include 'components/badge_icon.html' %}
+                        </div>
+                        <div class="flex items-center gap-3 text-xs text-slate-400 mt-0.5">
+                            {% if author.affiliation %}
+                            <span class="truncate">{{ author.affiliation }}</span>
+                            {% endif %}
+                            {% if author._paper_count %}
+                            <span>{{ author._paper_count }} paper{{ 's' if author._paper_count != 1 else '' }} on JAIGP</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <svg class="w-4 h-4 text-slate-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-white rounded-xl border border-slate-200 p-12 text-center">
+            <h3 class="text-lg font-bold text-slate-600 mb-1">No authors found for "{{ query }}"</h3>
+            <p class="text-sm text-slate-500">Try searching by name, affiliation, or ORCID ID.</p>
+        </div>
+        {% endif %}
+    {% endif %}
+
+    <!-- Pagination -->
+    {% if total_pages > 1 %}
+    <div class="flex items-center justify-center gap-2 mt-8">
+        {% if page > 1 %}
+        <a href="/search?q={{ query }}&tab={{ tab }}&page={{ page - 1 }}" class="px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition">Prev</a>
+        {% endif %}
+
+        {% for p in range([page - 2, 1]|max, [page + 3, total_pages + 1]|min) %}
+            {% if p == page %}
+            <span class="px-3 py-1.5 text-xs bg-primary text-white rounded-md font-medium">{{ p }}</span>
+            {% else %}
+            <a href="/search?q={{ query }}&tab={{ tab }}&page={{ p }}" class="px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition">{{ p }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page < total_pages %}
+        <a href="/search?q={{ query }}&tab={{ tab }}&page={{ page + 1 }}" class="px-3 py-1.5 text-xs bg-primary text-white rounded-md hover:bg-blue-700 transition">Next</a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty state (no query) -->
+    <div class="text-center py-12">
+        <svg class="w-16 h-16 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <h3 class="text-lg font-bold text-slate-600 mb-1">Search JAIGP</h3>
+        <p class="text-sm text-slate-500">Find papers by title, abstract, category, or author name. Find researchers by name or affiliation.</p>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

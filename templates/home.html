@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}{{ app_name }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="bg-white rounded-lg shadow-sm border border-slate-200 p-8 md:p-12 mb-8">
+    <div class="max-w-3xl mx-auto text-center">
+        <h1 class="text-3xl md:text-4xl font-bold text-secondary mb-3">
+            Journal for AI Generated Papers
+        </h1>
+        <p class="text-lg text-slate-600 mb-2 leading-relaxed">
+            Where humans and machines are welcomed.
+        </p>
+        <p class="text-sm text-slate-500 mb-6">
+            The Open Prompting Journal Built Collaboratively by its Community.
+        </p>
+
+        <!-- Community CTAs -->
+        <div class="flex flex-wrap gap-3 justify-center">
+            <a href="/submit" class="bg-primary text-white px-5 py-2.5 rounded-full hover:bg-blue-700 transition font-medium text-sm">
+                Submit
+            </a>
+            <a href="/issues" class="bg-white text-primary border-2 border-primary px-5 py-2.5 rounded-full hover:bg-blue-50 transition font-medium text-sm">
+                Browse
+            </a>
+            <a href="/prompts" class="bg-white text-primary border-2 border-primary px-5 py-2.5 rounded-full hover:bg-blue-50 transition font-medium text-sm">
+                Prompt
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Reviewer3.com Partnership -->
+<div class="bg-white rounded-lg border border-slate-200 p-5 mb-8">
+    <div class="flex flex-col sm:flex-row items-center gap-4 max-w-3xl mx-auto">
+        <a href="https://reviewer3.com" target="_blank" rel="noopener" class="flex-shrink-0">
+            <img src="/static/images/reviewer3-logo.png" alt="Reviewer3" class="w-10 h-10">
+        </a>
+        <div class="text-center sm:text-left">
+            <p class="text-sm text-slate-700">
+                AI-powered review by <a href="https://reviewer3.com" target="_blank" rel="noopener" class="text-secondary hover:text-primary font-semibold">Reviewer3.com</a>.
+                Every endorsed paper is eligible for AI review. AI reviews are free while supplies last.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works -->
+<div class="mb-10">
+    <h2 class="text-2xl font-bold text-secondary mb-6 text-center">How it works</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <!-- Stage 1: Screen -->
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-5 relative">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary text-white text-sm font-bold">1</span>
+                <h3 class="text-base font-bold text-secondary">Screen</h3>
+            </div>
+            <p class="text-sm text-slate-600 leading-relaxed">
+                Every submission is automatically screened by AI for basic academic substance. Papers that pass enter the public pipeline.
+            </p>
+            <div class="hidden md:block absolute top-1/2 -right-3 -translate-y-1/2 text-slate-300 z-10">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+            </div>
+        </div>
+
+        <!-- Stage 2: Endorse -->
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-5 relative">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-indigo-500 text-white text-sm font-bold">2</span>
+                <h3 class="text-base font-bold text-secondary">Endorse</h3>
+            </div>
+            <p class="text-sm text-slate-600 leading-relaxed">
+                A verified ORCID scholar endorses the paper, signaling it merits deeper review. Community comments are open throughout.
+            </p>
+            <div class="hidden md:block absolute top-1/2 -right-3 -translate-y-1/2 text-slate-300 z-10">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+            </div>
+        </div>
+
+        <!-- Stage 3: AI Review -->
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-5 relative">
+            <div class="flex items-center gap-2 mb-3">
+                <img src="/static/images/reviewer3-logo.png" alt="R3" class="w-7 h-7">
+                <h3 class="text-base font-bold text-secondary" style="font-family: Georgia, serif;">AI Review</h3>
+            </div>
+            <p class="text-sm text-slate-600 leading-relaxed">
+                Multiple AI reviewers via <a href="https://reviewer3.com" target="_blank" rel="noopener" class="text-purple-600 hover:text-purple-800 underline underline-offset-2">Reviewer3.com</a> evaluate the paper. Authors revise and respond, up to three rounds.
+            </p>
+            <div class="hidden md:block absolute top-1/2 -right-3 -translate-y-1/2 text-slate-300 z-10">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+            </div>
+        </div>
+
+        <!-- Stage 4: Peer Review (future) -->
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-5 relative opacity-50">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-amber-400 text-white text-sm font-bold">4</span>
+                <h3 class="text-base font-bold text-secondary">Peer Review</h3>
+            </div>
+            <p class="text-sm text-slate-500 leading-relaxed">
+                Human peer reviewers evaluate the work. Coming in the future.
+            </p>
+            <span class="absolute top-2 right-2 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">Forthcoming</span>
+            <div class="hidden md:block absolute top-1/2 -right-3 -translate-y-1/2 text-slate-300 z-10">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+            </div>
+        </div>
+
+        <!-- Stage 5: Accepted (future) -->
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-5 relative opacity-50">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-green-400 text-white text-sm font-bold">5</span>
+                <h3 class="text-base font-bold text-secondary">Accepted</h3>
+            </div>
+            <p class="text-sm text-slate-500 leading-relaxed">
+                Formally accepted by the editorial board after full review. Coming in the future.
+            </p>
+            <span class="absolute top-2 right-2 text-xs font-medium text-green-600 bg-green-50 border border-green-200 rounded-full px-2 py-0.5">Forthcoming</span>
+        </div>
+    </div>
+</div>
+
+<!-- Papers Section with Pipeline Tabs -->
+<div class="mb-8">
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-3xl font-bold text-secondary">
+            Pipeline
+        </h2>
+        <a href="/issues" class="text-primary hover:text-blue-700 text-sm font-medium">
+            View all &rarr;
+        </a>
+    </div>
+
+    <!-- Pipeline Tabs (HTMX — swap content without page reload) -->
+    {% set tab_labels_map = {0: "Screened Out", 1: "Screened", 2: "Endorsed", 3: "AI Reviewed", 4: "Peer Reviewed", 5: "Accepted"} %}
+    {% set tab_colors = {0: "red", 1: "blue", 2: "indigo", 3: "purple", 4: "amber", 5: "green"} %}
+
+    <div class="flex gap-1 mb-6 border-b border-slate-200 overflow-x-auto" id="pipeline-tabs">
+        <!-- All papers tab -->
+        <button hx-get="/papers-tab?stage=-2" hx-target="#papers-content" hx-swap="innerHTML"
+           onclick="setActiveTab(this, -2)"
+           data-stage="-2" data-color="secondary"
+           class="flex items-center gap-2 px-4 py-3 font-medium transition whitespace-nowrap cursor-pointer
+                  {% if stage == -2 %}text-secondary border-b-2 border-secondary
+                  {% else %}text-slate-500 hover:text-slate-700{% endif %}">
+            All
+            <span class="inline-flex items-center justify-center min-w-[20px] px-1.5 py-0.5 rounded-full text-xs
+                {% if stage == -2 %}bg-slate-200 text-secondary{% else %}bg-slate-100 text-slate-500{% endif %}
+            ">{{ stage_counts.values()|sum }}</span>
+        </button>
+
+        <!-- Recent Movements tab -->
+        <button hx-get="/papers-tab/recent" hx-target="#papers-content" hx-swap="innerHTML"
+           onclick="setActiveTab(this, -1)"
+           data-stage="-1" data-color="secondary"
+           class="flex items-center gap-2 px-4 py-3 font-medium transition whitespace-nowrap cursor-pointer
+                  {% if stage == -1 %}text-secondary border-b-2 border-secondary
+                  {% else %}text-slate-500 hover:text-slate-700{% endif %}">
+            Recent
+        </button>
+
+        <!-- Separator -->
+        <div class="flex items-center px-1"><span class="text-slate-200">|</span></div>
+
+        {% for s in range(0, 6) %}
+        {% set color = tab_colors[s] %}
+        <button hx-get="/papers-tab?stage={{ s }}" hx-target="#papers-content" hx-swap="innerHTML"
+           onclick="setActiveTab(this, {{ s }})"
+           data-stage="{{ s }}" data-color="{{ color }}"
+           class="flex items-center gap-2 px-4 py-3 font-medium transition whitespace-nowrap cursor-pointer
+                  {% if stage == s %}text-{{ color }}-600 border-b-2 border-{{ color }}-500
+                  {% else %}text-slate-500 hover:text-slate-700{% endif %}">
+            {{ tab_labels_map[s] }}
+            <span class="inline-flex items-center justify-center min-w-[20px] px-1.5 py-0.5 rounded-full text-xs
+                {% if stage == s %}bg-{{ color }}-100 text-{{ color }}-600
+                {% else %}bg-slate-100 text-slate-500{% endif %}
+            ">{{ stage_counts.get(s, 0) }}</span>
+        </button>
+        {% endfor %}
+    </div>
+
+    <!-- Tab content (swapped by HTMX) -->
+    <div id="papers-content">
+        {% include 'components/papers_tab_content.html' %}
+    </div>
+</div>
+
+<script>
+function setActiveTab(clicked, stageNum) {
+    var colorMap = {'-2':'secondary','-1':'secondary',0:'red',1:'blue',2:'indigo',3:'purple',4:'amber',5:'green'};
+    var color = colorMap[stageNum] || 'secondary';
+    // Reset all tabs
+    document.querySelectorAll('#pipeline-tabs button').forEach(function(btn) {
+        btn.className = btn.className.replace(/text-\w+-600/g, '').replace(/text-secondary/g, '').replace(/border-b-2/g, '').replace(/border-\w+-500/g, '').replace(/border-secondary/g, '');
+        btn.classList.add('text-slate-500');
+        var badge = btn.querySelector('span');
+        if (badge) {
+            badge.className = badge.className.replace(/bg-\w+-100/g, 'bg-slate-100').replace(/text-\w+-600/g, 'text-slate-500');
+        }
+    });
+    // Activate clicked tab
+    clicked.classList.remove('text-slate-500');
+    if (stageNum == -1 || stageNum == -2) {
+        clicked.classList.add('text-secondary', 'border-b-2', 'border-secondary');
+    } else {
+        clicked.classList.add('text-' + color + '-600', 'border-b-2', 'border-' + color + '-500');
+    }
+    var badge = clicked.querySelector('span');
+    if (badge && stageNum >= 0) {
+        badge.className = badge.className.replace('bg-slate-100', 'bg-' + color + '-100').replace('text-slate-500', 'text-' + color + '-600');
+    }
+    // Update URL without reload
+    history.replaceState(null, '', (stageNum == -2) ? '/' : '/?stage=' + stageNum);
+}
+</script>
+
+<!-- Open Exploration Statement -->
+<div class="mt-8 bg-gradient-to-r from-primary/5 to-accent/5 rounded-lg border border-primary/20 p-8">
+    <div class="max-w-3xl mx-auto space-y-4">
+        <p class="text-lg text-slate-700 text-center leading-relaxed">
+            JAIGP welcomes contributions from <strong>all fields</strong>. Have a side project idea you never had time to develop? A hypothesis you wanted to explore? Collaborate with AI, submit the paper, and see what the review process reveals.
+        </p>
+    </div>
+</div>
+{% endblock %}

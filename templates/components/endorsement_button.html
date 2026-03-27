@@ -1,0 +1,118 @@
+{# Endorsement Button Component #}
+{# Shows endorsement status and action button for eligible users #}
+
+{# Compute whether any author has 'new' badge (0 works) — requires 2 endorsements #}
+{% set ns = namespace(has_new_author=false, bronze_count=0) %}
+{% for author in paper.human_authors %}
+    {% if author.user and author.user.badge == 'new' %}
+        {% set ns.has_new_author = true %}
+    {% endif %}
+{% endfor %}
+{% set endorsements_required = 2 if ns.has_new_author else 1 %}
+
+{# Count bronze+ endorsements received #}
+{% set ns2 = namespace(bronze_count=0) %}
+{% for e in endorsements %}
+    {% if e.user and e.user.badge in ['bronze', 'silver', 'gold'] %}
+        {% set ns2.bronze_count = ns2.bronze_count + 1 %}
+    {% endif %}
+{% endfor %}
+
+<div id="endorsement-section" class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+    <h3 class="text-lg font-bold text-secondary mb-3">Endorsements</h3>
+
+    {% if endorsements %}
+    <div class="space-y-2 mb-4">
+        {% for endorsement in endorsements %}
+        <div class="flex items-center gap-2 text-sm">
+            <svg class="w-4 h-4 text-accent flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <a href="/auth/profile?user_id={{ endorsement.user_id }}" class="text-primary hover:text-blue-700 font-medium">
+                {{ endorsement.user.name }}
+            </a>
+            {% set badge = endorsement.user.badge or 'new' %}
+            {% set works_count = endorsement.user.works_count or 0 %}
+            {% include 'components/badge_icon.html' %}
+            <span class="text-slate-400 text-xs">{{ endorsement.created_at.strftime('%b %d, %Y') }}</span>
+        </div>
+        {% endfor %}
+    </div>
+
+    {# Progress bar for papers needing 2 endorsements #}
+    {% if paper.review_stage == 1 and endorsements_required == 2 %}
+    <div class="mb-4">
+        <div class="flex justify-between text-xs text-slate-500 mb-1">
+            <span>Bronze+ endorsements received</span>
+            <span class="font-medium">{{ ns2.bronze_count }} / {{ endorsements_required }}</span>
+        </div>
+        <div class="w-full bg-slate-100 rounded-full h-1.5">
+            <div class="bg-accent h-1.5 rounded-full transition-all"
+                 style="width: {{ [ns2.bronze_count * 100 // endorsements_required, 100] | min }}%"></div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <p class="text-sm text-slate-500 mb-4">
+        No endorsements yet.
+        {% if endorsements_required == 2 %}
+        This paper needs <strong>2 endorsements</strong> from bronze+ scholars to advance
+        (one author has no prior ORCID publications).
+        {% else %}
+        This paper needs 1 endorsement from a bronze+ scholar to advance.
+        {% endif %}
+    </p>
+    {% endif %}
+
+    {% if paper.review_stage == 1 %}
+        {% if user %}
+            {% if has_endorsed %}
+                <button hx-delete="/paper/{{ paper.id }}/endorse"
+                        hx-target="#endorsement-section"
+                        hx-swap="outerHTML"
+                        class="w-full px-4 py-2 bg-slate-100 text-slate-600 rounded-md hover:bg-slate-200 transition text-sm font-medium">
+                    Withdraw Endorsement
+                </button>
+            {% elif user_db and user_db.can_endorse %}
+                {% set ns_auth = namespace(is_author=false) %}
+                {% for author in paper.human_authors %}
+                    {% if author.user_id == user.id %}
+                        {% set ns_auth.is_author = true %}
+                    {% endif %}
+                {% endfor %}
+                {% if ns_auth.is_author %}
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <p class="text-sm text-blue-800 font-medium mb-2">Authors cannot endorse their own papers</p>
+                        <p class="text-xs text-blue-700 leading-relaxed">
+                            Endorsement is an independent eligibility check: another ORCID-verified scholar
+                            with a Bronze badge or higher must endorse your paper before it can proceed to AI review.
+                            {% if endorsements_required == 2 %}
+                            Because one of the listed authors has no prior ORCID publications, this paper
+                            requires <strong>{{ endorsements_required }} endorsements</strong>.
+                            {% endif %}
+                            Share your paper with colleagues who have an ORCID profile and ask them to endorse it here.
+                        </p>
+                    </div>
+                {% else %}
+                    <button hx-post="/paper/{{ paper.id }}/endorse"
+                            hx-target="#endorsement-section"
+                            hx-swap="outerHTML"
+                            class="w-full px-4 py-2 bg-accent text-white rounded-md hover:bg-green-700 transition text-sm font-medium">
+                        Endorse This Paper
+                    </button>
+                {% endif %}
+            {% else %}
+                <p class="text-xs text-slate-400 italic">Bronze badge or higher required to endorse papers.</p>
+            {% endif %}
+        {% else %}
+            <a href="/auth/login"
+               class="block w-full text-center px-4 py-2 bg-accent text-white rounded-md hover:bg-green-700 transition text-sm font-medium">
+                Endorse This Paper
+            </a>
+            <p class="text-xs text-slate-400 text-center mt-2">You'll be asked to log in with ORCID.</p>
+        {% endif %}
+    {% elif paper.review_stage >= 2 %}
+        <p class="text-xs text-accent font-medium">This paper has been endorsed and advanced to the next stage.</p>
+    {% endif %}
+</div>

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Extension Requests - Admin - JAIGP{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-secondary mb-2">Extension Requests</h1>
+            <p class="text-slate-600">Process deadline extension requests</p>
+        </div>
+        <a href="/admin" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-md hover:bg-slate-200 transition text-sm font-medium">&larr; Dashboard</a>
+    </div>
+
+    <!-- Pending Requests -->
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden mb-8">
+        <div class="px-6 py-4 border-b border-slate-200 bg-amber-50">
+            <h2 class="text-lg font-semibold text-amber-800">Pending Requests ({{ pending|length }})</h2>
+        </div>
+
+        {% if pending %}
+        <div class="divide-y divide-slate-200">
+            {% for ext in pending %}
+            <div class="px-6 py-4">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                            <a href="/paper/{{ ext.paper_id }}" class="text-sm font-medium text-primary hover:underline">
+                                Paper #{{ ext.paper_id }}
+                                {% if ext.paper %}({{ ext.paper.title|truncate(40) }}){% endif %}
+                            </a>
+                            <span class="text-xs text-slate-500">Stage {{ ext.stage }}</span>
+                        </div>
+                        <p class="text-sm text-slate-600">
+                            Requested by: {{ ext.requested_by.name if ext.requested_by else 'Unknown' }}
+                        </p>
+                        {% if ext.reason %}
+                        <p class="text-sm text-slate-500 mt-1 italic">"{{ ext.reason }}"</p>
+                        {% endif %}
+                        <p class="text-xs text-slate-400 mt-1">
+                            {{ ext.created_at.strftime('%Y-%m-%d %H:%M') }} | +{{ ext.extension_days }} days requested
+                        </p>
+                    </div>
+                    <div class="flex gap-2 ml-4">
+                        <form action="/admin/extension/{{ ext.id }}/approve" method="POST">
+                            <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition text-sm font-medium">
+                                Approve
+                            </button>
+                        </form>
+                        <form action="/admin/extension/{{ ext.id }}/deny" method="POST">
+                            <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition text-sm font-medium">
+                                Deny
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="p-8 text-center text-slate-500">
+            No pending extension requests.
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Recently Processed -->
+    {% if processed %}
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200">
+            <h2 class="text-lg font-semibold text-secondary">Recently Processed</h2>
+        </div>
+        <div class="divide-y divide-slate-200">
+            {% for ext in processed %}
+            <div class="px-6 py-3 flex items-center justify-between text-sm">
+                <div>
+                    <a href="/paper/{{ ext.paper_id }}" class="text-primary hover:underline">
+                        Paper #{{ ext.paper_id }}
+                    </a>
+                    <span class="text-slate-400 mx-2">|</span>
+                    <span class="text-slate-500">Stage {{ ext.stage }}</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
+                        {% if ext.status == 'approved' %}bg-green-100 text-green-800
+                        {% else %}bg-red-100 text-red-800{% endif %}
+                    ">{{ ext.status|capitalize }}</span>
+                    <span class="text-xs text-slate-400">
+                        {{ ext.reviewed_at.strftime('%Y-%m-%d') if ext.reviewed_at else '' }}
+                    </span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

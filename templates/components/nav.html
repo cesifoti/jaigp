@@ -1,0 +1,239 @@
+<nav class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <!-- Logo and Brand -->
+            <div class="flex items-center">
+                <a href="/" class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-primary rounded-sm flex items-center justify-center">
+                        <span class="text-white font-bold text-xl">J</span>
+                    </div>
+                    <div class="hidden sm:block">
+                        <div class="text-lg font-bold text-secondary">JAIGP</div>
+                        <div class="text-xs text-slate-500 -mt-1">AI Generated Papers</div>
+                    </div>
+                </a>
+                {% if user and request.state is defined and request.state.is_admin %}
+                {% set oc = request.state.online_count if request.state is defined and request.state.online_count is defined else 0 %}
+                {% if oc > 0 %}
+                <span class="hidden sm:inline-flex items-center gap-1 ml-3 text-[10px] text-slate-400" title="{{ oc }} active now">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+                    {{ oc }} online
+                </span>
+                {% endif %}
+                {% endif %}
+            </div>
+
+            <!-- Desktop Navigation: Home, Rules, Prompt, Browse, Submit, About, User -->
+            {% set current_path = request.url.path if request else '' %}
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="/" class="flex items-center gap-1.5 {% if current_path == '/' %}text-primary border-b-2 border-primary{% else %}text-slate-700{% endif %} hover:text-primary transition font-medium pb-0.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4"/></svg>
+                    Home
+                </a>
+                <a href="/rules" class="flex items-center gap-1.5 {% if current_path == '/rules' %}text-primary border-b-2 border-primary{% else %}text-slate-700{% endif %} hover:text-primary transition font-medium pb-0.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                    Rules
+                </a>
+                <a href="/prompts" class="flex items-center gap-1.5 {% if current_path.startswith('/prompts') %}text-primary border-b-2 border-primary{% else %}text-slate-700{% endif %} hover:text-primary transition font-medium pb-0.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                    Prompt
+                </a>
+                <a href="/issues" class="flex items-center gap-1.5 {% if current_path.startswith('/issues') %}text-primary border-b-2 border-primary{% else %}text-slate-700{% endif %} hover:text-primary transition font-medium pb-0.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    Browse
+                </a>
+
+                {% if user %}
+                    <a href="/submit" class="flex items-center gap-1.5 {% if current_path.startswith('/submit') %}text-primary border-b-2 border-primary{% else %}text-slate-700{% endif %} hover:text-primary transition font-medium pb-0.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                        Submit
+                    </a>
+                {% endif %}
+
+                <a href="/about" class="flex items-center gap-1.5 {% if current_path == '/about' %}text-primary border-b-2 border-primary{% else %}text-slate-700{% endif %} hover:text-primary transition font-medium pb-0.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    About
+                </a>
+
+                <!-- Search icon (visible to everyone) -->
+                <a href="/search" class="text-slate-500 hover:text-primary transition p-1" title="Search">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </a>
+
+                {% if user %}
+                    <!-- Notification bell -->
+                    <a href="/notifications" class="relative text-slate-500 hover:text-primary transition p-1" title="Notifications">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                        </svg>
+                        {% set nc = request.state.notification_count if request.state is defined and request.state.notification_count is defined else 0 %}
+                        {% if nc > 0 %}
+                        <span class="absolute -top-1 -right-1 inline-flex items-center justify-center min-w-[16px] h-4 px-1 text-[10px] font-bold text-white bg-red-500 rounded-full">{{ nc if nc < 100 else '99+' }}</span>
+                        {% endif %}
+                    </a>
+
+                    <!-- Message envelope icon -->
+                    <a href="/messages" class="relative text-slate-500 hover:text-primary transition p-1" title="Messages">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        {% set mc = request.state.unread_messages if request.state is defined and request.state.unread_messages is defined else 0 %}
+                        {% if mc > 0 %}
+                        <span class="absolute -top-1 -right-1 inline-flex items-center justify-center min-w-[16px] h-4 px-1 text-[10px] font-bold text-white bg-primary rounded-full">{{ mc if mc < 100 else '99+' }}</span>
+                        {% endif %}
+                    </a>
+
+                    <div class="relative">
+                        <button id="user-menu-button" class="flex items-center space-x-2 text-slate-700 hover:text-primary transition">
+                            <div class="w-7 h-7 rounded-md bg-primary flex items-center justify-center">
+                                <span class="text-xs font-bold text-white">{{ user.name[0] }}</span>
+                            </div>
+                            <svg class="w-3.5 h-3.5 transition-transform" id="user-menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div id="user-menu-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 border border-slate-200 hidden z-50">
+                            <div class="px-4 py-2 text-xs text-slate-500 border-b border-slate-100">{{ user.name }}</div>
+                            <a href="/auth/profile" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 transition">
+                                My Papers
+                            </a>
+                            <a href="/activity/{{ user.id }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 transition">
+                                Activity
+                            </a>
+                            {% if request.state is defined and request.state.is_admin %}
+                            <a href="/admin" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 transition">
+                                Admin
+                            </a>
+                            {% endif %}
+                            <a href="/auth/logout" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 transition">
+                                Logout
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="/auth/login" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-700 transition font-medium text-sm">
+                        Login with ORCID
+                    </a>
+                {% endif %}
+            </div>
+
+            <!-- Mobile menu button -->
+            <div class="md:hidden">
+                <button type="button" onclick="document.getElementById('mobile-menu').style.display = document.getElementById('mobile-menu').style.display === 'none' ? 'block' : 'none'" class="text-slate-700 hover:text-primary p-2 -mr-2">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="md:hidden border-t border-slate-200 bg-white" style="display:none">
+        <div class="px-2 pt-2 pb-3 space-y-1">
+            <a href="/search" class="flex items-center gap-2 px-3 py-2 text-slate-700 hover:bg-slate-100 rounded-md">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                Search
+            </a>
+            <a href="/" class="flex items-center gap-2 px-3 py-2 text-slate-700 hover:bg-slate-100 rounded-md">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4"/></svg>
+                Home
+            </a>
+            <a href="/rules" class="flex items-center gap-2 px-3 py-2 text-slate-700 hover:bg-slate-100 rounded-md">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                Rules
+            </a>
+            <a href="/prompts" class="flex items-center gap-2 px-3 py-2 text-slate-700 hover:bg-slate-100 rounded-md">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                Prompt
+            </a>
+            <a href="/issues" class="flex items-center gap-2 px-3 py-2 text-slate-700 hover:bg-slate-100 rounded-md">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                Browse
+            </a>
+            {% if user %}
+                <a href="/submit" class="flex items-center gap-2 px-3 py-2 text-slate-700 hover:bg-slate-100 rounded-md">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    Submit
+                </a>
+            {% endif %}
+            <a href="/about" class="flex items-center gap-2 px-3 py-2 text-slate-700 hover:bg-slate-100 rounded-md">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                About
+            </a>
+            {% if user %}
+                <div class="border-t border-slate-200 mt-2 pt-2">
+                    <div class="flex items-center gap-2 px-3 py-2">
+                        <div class="w-6 h-6 rounded-md bg-primary flex items-center justify-center">
+                            <span class="text-[10px] font-bold text-white">{{ user.name[0] }}</span>
+                        </div>
+                        <span class="text-sm font-medium text-slate-700">{{ user.name }}</span>
+                    </div>
+                    <a href="/auth/profile" class="block px-3 py-2 pl-11 text-slate-700 hover:bg-slate-100 rounded-md text-sm">
+                        My Papers
+                    </a>
+                    <a href="/activity/{{ user.id }}" class="block px-3 py-2 pl-11 text-slate-700 hover:bg-slate-100 rounded-md text-sm">
+                        Activity
+                    </a>
+                    <a href="/messages" class="flex items-center gap-2 px-3 py-2 pl-11 text-slate-700 hover:bg-slate-100 rounded-md text-sm">
+                        Messages
+                        {% set mc = request.state.unread_messages if request.state is defined and request.state.unread_messages is defined else 0 %}
+                        {% if mc > 0 %}
+                        <span class="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold text-white bg-primary rounded-full">{{ mc if mc < 100 else '99+' }}</span>
+                        {% endif %}
+                    </a>
+                    <a href="/notifications" class="flex items-center gap-2 px-3 py-2 pl-11 text-slate-700 hover:bg-slate-100 rounded-md text-sm">
+                        Notifications
+                        {% set nc = request.state.notification_count if request.state is defined and request.state.notification_count is defined else 0 %}
+                        {% if nc > 0 %}
+                        <span class="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold text-white bg-red-500 rounded-full">{{ nc if nc < 100 else '99+' }}</span>
+                        {% endif %}
+                    </a>
+                    {% if request.state is defined and request.state.is_admin %}
+                    <a href="/admin" class="block px-3 py-2 pl-11 text-slate-700 hover:bg-slate-100 rounded-md text-sm">
+                        Admin
+                    </a>
+                    {% endif %}
+                    <a href="/auth/logout" class="block px-3 py-2 pl-11 text-slate-700 hover:bg-slate-100 rounded-md text-sm">
+                        Logout
+                    </a>
+                </div>
+            {% else %}
+                <a href="/auth/login" class="flex items-center gap-2 px-3 py-2 bg-primary text-white rounded-md justify-center mt-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+                    Login with ORCID
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    (function() {
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userMenuDropdown = document.getElementById('user-menu-dropdown');
+        const userMenuIcon = document.getElementById('user-menu-icon');
+        if (userMenuButton && userMenuDropdown) {
+            userMenuButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isHidden = userMenuDropdown.classList.contains('hidden');
+                if (isHidden) {
+                    userMenuDropdown.classList.remove('hidden');
+                    if (userMenuIcon) userMenuIcon.style.transform = 'rotate(180deg)';
+                } else {
+                    userMenuDropdown.classList.add('hidden');
+                    if (userMenuIcon) userMenuIcon.style.transform = 'rotate(0deg)';
+                }
+            });
+            document.addEventListener('click', function(e) {
+                if (!userMenuButton.contains(e.target) && !userMenuDropdown.contains(e.target)) {
+                    userMenuDropdown.classList.add('hidden');
+                    if (userMenuIcon) userMenuIcon.style.transform = 'rotate(0deg)';
+                }
+            });
+            userMenuDropdown.addEventListener('click', function(e) { e.stopPropagation(); });
+        }
+    })();
+});
+</script>

@@ -1,0 +1,7 @@
+{% set is_mine = msg.sender_id == user.id %}
+<div class="flex {{ 'justify-end' if is_mine else 'justify-start' }}">
+    <div class="max-w-[75%] {{ 'bg-blue-50 border border-blue-100' if is_mine else 'bg-slate-50 border border-slate-100' }} rounded-2xl px-4 py-2.5 {{ 'rounded-br-md' if is_mine else 'rounded-bl-md' }}">
+        <p class="text-sm leading-relaxed whitespace-pre-line {{ 'text-slate-800' if is_mine else 'text-slate-700' }}">{{ msg.content }}</p>
+        <p class="text-[10px] {{ 'text-blue-400' if is_mine else 'text-slate-400' }} mt-1">{{ msg.created_at|format_date("%b %d, %H:%M") }}</p>
+    </div>
+</div>

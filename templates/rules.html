@@ -1,0 +1,571 @@
+{% extends "base.html" %}
+
+{% block title %}Rules - Journal for AI Generated Papers{% endblock %}
+{% block og_title %}JAIGP Rules — How the Journal Works{% endblock %}
+{% block og_description %}Complete rules for submitting, reviewing, and publishing AI-generated research papers at JAIGP.{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Header -->
+    <div class="mb-10">
+        <h1 class="text-3xl font-bold text-secondary mb-3">Rules</h1>
+        <p class="text-slate-600 text-lg leading-relaxed">
+            JAIGP is the Journal for AI Generated Papers — a multidisciplinary, open-access journal where
+            AIs are authors and humans are prompters. Every paper goes through a transparent,
+            multi-stage review pipeline before acceptance.
+        </p>
+    </div>
+
+    <!-- ============================== PIPELINE DIAGRAM ============================== -->
+    <div class="bg-white rounded-xl border border-slate-200 p-6 sm:p-8 mb-8">
+        <h2 class="text-lg font-bold text-secondary mb-6 text-center">The Review Pipeline</h2>
+
+        <!-- Pipeline: compact grid for all screen sizes -->
+        <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
+            {% for stage_num, stage_name, bg, border, label_color, text_color in [
+                ('0', 'Submitted', 'bg-slate-100', 'border-slate-300', 'text-slate-500', 'text-slate-700'),
+                ('1', 'Screened', 'bg-blue-50', 'border-blue-300', 'text-blue-600', 'text-blue-900'),
+                ('2', 'Endorsed', 'bg-emerald-50', 'border-emerald-300', 'text-emerald-600', 'text-emerald-900'),
+                ('3', 'AI Review', 'bg-purple-50', 'border-purple-300', 'text-purple-600', 'text-purple-900'),
+                ('4', 'Peer Review', 'bg-amber-50', 'border-amber-300', 'text-amber-600', 'text-amber-900'),
+                ('5', 'Accepted', 'bg-green-100', 'border-green-400', 'text-green-700', 'text-green-900'),
+            ] %}
+            <div class="text-center px-2 py-2.5 rounded-lg {{ bg }} border-2 {{ border }}">
+                <div class="text-[9px] font-bold {{ label_color }} uppercase tracking-wider">{{ stage_num }}</div>
+                <div class="text-[11px] font-semibold {{ text_color }} mt-0.5 leading-tight">{{ stage_name }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <p class="text-xs text-slate-500 text-center mt-4">Papers advance through stages as they meet requirements. Each stage has a 180-day deadline.</p>
+    </div>
+
+    <!-- ============================== SECTIONS ============================== -->
+
+    <!-- 1. Submission -->
+    <section class="mb-6">
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <button onclick="toggleRule(this)" class="w-full flex items-center gap-3 px-6 py-4 text-left hover:bg-slate-50 transition">
+                <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                </div>
+                <h2 class="text-lg font-bold text-secondary flex-1">Submitting a Paper</h2>
+                <svg class="w-5 h-5 text-slate-400 rule-chevron transition-transform" style="transform:rotate(90deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+            <div class="rule-content border-t border-slate-100 px-6 py-5">
+                <ul class="space-y-3 text-sm text-slate-700">
+                    <li class="flex gap-2">
+                        <span class="text-blue-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>ORCID required</strong> — You must authenticate with your ORCID iD to submit. This links your real academic identity to your submissions.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-blue-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Paper details</strong> — Title, abstract, PDF, at least one AI author and one human prompter, and at least 1 subject category (up to 5).</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-blue-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Email verification</strong> — After submitting, you receive a verification email. You have <strong>7 days</strong> to click the link or the submission expires.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-blue-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Concurrent submission limits</strong> — You can have a limited number of active papers in the pipeline at once, based on your badge level (1 for new/copper, up to 5 for gold).</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-blue-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Optional cover image</strong> — JPG or PNG to visually represent your paper on the homepage.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-blue-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Updates allowed at Stage 1</strong> — You may update your paper's title, abstract, PDF, and categories while it is at Stage 1. Maximum one version per hour. After endorsement (Stage 2), the paper is locked.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. AI Screening -->
+    <section class="mb-6">
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <button onclick="toggleRule(this)" class="w-full flex items-center gap-3 px-6 py-4 text-left hover:bg-slate-50 transition">
+                <div class="w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <h2 class="text-lg font-bold text-secondary flex-1">AI Screening (Stage 0 → 1)</h2>
+                <svg class="w-5 h-5 text-slate-400 rule-chevron transition-transform" style="transform:rotate(90deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+            <div class="rule-content border-t border-slate-100 px-6 py-5">
+                <p class="text-sm text-slate-600 mb-4">After email verification, a simple commonsense AI check runs automatically. This is not a quality judgment — it is a basic filter to keep out spam and non-academic content. The vast majority of genuine submissions pass.</p>
+
+                <!-- Screening outcomes diagram -->
+                <div class="bg-slate-50 rounded-lg p-4 mb-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center text-sm">
+                        <div class="bg-green-50 border border-green-200 rounded-lg px-3 py-3">
+                            <div class="font-bold text-green-700">PASS</div>
+                            <div class="text-xs text-green-600 mt-1">Paper screened, enters Stage 1</div>
+                        </div>
+                        <div class="bg-amber-50 border border-amber-200 rounded-lg px-3 py-3">
+                            <div class="font-bold text-amber-700">BORDERLINE</div>
+                            <div class="text-xs text-amber-600 mt-1">Soft rejection; may resubmit</div>
+                        </div>
+                        <div class="bg-red-50 border border-red-200 rounded-lg px-3 py-3">
+                            <div class="font-bold text-red-700">REJECT</div>
+                            <div class="text-xs text-red-600 mt-1">48h cooldown applied</div>
+                        </div>
+                    </div>
+                </div>
+
+                <ul class="space-y-2 text-sm text-slate-700">
+                    <li class="flex gap-2">
+                        <span class="text-slate-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>What passes?</strong> Anything with a recognizable research question, some content, and basic academic framing. This is a low bar by design.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-slate-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>What gets rejected?</strong> Only clearly non-academic content: gibberish, test text, spam, promotional material, or harmful content.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-slate-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Cooldowns</strong> — A hard rejection imposes a 48-hour submission pause. 3 consecutive borderline results also trigger a 48-hour pause.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-red-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>3 rejections = 6-month block</strong> — If an ORCID account accumulates 3 hard rejections (lifetime total), the account is blocked from submitting for 6 months.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-slate-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Deleting screened-out papers</strong> — Authors may delete their screened-out papers. A tombstone record remains in the Screened Out section showing "Deleted Paper" with the dates of submission and withdrawal, as a permanent trace of the former submission.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Endorsement -->
+    <section class="mb-6">
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <button onclick="toggleRule(this)" class="w-full flex items-center gap-3 px-6 py-4 text-left hover:bg-slate-50 transition">
+                <div class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017a2 2 0 01-.95-.238l-2.018-1.118A2 2 0 007.278 19H6a2 2 0 01-2-2v-5a2 2 0 012-2h.5a2 2 0 001.6-.8l3.2-4.267A2 2 0 0112.9 4h.6a2 2 0 012 2v4z"/></svg>
+                </div>
+                <h2 class="text-lg font-bold text-secondary flex-1">Endorsement (Stage 1 → 2)</h2>
+                <svg class="w-5 h-5 text-slate-400 rule-chevron transition-transform" style="transform:rotate(90deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+            <div class="rule-content border-t border-slate-100 px-6 py-5">
+                <!-- Endorsement flow -->
+                <div class="bg-emerald-50/50 rounded-lg p-4 mb-4 text-sm">
+                    <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center">
+                        <div class="px-3 py-2 bg-white rounded border border-emerald-200">Screened paper (Stage 1)</div>
+                        <svg class="w-4 h-4 text-emerald-400 rotate-90 sm:rotate-0 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                        <div class="px-3 py-2 bg-white rounded border border-emerald-200">Bronze+ researcher endorses</div>
+                        <svg class="w-4 h-4 text-emerald-400 rotate-90 sm:rotate-0 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                        <div class="px-3 py-2 bg-emerald-100 rounded border border-emerald-300 font-semibold">Endorsed (Stage 2)</div>
+                    </div>
+                </div>
+
+                <ul class="space-y-2 text-sm text-slate-700">
+                    <li class="flex gap-2">
+                        <span class="text-emerald-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Who can endorse?</strong> Any ORCID-authenticated researcher with a <strong>Bronze badge or higher</strong> (6+ verified journal articles/books on ORCID).</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-emerald-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>How many endorsements?</strong> Established authors (1+ ORCID works) need <strong>1 endorsement</strong>. New authors (0 ORCID works) need <strong>2 endorsements</strong>.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-emerald-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Self-endorsement?</strong> No. You cannot endorse your own papers.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-emerald-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>After endorsement</strong> — The paper is <strong>locked</strong> (no more updates) and advances to AI Review eligibility.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-emerald-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Withdrawal</strong> — Endorsements can only be withdrawn while the paper is still at Stage 1.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. AI Review — Reviewer3 branded (light) -->
+    <section class="mb-6">
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <button onclick="toggleRule(this)" class="w-full flex items-center gap-3 px-6 py-4 text-left hover:bg-slate-50 transition">
+                <img src="/static/images/reviewer3-logo.png" alt="Reviewer3" class="w-8 h-8 flex-shrink-0">
+                <h2 class="text-lg font-bold text-secondary flex-1" style="font-family: Georgia, 'Times New Roman', serif;">AI Review (Stage 2 → 3) — Powered by Reviewer3</h2>
+                <svg class="w-5 h-5 text-slate-400 rule-chevron transition-transform" style="transform:rotate(90deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+            <div class="rule-content border-t border-slate-100 px-6 py-5">
+                <p class="text-sm text-slate-600 mb-4">
+                    Once endorsed, authors submit their paper for AI review powered by
+                    <a href="https://reviewer3.com" target="_blank" class="text-secondary font-semibold hover:underline">Reviewer3.com</a>,
+                    which assembles multiple AI reviewers to evaluate the work.
+                    AI reviews via Reviewer3.com are free while supplies last.
+                </p>
+
+                <!-- Revision flow diagram -->
+                <div class="bg-slate-50 rounded-lg p-4 mb-4 text-sm border border-slate-200">
+                    <h3 class="font-semibold text-secondary mb-3 text-center" style="font-family: Georgia, serif;">Revision Process</h3>
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="px-4 py-2 bg-white rounded border border-slate-200 text-center w-full max-w-xs text-slate-700">Paper submitted for AI review</div>
+                        <svg class="w-4 h-4 text-slate-300 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                        <div class="px-4 py-2 bg-white rounded border border-slate-200 text-center w-full max-w-xs text-slate-700">AI reviewers provide comments</div>
+                        <svg class="w-4 h-4 text-slate-300 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full max-w-lg">
+                            <div class="px-3 py-2 bg-green-50 rounded border border-green-200 text-center text-xs">
+                                <div class="font-bold text-green-700">All scores ≥ 3</div>
+                                <div class="text-green-600 mt-0.5">→ Advance to Stage 4</div>
+                            </div>
+                            <div class="px-3 py-2 bg-amber-50 rounded border border-amber-200 text-center text-xs">
+                                <div class="font-bold text-amber-700">Needs revision</div>
+                                <div class="text-amber-600 mt-0.5">Up to 3 revision attempts</div>
+                            </div>
+                            <div class="px-3 py-2 bg-red-50 rounded border border-red-200 text-center text-xs">
+                                <div class="font-bold text-red-700">Desk rejected</div>
+                                <div class="text-red-600 mt-0.5">Back to Stage 1</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <ul class="space-y-2 text-sm text-slate-700">
+                    <li class="flex gap-2">
+                        <span class="text-secondary font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Initial review</strong> — Multiple AI reviewers evaluate the full PDF and provide structured comments.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-secondary font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>No comments?</strong> — If the AI finds zero issues, the paper auto-advances to Human Peer Review.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-secondary font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Revision rounds</strong> — Authors can revise up to <strong>3 times</strong>. Each revision submits a new PDF plus a response letter addressing the AI comments.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-secondary font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Scoring</strong> — Each comment is scored 1-4: (1) Ignored, (2) Weakly acknowledged, (3) Well acknowledged, (4) Fully addressed. All scores must be ≥3 to pass.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-secondary font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Desk rejection</strong> — If the AI determines the revision fundamentally doesn't address critical concerns, the paper returns to Stage 1 and must be re-endorsed.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-secondary font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Exhausted attempts</strong> — If all 3 revision attempts fail to meet the score threshold, the paper returns to Stage 1.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Human Peer Review -->
+    <section class="mb-6">
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <button onclick="toggleRule(this)" class="w-full flex items-center gap-3 px-6 py-4 text-left hover:bg-slate-50 transition">
+                <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </div>
+                <h2 class="text-lg font-bold text-secondary flex-1">Human Peer Review (Stage 3 → 4)</h2>
+                <span class="text-xs font-medium text-amber-600">Forthcoming</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- 6. Editorial Decision -->
+    <section class="mb-6">
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <div class="flex items-center gap-3 px-6 py-4">
+                <div class="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                </div>
+                <h2 class="text-lg font-bold text-secondary flex-1">Editorial Decision (Stage 4 → 5)</h2>
+                <span class="text-xs font-medium text-amber-600">Forthcoming</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. Badge System -->
+    <section class="mb-6">
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <button onclick="toggleRule(this)" class="w-full flex items-center gap-3 px-6 py-4 text-left hover:bg-slate-50 transition">
+                <div class="w-8 h-8 rounded-lg bg-yellow-100 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                </div>
+                <h2 class="text-lg font-bold text-secondary flex-1">Author Badges</h2>
+                <svg class="w-5 h-5 text-slate-400 rule-chevron transition-transform" style="transform:rotate(90deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+            <div class="rule-content border-t border-slate-100 px-6 py-5">
+                <p class="text-sm text-slate-600 mb-4">
+                    Badges are calculated automatically from the number of verified journal articles and books on your ORCID profile.
+                    They determine your privileges on JAIGP.
+                </p>
+
+                <!-- Badge table -->
+                <div class="grid grid-cols-1 sm:grid-cols-5 gap-2 mb-5">
+                    <div class="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-yellow-50 border border-yellow-200">
+                        <span class="text-lg">🥇</span>
+                        <div>
+                            <div class="text-sm font-bold text-yellow-800">Gold</div>
+                            <div class="text-xs text-yellow-600">50+ works</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                        <span class="text-lg">🥈</span>
+                        <div>
+                            <div class="text-sm font-bold text-slate-700">Silver</div>
+                            <div class="text-xs text-slate-500">25–49 works</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-amber-50 border border-amber-200">
+                        <span class="text-lg">🥉</span>
+                        <div>
+                            <div class="text-sm font-bold text-amber-800">Bronze</div>
+                            <div class="text-xs text-amber-600">6–24 works</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-orange-50 border border-orange-200">
+                        <span class="text-lg">🟠</span>
+                        <div>
+                            <div class="text-sm font-bold text-orange-800">Copper</div>
+                            <div class="text-xs text-orange-600">1–5 works</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-blue-50 border border-blue-200">
+                        <span class="text-lg">🔵</span>
+                        <div>
+                            <div class="text-sm font-bold text-blue-800">New</div>
+                            <div class="text-xs text-blue-600">0 works</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="font-semibold text-secondary text-sm mb-2">Badge Privileges</h3>
+                <ul class="space-y-2 text-sm text-slate-700">
+                    <li class="flex gap-2">
+                        <span class="text-yellow-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Endorsement power</strong> — Only Bronze, Silver, and Gold badge holders can endorse papers.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-yellow-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Concurrent papers</strong> — New/Copper: 1, Bronze: 2, Silver: 3, Gold: 5.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-yellow-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Endorsement threshold</strong> — Papers by New authors require 2 endorsements; all others need 1.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-yellow-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Automatic updates</strong> — Badges refresh on ORCID login (maximum once per 7 days).</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. Deadlines & Extensions -->
+    <section class="mb-6">
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <button onclick="toggleRule(this)" class="w-full flex items-center gap-3 px-6 py-4 text-left hover:bg-slate-50 transition">
+                <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <h2 class="text-lg font-bold text-secondary flex-1">Deadlines &amp; Extensions</h2>
+                <svg class="w-5 h-5 text-slate-400 rule-chevron transition-transform" style="transform:rotate(90deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+            <div class="rule-content border-t border-slate-100 px-6 py-5">
+                <ul class="space-y-2 text-sm text-slate-700">
+                    <li class="flex gap-2">
+                        <span class="text-red-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Stage deadline</strong> — Each stage has a <strong>180-day</strong> (6-month) deadline from the time the paper enters that stage.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-red-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Extensions</strong> — Authors can request a <strong>20-day extension</strong> once per stage. The editorial board approves or denies the request.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-red-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Approaching deadline</strong> — Email notifications are sent when fewer than 30 days remain.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-red-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Stale papers</strong> — Papers that exceed their deadline are flagged as stale in the admin pipeline.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. Identity & Authentication -->
+    <section class="mb-6">
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <button onclick="toggleRule(this)" class="w-full flex items-center gap-3 px-6 py-4 text-left hover:bg-slate-50 transition">
+                <div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                </div>
+                <h2 class="text-lg font-bold text-secondary flex-1">Identity &amp; Authentication</h2>
+                <svg class="w-5 h-5 text-slate-400 rule-chevron transition-transform" style="transform:rotate(90deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+            <div class="rule-content border-t border-slate-100 px-6 py-5">
+                <ul class="space-y-2 text-sm text-slate-700">
+                    <li class="flex gap-2">
+                        <span class="text-indigo-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>ORCID-only</strong> — All users authenticate through <a href="https://orcid.org" target="_blank" class="text-primary hover:underline">ORCID</a>, the global academic identifier. No separate account creation.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-indigo-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>What ORCID provides</strong> — Your name, email(s), affiliation, and publication count are fetched from ORCID on login.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-indigo-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Multiple emails</strong> — JAIGP tracks all emails associated with your account (from ORCID, paper submissions, and profile edits). You can set any verified email as your primary.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-indigo-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Profile</strong> — Your profile shows all your papers, ORCID works, and optional links to Google Scholar and Rankless.org.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. Voting & Community -->
+    <section class="mb-6">
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <button onclick="toggleRule(this)" class="w-full flex items-center gap-3 px-6 py-4 text-left hover:bg-slate-50 transition">
+                <div class="w-8 h-8 rounded-lg bg-pink-100 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                </div>
+                <h2 class="text-lg font-bold text-secondary flex-1">Voting &amp; Community</h2>
+                <svg class="w-5 h-5 text-slate-400 rule-chevron transition-transform" style="transform:rotate(90deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+            <div class="rule-content border-t border-slate-100 px-6 py-5">
+                <ul class="space-y-2 text-sm text-slate-700">
+                    <li class="flex gap-2">
+                        <span class="text-pink-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Paper voting</strong> — Authenticated users can upvote or downvote any published paper. One vote per user per paper.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-pink-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Open Prompt</strong> — The <a href="/prompts" class="text-primary hover:underline">Prompt page</a> lets any authenticated user suggest what JAIGP should build next, and vote on others' suggestions.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-pink-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Prompt sorting</strong> — Community prompts can be sorted by newest, top voted, most discussed, or most divisive (how split the vote is).</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-pink-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Transparency</strong> — Every prompt used to build JAIGP is available in the <a href="/prompts?tab=archive" class="text-primary hover:underline">prompt archive</a>, including a <a href="/prompts.json" class="text-primary hover:underline">machine-readable JSON</a> download.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 11. Community & Messaging -->
+    <section class="mb-6">
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <button onclick="toggleRule(this)" class="w-full flex items-center gap-3 px-6 py-4 text-left hover:bg-slate-50 transition">
+                <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                </div>
+                <h2 class="text-lg font-bold text-secondary flex-1">Community &amp; Messaging</h2>
+                <svg class="w-5 h-5 text-slate-400 rule-chevron transition-transform" style="transform:rotate(90deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+            <div class="rule-content border-t border-slate-100 px-6 py-5">
+                <p class="text-sm text-slate-600 mb-4">JAIGP includes social features to foster collaboration and conversation among researchers.</p>
+
+                <h3 class="font-semibold text-secondary text-sm mb-2">Community Feed</h3>
+                <ul class="space-y-2 text-sm text-slate-700 mb-5">
+                    <li class="flex gap-2">
+                        <span class="text-blue-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Posts</strong> — Any authenticated user can post comments, suggest prompts, or propose rules in the community feed at <a href="/prompts" class="text-primary hover:underline">/prompts</a>. Posts are categorized by type (comment, prompt, or rule) and can be filtered.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-blue-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Replies</strong> — Posts can receive threaded replies from any authenticated user.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-blue-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Editing</strong> — Authors can edit their own posts and comments within <strong>1 hour</strong> of posting. After that, the content is permanent. Edited posts are marked with an "edited" label.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-blue-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Deletion</strong> — Authors can delete their own posts and comments at any time.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-blue-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Voting</strong> — Users can like or dislike posts and comments. Voting is anonymous but counts are public.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-blue-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>AI Summaries</strong> — The community feed can be summarized by AI (Claude Haiku) to help users catch up on recent activity.</span>
+                    </li>
+                </ul>
+
+                <h3 class="font-semibold text-secondary text-sm mb-2">Following &amp; Search</h3>
+                <ul class="space-y-2 text-sm text-slate-700 mb-5">
+                    <li class="flex gap-2">
+                        <span class="text-blue-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Follow users</strong> — Click "Follow" next to any username in the feed or on their profile page. Following is not mutual by default — you can follow someone without them following you back.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-blue-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Notifications</strong> — You receive notifications when someone replies to your posts, likes your content, endorses your paper, or sends you a message. Notifications appear as a bell icon in the navigation bar.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-blue-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Search</strong> — Use the <a href="/search" class="text-primary hover:underline">search page</a> to find papers by title, abstract, category, or author name. You can also search for researchers by name, affiliation, or ORCID ID.</span>
+                    </li>
+                </ul>
+
+                <h3 class="font-semibold text-secondary text-sm mb-2">Direct Messages</h3>
+                <ul class="space-y-2 text-sm text-slate-700 mb-5">
+                    <li class="flex gap-2">
+                        <span class="text-blue-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Who can message whom?</strong> By default, messaging is <strong>open to everyone</strong> — any logged-in user can send you a message. You can restrict this to mutual followers only in your <a href="/auth/profile/edit" class="text-primary hover:underline">profile settings</a>.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-blue-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Privacy control</strong> — Toggle "Open to messages from anyone" on or off from your profile page. When off, only users you mutually follow can message you.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-blue-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Email notifications</strong> — When you receive a new message, you'll also get an email notification to the email address on your profile.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-blue-500 font-bold mt-0.5">&#x2022;</span>
+                        <span><strong>Content rules</strong> — Messages are private between the two participants. Using the messaging system for harassment, spam, unsolicited promotion, or abuse will result in immediate account termination.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Audit Trail note -->
+    <div class="bg-slate-50 rounded-xl border border-slate-200 p-6 text-sm text-slate-600">
+        <h3 class="font-semibold text-secondary mb-2">Full Audit Trail</h3>
+        <p class="leading-relaxed">
+            Every stage transition, screening decision, editorial decision, and extension request is permanently recorded.
+            Papers never move backward unless desk-rejected during AI review or administratively rewound — and every such action
+            is logged with the reason and the user who triggered it.
+        </p>
+    </div>
+
+</div>
+
+<script>
+function toggleRule(btn) {
+    const content = btn.nextElementSibling;
+    const chevron = btn.querySelector('.rule-chevron');
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        chevron.style.transform = 'rotate(90deg)';
+    } else {
+        content.classList.add('hidden');
+        chevron.style.transform = 'rotate(0deg)';
+    }
+}
+</script>
+{% endblock %}

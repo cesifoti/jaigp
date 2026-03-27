@@ -1,0 +1,51 @@
+<!-- Single prompt comment -->
+<div class="flex gap-2 py-2 {% if is_new %}bg-green-50/30 -mx-3 px-3 rounded{% endif %}" id="pcomment-{{ comment.id }}">
+    <a href="/auth/profile?user_id={{ comment.user_id }}" class="flex-shrink-0">
+        <div class="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+            <span class="text-[10px] font-bold text-primary">{{ comment.user.name[0] }}</span>
+        </div>
+    </a>
+    <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-1.5">
+            <a href="/auth/profile?user_id={{ comment.user_id }}" class="text-xs font-semibold text-secondary hover:underline">{{ comment.user.name }}</a>
+            <span class="text-[10px] text-slate-400">&middot; {{ comment.created_at|format_date("%b %d") }}</span>
+            {% if comment.edited_at %}<span class="text-[10px] text-slate-400 italic">edited</span>{% endif %}
+        </div>
+        {% if comment.content|length > 300 %}
+        <div class="text-sm text-slate-600 leading-relaxed mt-0.5" id="comment-text-{{ comment.id }}">{{ comment.content[:300]|format_post }}...<button onclick="document.getElementById('comment-text-{{ comment.id }}').classList.add('hidden');document.getElementById('comment-full-{{ comment.id }}').classList.remove('hidden')" class="text-primary hover:underline ml-1 text-xs">show more</button></div>
+        <div class="hidden text-sm text-slate-600 leading-relaxed mt-0.5" id="comment-full-{{ comment.id }}">{{ comment.content|format_post }}<button onclick="document.getElementById('comment-full-{{ comment.id }}').classList.add('hidden');document.getElementById('comment-text-{{ comment.id }}').classList.remove('hidden')" class="text-primary hover:underline ml-1 text-xs">show less</button></div>
+        {% else %}
+        <div class="text-sm text-slate-600 leading-relaxed mt-0.5" id="comment-text-{{ comment.id }}">{{ comment.content|format_post }}</div>
+        {% endif %}
+        <div id="comment-edit-{{ comment.id }}" class="hidden mt-0.5">
+            <textarea id="comment-edit-input-{{ comment.id }}" rows="2" class="w-full text-xs px-2 py-1 border border-slate-200 rounded-lg focus:outline-none resize-y leading-relaxed mb-1"></textarea>
+            <div class="flex items-center gap-2">
+                <button onclick="var i=document.getElementById('comment-edit-input-{{ comment.id }}');var e=document.getElementById('comment-edit-err-{{ comment.id }}');e.textContent='';fetch('/prompts/comment/{{ comment.id }}/edit',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'content='+encodeURIComponent(i.value)}).then(function(r){if(!r.ok)return r.json().then(function(d){throw new Error(d.detail||'Failed')});return r.json()}).then(function(){location.reload()}).catch(function(x){e.textContent=x.message})" class="text-[10px] px-2 py-0.5 bg-primary text-white rounded-full">Save</button>
+                <button onclick="document.getElementById('comment-text-{{ comment.id }}').classList.remove('hidden');document.getElementById('comment-edit-{{ comment.id }}').classList.add('hidden');var f=document.getElementById('comment-full-{{ comment.id }}');if(f)f.classList.add('hidden')" class="text-[10px] text-slate-400">Cancel</button>
+                <span id="comment-edit-err-{{ comment.id }}" class="text-[10px] text-red-500"></span>
+            </div>
+        </div>
+        {% if user and user.id == comment.user_id %}
+        <button onclick="var t=document.getElementById('comment-text-{{ comment.id }}');var f=document.getElementById('comment-full-{{ comment.id }}');var e=document.getElementById('comment-edit-{{ comment.id }}');var i=document.getElementById('comment-edit-input-{{ comment.id }}');var raw=(f&&!f.classList.contains('hidden'))?f.innerText:t.innerText;i.value=raw.replace(/show more$/,'').replace(/show less$/,'').trim();t.classList.add('hidden');if(f)f.classList.add('hidden');e.classList.remove('hidden');i.focus()" class="text-[10px] text-slate-400 hover:text-primary">Edit</button>
+        {% endif %}
+        <div class="flex items-center gap-3 mt-1 -ml-1">
+            <button onclick="voteComment('prompts', {{ comment.id }}, 'upvote')"
+                    class="flex items-center gap-0.5 px-1 py-0.5 rounded hover:bg-green-50 transition group" id="pcv-up-{{ comment.id }}">
+                <svg class="w-3 h-3 {% if comment_votes.get(comment.id) == 'upvote' %}text-pink-500{% else %}text-slate-300 group-hover:text-pink-400{% endif %}" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                <span class="text-[10px] {% if comment_votes.get(comment.id) == 'upvote' %}text-green-600{% else %}text-slate-400{% endif %}" id="pcv-upc-{{ comment.id }}">{{ comment.upvote_count }}</span>
+            </button>
+            <button onclick="voteComment('prompts', {{ comment.id }}, 'downvote')"
+                    class="flex items-center gap-0.5 px-1 py-0.5 rounded hover:bg-red-50 transition group" id="pcv-down-{{ comment.id }}">
+                <svg class="w-3 h-3 {% if comment_votes.get(comment.id) == 'downvote' %}text-red-500{% else %}text-slate-300 group-hover:text-red-400{% endif %}" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" opacity="0.15"/><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="8" y1="7" x2="16" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <span class="text-[10px] {% if comment_votes.get(comment.id) == 'downvote' %}text-red-600{% else %}text-slate-400{% endif %}" id="pcv-downc-{{ comment.id }}">{{ comment.downvote_count }}</span>
+            </button>
+            {% if comment.net_votes != 0 %}
+            <span class="text-[10px] font-semibold {% if comment.net_votes > 0 %}text-green-600{% else %}text-red-600{% endif %}" id="pcv-net-{{ comment.id }}">{% if comment.net_votes > 0 %}+{% endif %}{{ comment.net_votes }}</span>
+            {% endif %}
+        </div>
+    </div>
+</div>

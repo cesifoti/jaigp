@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Editorial Board - Admin - JAIGP{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-secondary mb-2">Editorial Board</h1>
+            <p class="text-slate-600">Manage editorial board members</p>
+        </div>
+        <a href="/admin" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-md hover:bg-slate-200 transition text-sm font-medium">&larr; Dashboard</a>
+    </div>
+
+    <!-- Add Member Form -->
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 mb-8">
+        <h2 class="text-lg font-semibold text-secondary mb-4">Add Board Member</h2>
+        <form action="/admin/editorial-board/add" method="POST" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">ORCID ID *</label>
+                    <input type="text" name="orcid_id" required placeholder="0000-0000-0000-0000"
+                           class="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-primary focus:border-primary">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Role</label>
+                    <select name="role" class="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-primary focus:border-primary">
+                        <option value="editor">Editor</option>
+                        <option value="editor-in-chief">Editor-in-Chief</option>
+                        <option value="associate_editor">Associate Editor</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Specialty</label>
+                    <input type="text" name="specialty" placeholder="e.g., Computer Science"
+                           class="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-primary focus:border-primary">
+                </div>
+            </div>
+            <button type="submit" class="px-6 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition text-sm font-medium">
+                Add Member
+            </button>
+        </form>
+    </div>
+
+    <!-- Current Members -->
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200">
+            <h2 class="text-lg font-semibold text-secondary">Current Members ({{ members|length }})</h2>
+        </div>
+
+        {% if members %}
+        <div class="divide-y divide-slate-200">
+            {% for member in members %}
+            <div class="px-6 py-4 flex items-center justify-between hover:bg-slate-50">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-medium text-slate-900">{{ member.user.name }}</span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                            {{ member.role|replace('-', ' ')|replace('_', ' ')|title }}
+                        </span>
+                    </div>
+                    <div class="text-xs text-slate-500 mt-1">
+                        ORCID: {{ member.user.orcid_id }}
+                        {% if member.specialty %} | {{ member.specialty }}{% endif %}
+                        | Appointed: {{ member.appointed_at.strftime('%Y-%m-%d') }}
+                    </div>
+                </div>
+                <form action="/admin/editorial-board/{{ member.id }}/remove" method="POST"
+                      onsubmit="return confirm('Remove this board member?')">
+                    <button type="submit" class="px-3 py-1.5 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 transition">
+                        Remove
+                    </button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="p-12 text-center text-slate-500">
+            No editorial board members yet. Add one above.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

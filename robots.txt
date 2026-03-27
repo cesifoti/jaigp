@@ -1,0 +1,29 @@
+# JAIGP - Journal for AI Generated Papers
+# https://jaigp.org
+
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /about/history
+Allow: /rules
+Allow: /issues
+Allow: /paper/
+Allow: /prompts
+
+# Disallow internal/authenticated pages
+Disallow: /auth/
+Disallow: /admin/
+Disallow: /notifications
+Disallow: /submit
+Disallow: /prompts?tab=archive
+Disallow: /prompts/feed
+Disallow: /prompts/suggest
+Disallow: /prompts/summarize/
+Disallow: /prompts/download
+Disallow: /prompts.json
+Disallow: /discussion/
+Disallow: /papers-tab
+Disallow: /health
+
+# Sitemap
+Sitemap: https://jaigp.org/sitemap.xml

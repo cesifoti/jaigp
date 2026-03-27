@@ -1,0 +1,463 @@
+{% extends "base.html" %}
+
+{% block title %}AI Review - {{ paper.title|smart_title }} - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+        <a href="/paper/{{ paper.id }}" class="text-primary hover:text-blue-700 text-sm font-medium mb-2 inline-block">
+            &larr; Back to Paper
+        </a>
+        <h1 class="text-3xl font-bold text-secondary mb-2">AI Review</h1>
+        <p class="text-slate-600">Stage 3: AI-powered manuscript review</p>
+    </div>
+
+    <!-- Stage Progress -->
+    {% include 'components/stage_progress.html' %}
+
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-8">
+        <div class="mb-6">
+            <h2 class="text-xl font-bold text-secondary mb-2">{{ paper.title|smart_title }}</h2>
+            <p class="text-sm text-slate-600">
+                Current Stage: <span class="font-medium text-primary">{{ paper.stage_name }}</span>
+            </p>
+            {% if latest_review %}
+            <div class="mt-3 flex flex-wrap items-center gap-3">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-full">
+                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    <span class="text-xs text-slate-600">
+                        Reviewed by
+                        {% if latest_review.reviewer3_tracking_id %}
+                            <a href="https://reviewer3.com" target="_blank" class="font-medium text-primary hover:underline">Reviewer3.com</a>
+                        {% else %}
+                            <span class="font-medium">AI Review Service</span>
+                        {% endif %}
+                    </span>
+                </div>
+                {% if latest_review.status == 'completed' %}
+                <div class="inline-flex items-center gap-2">
+                    <span class="text-xs text-slate-400">Download:</span>
+                    <a href="/paper/{{ paper.id }}/ai-review/export/pdf"
+                       class="inline-flex items-center gap-1 px-2.5 py-1 bg-white border border-slate-200 rounded-md text-xs font-medium text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition">
+                        <svg class="w-3.5 h-3.5 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM6 20V4h7v5h5v11H6z"/>
+                        </svg>
+                        PDF
+                    </a>
+                    <a href="/paper/{{ paper.id }}/ai-review/export/markdown"
+                       class="inline-flex items-center gap-1 px-2.5 py-1 bg-white border border-slate-200 rounded-md text-xs font-medium text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition">
+                        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                        </svg>
+                        Markdown
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        {% if paper.review_stage == 2 %}
+            {# === STAGE 2: Ready to submit === #}
+            {% if not latest_review %}
+            <!-- Submission Form -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+                <h3 class="text-lg font-semibold text-blue-800 mb-3">About AI Review</h3>
+                <p class="text-sm text-blue-700 mb-3">
+                    Your paper will be reviewed by multiple AI reviewers who will provide detailed feedback
+                    on your manuscript. After reviewing the feedback, you'll need to respond to each comment
+                    and upload a revised version of your paper.
+                </p>
+                <ul class="text-sm text-blue-700 space-y-1 ml-4 list-disc">
+                    <li>Review typically completes within 2-5 minutes</li>
+                    <li>You will respond to each reviewer comment directly on this page</li>
+                    <li>A revised PDF must be uploaded with each resubmission</li>
+                    <li>Your paper advances to Human Peer Review when a re-review returns no new comments</li>
+                </ul>
+            </div>
+
+            {% if not author_email %}
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+                <p class="text-amber-800 font-medium">Email address required</p>
+                <p class="text-sm text-amber-700 mt-1">
+                    An email address is needed to submit for AI review.
+                    Please <a href="/auth/profile/edit" class="underline font-medium">add an email to your profile</a> first.
+                </p>
+            </div>
+            {% else %}
+            <div id="submit-area">
+                <button hx-post="/paper/{{ paper.id }}/ai-review/submit"
+                        hx-target="#submit-area"
+                        hx-swap="innerHTML"
+                        hx-indicator="#submit-spinner"
+                        class="w-full px-6 py-3 bg-primary text-white rounded-md hover:bg-blue-700 transition font-medium flex items-center justify-center gap-2">
+                    <span>Submit for AI Review</span>
+                    <svg id="submit-spinner" class="htmx-indicator animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+                <p class="text-xs text-slate-500 mt-2 text-center">
+                    Submitting as {{ author_email }}
+                </p>
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p class="text-yellow-800 font-medium">AI review already submitted.</p>
+            </div>
+            {% endif %}
+            {% if previous_cycle_count > 0 %}
+            <div class="mt-4">
+                <p class="text-xs text-slate-400">
+                    {{ previous_cycle_count }} review{{ 's' if previous_cycle_count != 1 else '' }} from
+                    {% if paper.review_cycle == 2 %}a previous review cycle{% else %}previous review cycles{% endif %}
+                    (visible in the admin review panel).
+                </p>
+            </div>
+            {% endif %}
+
+        {% elif paper.review_stage >= 3 %}
+            {# === STAGE 3+: Review submitted or complete === #}
+
+            {# --- APPROVED: Green success banner --- #}
+            {% if latest_review and latest_review.approved %}
+            <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
+                <div class="flex items-center gap-3 mb-2">
+                    <svg class="w-8 h-8 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div>
+                        <p class="text-green-800 font-bold text-lg">AI Review Passed</p>
+                        <p class="text-sm text-green-700">
+                            All reviewer comments have been adequately addressed. Your paper is now eligible for
+                            <strong>Stage 4: Human Peer Review</strong>. The editorial board will assign reviewers when ready.
+                        </p>
+                    </div>
+                </div>
+                <a href="/paper/{{ paper.id }}" class="text-primary hover:underline text-sm mt-2 inline-block">
+                    Return to paper &rarr;
+                </a>
+            </div>
+            {% endif %}
+
+            {# --- IN PROGRESS (submitted/in_progress) --- #}
+            {% if latest_review and latest_review.status in ('submitted', 'in_progress') %}
+            <div id="review-status-poll"
+                 hx-get="/paper/{{ paper.id }}/ai-review/status"
+                 hx-trigger="every 30s"
+                 hx-swap="outerHTML">
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-6">
+                    <div class="flex items-center gap-3">
+                        <svg class="animate-spin h-6 w-6 text-amber-600 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <div>
+                            <p class="text-amber-800 font-medium">
+                                {% if latest_review.review_round > 1 %}
+                                    Re-review in progress (Round {{ latest_review.review_round }})...
+                                {% else %}
+                                    AI review in progress...
+                                {% endif %}
+                            </p>
+                            <p class="text-sm text-amber-700 mt-1">
+                                This typically takes 2-5 minutes. This page will automatically update
+                                when results are ready &mdash; no need to refresh.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# --- COMPLETED but NOT approved --- #}
+            {% elif latest_review and latest_review.status == 'completed' and not latest_review.approved %}
+                <div class="space-y-6">
+                    <!-- Current round header -->
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-bold text-secondary">
+                            Round {{ latest_review.review_round }} Review Comments
+                        </h3>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                            Action Required
+                        </span>
+                    </div>
+
+                    {% if latest_review.submitted_at %}
+                    <p class="text-xs text-slate-500">
+                        Submitted {{ latest_review.submitted_at.strftime('%B %d, %Y at %H:%M UTC') }}
+                        {% if latest_review.completed_at %}
+                            &middot; Completed {{ latest_review.completed_at.strftime('%B %d, %Y at %H:%M UTC') }}
+                        {% endif %}
+                    </p>
+                    {% endif %}
+
+                    {# Compute attempt info #}
+                    {% set attempt_number = latest_review.review_round %}
+                    {% set attempts_remaining = 3 - (latest_review.review_round - 1) %}
+
+                    <!-- Attempt counter -->
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm text-slate-600">
+                            Revision attempt
+                            <strong>{{ attempt_number }}</strong> of <strong>3</strong>
+                        </span>
+                        {% if attempts_remaining == 1 %}
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            Final attempt
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    {% if attempts_remaining == 1 %}
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <p class="text-red-800 font-semibold">&#9888;&#65039; Final revision attempt</p>
+                        <p class="text-sm text-red-700 mt-1">
+                            This is your last chance to address reviewer feedback. If this revision does not
+                            receive scores of 3 or higher on all comments, your paper will be returned to
+                            Stage&nbsp;1 and must go through a new endorsement cycle.
+                        </p>
+                    </div>
+                    {% else %}
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <p class="text-sm text-blue-800">
+                            <strong>What to do:</strong> Address the reviewer comments below, then upload
+                            your revised manuscript and a response letter explaining what you changed.
+                            Results are returned immediately. You have
+                            <strong>{{ attempts_remaining }} revision attempt{{ 's' if attempts_remaining != 1 else '' }}</strong>
+                            remaining (including this one).
+                        </p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Read-only reviewer comments -->
+                    {% set comments = latest_review.review_data.get('comments', []) if latest_review.review_data is mapping else [] %}
+                    {% if comments %}
+                    <div class="space-y-3">
+                        <h4 class="text-sm font-semibold text-secondary">Reviewer Comments</h4>
+                        {% for comment in comments %}
+                        <div class="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 mb-2">
+                                {{ comment.get('reviewerId', 'Reviewer ' ~ loop.index) }}
+                            </span>
+                            <p class="text-sm text-slate-700 whitespace-pre-line">{{ comment.get('comment', '') }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Resubmit form: two file uploads -->
+                    <form id="resubmit-area"
+                          hx-post="/paper/{{ paper.id }}/ai-review/resubmit"
+                          hx-target="#resubmit-area"
+                          hx-swap="outerHTML"
+                          hx-encoding="multipart/form-data"
+                          hx-timeout="300000"
+                          class="space-y-5 border-t border-slate-200 pt-5">
+
+                        <!-- Updated title (optional) -->
+                        <div>
+                            <label class="block text-sm font-semibold text-secondary mb-1">Updated Title</label>
+                            <p class="text-xs text-slate-500 mb-2">Update if your title has changed during revision. Leave as-is otherwise.</p>
+                            <input type="text" name="updated_title" value="{{ paper.title }}" maxlength="500"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:ring-primary focus:border-primary">
+                        </div>
+
+                        <!-- Updated abstract (optional) -->
+                        <div>
+                            <label class="block text-sm font-semibold text-secondary mb-1">Updated Abstract</label>
+                            <p class="text-xs text-slate-500 mb-2">Update if your abstract has changed during revision. Leave as-is otherwise.</p>
+                            <textarea name="updated_abstract" rows="6"
+                                      class="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:ring-primary focus:border-primary">{{ paper.abstract }}</textarea>
+                        </div>
+
+                        <!-- Revised manuscript -->
+                        <div>
+                            <label class="block text-sm font-semibold text-secondary mb-1">
+                                Revised manuscript PDF <span class="text-red-500">*</span>
+                            </label>
+                            <p class="text-xs text-slate-500 mb-2">
+                                Upload the updated version of your paper that incorporates the reviewer feedback.
+                            </p>
+                            <input type="file"
+                                   name="revised_pdf"
+                                   accept=".pdf"
+                                   required
+                                   class="block w-full text-sm text-slate-500
+                                          file:mr-4 file:py-2 file:px-4
+                                          file:rounded-md file:border-0
+                                          file:text-sm file:font-medium
+                                          file:bg-primary file:text-white
+                                          hover:file:bg-blue-700 file:cursor-pointer">
+                        </div>
+
+                        <!-- Author response letter -->
+                        <div>
+                            <label class="block text-sm font-semibold text-secondary mb-1">
+                                Author response letter PDF <span class="text-red-500">*</span>
+                            </label>
+                            <p class="text-xs text-slate-500 mb-2">
+                                A PDF document addressing each reviewer comment point-by-point.
+                                The text will be extracted automatically.
+                            </p>
+                            <input type="file"
+                                   name="author_response_pdf"
+                                   accept=".pdf"
+                                   required
+                                   class="block w-full text-sm text-slate-500
+                                          file:mr-4 file:py-2 file:px-4
+                                          file:rounded-md file:border-0
+                                          file:text-sm file:font-medium
+                                          file:bg-slate-600 file:text-white
+                                          hover:file:bg-slate-700 file:cursor-pointer">
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="pt-2">
+                            <button type="submit" id="resubmit-btn"
+                                    class="w-full px-6 py-3 bg-accent text-white rounded-md hover:bg-green-700 transition font-medium">
+                                Submit Revision for Scoring
+                            </button>
+                            <p class="text-xs text-slate-400 text-center mt-2">
+                                Your files will be uploaded and sent to the AI reviewers for re-evaluation.
+                                This process may take several minutes &mdash; please do not close this page.
+                            </p>
+                        </div>
+
+                        <script>
+                        document.querySelector('#resubmit-area').addEventListener('htmx:beforeRequest', function(e) {
+                            var btn = document.getElementById('resubmit-btn');
+                            if (btn) { btn.disabled = true; btn.classList.add('opacity-50', 'cursor-not-allowed'); }
+                            var area = document.getElementById('resubmit-area');
+                            area.insertAdjacentHTML('beforeend',
+                                '<div id="resubmit-wait" class="mt-6 bg-purple-50 border border-purple-200 rounded-lg p-6 text-center">' +
+                                '<svg class="animate-spin h-8 w-8 text-purple-600 mx-auto mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">' +
+                                '<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>' +
+                                '<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>' +
+                                '<p class="text-purple-800 font-semibold text-lg mb-2">Revision Under Review</p>' +
+                                '<p class="text-sm text-purple-700 mb-1">Your revised manuscript and response letter have been submitted.</p>' +
+                                '<p class="text-sm text-purple-700 mb-3">The AI reviewers are now re-evaluating your paper against their original comments. Each comment will be scored on how well it was addressed.</p>' +
+                                '<div class="flex items-center justify-center gap-2 text-xs text-purple-600">' +
+                                '<span>This typically takes 1\u20135 minutes</span>' +
+                                '<span class="text-purple-400">\u00b7</span>' +
+                                '<span>Please do not close or refresh this page</span>' +
+                                '</div></div>'
+                            );
+                            // Hide form fields
+                            area.querySelectorAll(':scope > div:not(#resubmit-wait)').forEach(function(el) { el.style.display = 'none'; });
+                        });
+                        </script>
+                    </form>
+                </div>
+
+            {# --- FAILED --- #}
+            {% elif latest_review and latest_review.status == 'failed' %}
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <p class="text-red-800 font-medium">AI review failed</p>
+                    <p class="text-sm text-red-600 mt-1">
+                        There was an error processing your paper. Please contact the editorial team for assistance.
+                    </p>
+                </div>
+
+            {% elif not latest_review %}
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                    <p class="text-slate-600">No AI review record found for this paper.</p>
+                </div>
+            {% endif %}
+
+            {# === ROUND HISTORY (all previous rounds) === #}
+            {% if all_reviews|length > 1 %}
+            <div class="mt-8 border-t border-slate-200 pt-6">
+                <h3 class="text-lg font-bold text-secondary mb-4">Review Round History</h3>
+
+                {% for review in all_reviews|reverse %}
+                    {% if review.id != latest_review.id or latest_review.approved %}
+                    <details class="mb-3 bg-slate-50 rounded-lg border border-slate-200" {% if loop.first and not latest_review.approved %}open{% endif %}>
+                        <summary class="px-4 py-3 cursor-pointer hover:bg-slate-100 rounded-lg transition">
+                            <span class="font-medium text-sm text-slate-800">
+                                Round {{ review.review_round }}
+                                {% if review.approved %}
+                                    <span class="text-green-600 ml-1">- Approved</span>
+                                {% elif review.status == 'completed' %}
+                                    {% set rc = review.review_data.get('comments', []) if review.review_data is mapping else [] %}
+                                    <span class="text-slate-500 ml-1">- {{ rc|length }} comment{{ 's' if rc|length != 1 else '' }}</span>
+                                {% else %}
+                                    <span class="text-slate-500 ml-1">- {{ review.status|capitalize }}</span>
+                                {% endif %}
+                            </span>
+                            <span class="text-xs text-slate-400 ml-2">
+                                {% if review.submitted_at %}{{ review.submitted_at.strftime('%b %d, %Y') }}{% endif %}
+                            </span>
+                        </summary>
+                        <div class="px-4 pb-4 space-y-3">
+                            {% if review.status == 'completed' %}
+                                {# Revision rounds (2+): show scored evaluations #}
+                                {% if review.review_round > 1 and review.revision_scores %}
+                                    {% set score_labels = {1: 'Ignored', 2: 'Weakly acknowledged', 3: 'Well acknowledged', 4: 'Fully addressed'} %}
+                                    {% set score_colors = {1: 'red', 2: 'amber', 3: 'emerald', 4: 'green'} %}
+                                    {% for ev in review.revision_scores %}
+                                    {% set sc = ev.get('score', 0) %}
+                                    {% set color = score_colors.get(sc, 'slate') %}
+                                    <div class="bg-white rounded p-3 border border-slate-100">
+                                        <div class="flex items-start justify-between gap-2 mb-1">
+                                            <p class="text-sm text-slate-700 whitespace-pre-line flex-1">{{ ev.get('originalComment', '') }}</p>
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-{{ color }}-100 text-{{ color }}-800 whitespace-nowrap flex-shrink-0">
+                                                {{ sc }}/4 &mdash; {{ score_labels.get(sc, '') }}
+                                            </span>
+                                        </div>
+                                        {% if ev.get('authorResponse') %}
+                                        <div class="mt-2 pl-3 border-l-2 border-blue-300">
+                                            <span class="text-xs font-medium text-blue-700">Author response:</span>
+                                            <p class="text-sm text-slate-600 mt-0.5 whitespace-pre-line">{{ ev.get('authorResponse', '') }}</p>
+                                        </div>
+                                        {% endif %}
+                                        {% if ev.get('reviewerResponse') %}
+                                        <div class="mt-2 pl-3 border-l-2 border-{{ color }}-300">
+                                            <span class="text-xs font-medium text-{{ color }}-700">Reviewer assessment:</span>
+                                            <p class="text-sm text-slate-600 mt-0.5 whitespace-pre-line">{{ ev.get('reviewerResponse', '') }}</p>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                {# Initial round (1): show original comments #}
+                                {% elif review.review_data is mapping %}
+                                    {% set round_comments = review.review_data.get('comments', []) %}
+                                    {% for c in round_comments %}
+                                    <div class="bg-white rounded p-3 border border-slate-100">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 mb-1">
+                                            {{ c.get('reviewerId', 'Reviewer') }}
+                                        </span>
+                                        <p class="text-sm text-slate-700 whitespace-pre-line">{{ c.get('comment', '') }}</p>
+                                    </div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </details>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if previous_cycle_count > 0 %}
+            <div class="mt-6 border-t border-slate-200 pt-4">
+                <p class="text-xs text-slate-400">
+                    {{ previous_cycle_count }} review{{ 's' if previous_cycle_count != 1 else '' }} from
+                    {% if paper.review_cycle == 2 %}a previous review cycle{% else %}previous review cycles{% endif %}
+                    (visible in the admin review panel).
+                </p>
+            </div>
+            {% endif %}
+
+        {% else %}
+            <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                <p class="text-slate-600">This paper is not yet at the AI review stage.</p>
+                <a href="/paper/{{ paper.id }}" class="text-primary hover:underline text-sm mt-2 inline-block">Return to paper</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
