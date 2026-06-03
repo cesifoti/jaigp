@@ -7,30 +7,32 @@ from models.review import AIReview, HumanReview
 from models.editorial import EditorialDecision
 from models.stage_history import StageHistory
 from models.extension import ExtensionRequest
-
-
-STAGE_DEADLINE_DAYS = 180
-EXTENSION_DAYS = 20
+from services.governance import get_rule_value, get_rule_value_int, badges_at_or_above
 
 
 class StageTransitionService:
     """Orchestrates paper transitions through the 5-stage review pipeline."""
 
     def endorsements_required(self, paper_id: int, db: Session) -> int:
-        """Return the number of bronze+ endorsements required for this paper to advance.
+        """Return the number of endorsements required for this paper to advance.
 
-        Papers where any registered author has badge='new' (0 ORCID works) require 2;
-        all other papers require 1.
+        Looks up the governance rule based on the lowest badge among the paper's authors.
         """
         from models.user import User
         from models.paper import PaperHumanAuthor
-        new_badge_author = db.query(PaperHumanAuthor).join(
+        authors = db.query(PaperHumanAuthor).join(
             User, User.id == PaperHumanAuthor.user_id
         ).filter(
             PaperHumanAuthor.paper_id == paper_id,
-            User.badge == "new",
-        ).first()
-        return 2 if new_badge_author else 1
+        ).all()
+        # Find the lowest badge among authors
+        badge_order = {"new": 0, "copper": 1, "bronze": 2, "silver": 3, "gold": 4}
+        lowest_badge = "new"
+        for a in authors:
+            if a.user and a.user.badge:
+                if badge_order.get(a.user.badge, 0) < badge_order.get(lowest_badge, 0):
+                    lowest_badge = a.user.badge
+        return get_rule_value_int(f"endorsements_required_{lowest_badge}", db)
 
     def advance_to_screened(self, paper_id: int, screener_user_id: int, db: Session) -> bool:
         """Advance paper from Stage 0 (Submitted) to Stage 1 (AI Screened).
@@ -64,13 +66,25 @@ class StageTransitionService:
         if not paper or paper.review_stage != 1:
             return False
 
-        # Count only bronze+ endorsers
+        # Determine which endorser badges qualify based on author's lowest badge
         from models.user import User
+        from models.paper import PaperHumanAuthor
+        authors = db.query(PaperHumanAuthor).join(
+            User, User.id == PaperHumanAuthor.user_id
+        ).filter(PaperHumanAuthor.paper_id == paper_id).all()
+        badge_order = {"new": 0, "copper": 1, "bronze": 2, "silver": 3, "gold": 4}
+        lowest_badge = "new"
+        for a in authors:
+            if a.user and a.user.badge:
+                if badge_order.get(a.user.badge, 0) < badge_order.get(lowest_badge, 0):
+                    lowest_badge = a.user.badge
+        min_endorser = get_rule_value(f"endorser_min_badge_{lowest_badge}", db)
+        allowed_badges = badges_at_or_above(min_endorser)
         endorsement_count = db.query(Endorsement).join(
             User, User.id == Endorsement.user_id
         ).filter(
             Endorsement.paper_id == paper_id,
-            User.badge.in_(["bronze", "silver", "gold"]),
+            User.badge.in_(allowed_badges),
         ).count()
 
         required = self.endorsements_required(paper_id, db)
@@ -261,7 +275,7 @@ class StageTransitionService:
         # Update paper
         paper.review_stage = to_stage
         paper.stage_entered_at = now
-        paper.stage_deadline_at = now + timedelta(days=STAGE_DEADLINE_DAYS)
+        paper.stage_deadline_at = now + timedelta(days=get_rule_value_int("stage_deadline_days", db))
 
         db.commit()
 
@@ -314,7 +328,7 @@ class StageTransitionService:
             requested_by_user_id=user_id,
             stage=paper.review_stage,
             reason=reason,
-            extension_days=EXTENSION_DAYS,
+            extension_days=get_rule_value_int("extension_days", db),
         )
         db.add(extension)
         db.commit()

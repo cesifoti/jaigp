@@ -46,11 +46,11 @@ class NotificationCountMiddleware(BaseHTTPMiddleware):
                         if hasattr(request, "cookies"):
                             session_id = request.cookies.get(config.SESSION_COOKIE_NAME)
                         if session_id:
-                            redis_client.setex(f"online:{session_id}", 300, "1")  # 5-min TTL
+                            redis_client.setex(f"{config.REDIS_KEY_PREFIX}online:{session_id}", 300, "1")  # 5-min TTL
                         # Cache online count for 30 seconds
                         now = _time.time()
                         if now - NotificationCountMiddleware._online_count_ts > 30:
-                            keys = redis_client.keys("online:*")
+                            keys = redis_client.keys(f"{config.REDIS_KEY_PREFIX}online:*")
                             NotificationCountMiddleware._online_count_cache = len(keys) if keys else 0
                             NotificationCountMiddleware._online_count_ts = now
                         request.state.online_count = NotificationCountMiddleware._online_count_cache

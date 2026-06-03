@@ -40,14 +40,24 @@ async def endorse_paper(
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
 
-    # Check badge eligibility
-    if not user.can_endorse:
-        raise HTTPException(status_code=403, detail="Bronze badge or higher required to endorse")
-
-    # Get paper
+    # Get paper first (needed to determine endorsement rules)
     paper = db.query(Paper).filter(Paper.id == paper_id).first()
     if not paper:
         raise HTTPException(status_code=404, detail="Paper not found")
+
+    # Check badge eligibility via governance rules
+    from services.governance import get_rule_value, badges_at_or_above
+    # Find the lowest badge among paper authors
+    _badge_order = {"new": 0, "copper": 1, "bronze": 2, "silver": 3, "gold": 4}
+    lowest_author_badge = "new"
+    for a in paper.human_authors:
+        if a.user and a.user.badge:
+            if _badge_order.get(a.user.badge, 0) < _badge_order.get(lowest_author_badge, 0):
+                lowest_author_badge = a.user.badge
+    min_endorser = get_rule_value(f"endorser_min_badge_{lowest_author_badge}", db)
+    allowed_badges = badges_at_or_above(min_endorser)
+    if (user.badge or "new") not in allowed_badges:
+        raise HTTPException(status_code=403, detail=f"{min_endorser.capitalize()} badge or higher required to endorse")
 
     # Must be at stage 1
     if paper.review_stage != 1:

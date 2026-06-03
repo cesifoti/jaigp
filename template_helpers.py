@@ -72,6 +72,7 @@ def smart_title_case(text):
 def format_post(text):
     """Format user post text with basic markdown: **bold** and *italic*.
 
+    Also unfurls /rules#slug links into inline preview cards.
     Text is auto-escaped first, then formatting markers are converted to HTML.
     """
     from markupsafe import Markup, escape
@@ -83,7 +84,46 @@ def format_post(text):
     safe = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', safe)
     # *italic* (single asterisks, not inside **)
     safe = re.sub(r'(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)', r'<em>\1</em>', safe)
+    # Unfurl /rules#slug links into preview cards
+    safe = _unfurl_rule_links(safe)
     return Markup(safe)
+
+
+def _unfurl_rule_links(html_text):
+    """Detect /rules#slug patterns and replace with inline rule preview cards."""
+    pattern = r'/rules#([\w_-]+)'
+
+    def _replace(match):
+        slug = match.group(1)
+        try:
+            from markupsafe import escape
+            from models.database import SessionLocal
+            from services.governance import get_rule_by_slug
+            db = SessionLocal()
+            try:
+                rule = get_rule_by_slug(slug, db)
+                if not rule:
+                    return match.group(0)  # return as-is if slug not found
+                label = rule.option_labels.get(rule.active_value, rule.active_value) if rule.is_votable else rule.active_value
+                # Escape DB-sourced values before interpolating into HTML.
+                # Defense-in-depth: rule titles/values aren't user-editable today,
+                # but this guarantees no HTML can ever break out of these spans.
+                safe_title = escape(rule.title)
+                safe_label = escape(label)
+                return (
+                    f'<a href="/rules#{slug}" class="inline-block my-1 px-3 py-2 rounded-lg border border-slate-200 '
+                    f'bg-slate-50 hover:bg-slate-100 transition text-xs no-underline">'
+                    f'<span class="font-semibold text-secondary">{safe_title}</span>'
+                    f' <span class="text-slate-400">·</span> '
+                    f'<span class="font-medium text-emerald-700">{safe_label}</span>'
+                    f'</a>'
+                )
+            finally:
+                db.close()
+        except Exception:
+            return match.group(0)
+
+    return re.sub(pattern, _replace, html_text)
 
 
 # Register globally

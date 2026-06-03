@@ -120,6 +120,24 @@ def sanitize_text(text):
     return text
 
 
+# Topic-level exclusion. SANITIZE_PATTERNS only scrub secret *values* out of an
+# otherwise-publishable prompt; these terms instead drop the ENTIRE prompt from
+# the archive, because a message that *discusses* credentials is private even
+# when no secret value is present (e.g. "how should I share the password?").
+SECRET_TOPIC_TERMS = (
+    "password",    # also covers "app password", "smtp_password"
+    "passwd",
+    "passphrase",
+    "credential",  # also covers "credentials"
+)
+
+
+def is_secret_topic(text):
+    """True if the prompt is about passwords/credentials and must be excluded."""
+    low = text.lower()
+    return any(term in low for term in SECRET_TOPIC_TERMS)
+
+
 # Patterns that strongly indicate a procedural/debugging prompt
 _PROCEDURAL_PATTERNS = [
     re.compile(r'(?i)^(resume|redeploy|restart|enter plan mode|exit plan mode|claude\s*/)', re.MULTILINE),
@@ -288,6 +306,11 @@ def extract_prompts_from_file(filepath):
             if any(full_text.startswith(prefix) for prefix in SYSTEM_PREFIXES):
                 continue
 
+            # Drop entire prompts that discuss passwords/credentials — even with
+            # values redacted, the surrounding discussion shouldn't be published.
+            if is_secret_topic(full_text):
+                continue
+
             sanitized = sanitize_text(full_text)
             prompts.append({
                 "text": sanitized,
@@ -340,12 +363,17 @@ def main():
 
     sessions = []
 
-    for filename in os.listdir(CONVERSATIONS_SRC):
+    # Extract from the persistent COPY, not the ephemeral SRC. Claude Code
+    # periodically prunes old transcripts from SRC; COPY accumulates every
+    # session ever seen (sync_conversations only ever adds/refreshes, never
+    # deletes), so reading it keeps the archive complete instead of shrinking
+    # to whatever happens to be in SRC right now.
+    for filename in os.listdir(CONVERSATIONS_COPY):
         if not filename.endswith(".jsonl"):
             continue
 
         uuid = filename.replace(".jsonl", "")
-        filepath = os.path.join(CONVERSATIONS_SRC, filename)
+        filepath = os.path.join(CONVERSATIONS_COPY, filename)
 
         prompts = extract_prompts_from_file(filepath)
         if not prompts:

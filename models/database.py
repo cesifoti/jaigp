@@ -53,12 +53,17 @@ def init_db():
     from models.user_email import UserEmail
     from models.notification import Notification
     from models.message import DirectMessage
+    from models.governance import GovernanceRule, GovernanceVote, GovernanceTally
 
     # Create all tables
     Base.metadata.create_all(bind=engine)
 
     # Data migration: set review_stage for existing published papers
     _migrate_existing_papers()
+
+    # Seed governance rules if not present
+    from scripts.seed_governance import seed_governance_rules
+    seed_governance_rules()
 
 
 def _migrate_existing_papers():

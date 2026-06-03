@@ -47,6 +47,9 @@ HOST = os.getenv("HOST", "127.0.0.1")
 SESSION_MAX_AGE = int(os.getenv("SESSION_MAX_AGE", "86400"))  # 24 hours
 SESSION_COOKIE_NAME = os.getenv("SESSION_COOKIE_NAME", "jaigp_session")
 
+# Redis key namespace (isolates dev from prod when both use the same Redis instance)
+REDIS_KEY_PREFIX = os.getenv("REDIS_KEY_PREFIX", "")
+
 # Admin
 ADMIN_ORCIDS = os.getenv("ADMIN_ORCIDS", "0000-0002-6977-9492").split(",")
 

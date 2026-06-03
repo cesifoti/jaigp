@@ -1,0 +1,67 @@
+{# HTMX-swappable vote widget for a single governance rule #}
+<div id="rule-widget-{{ rule.id }}" class="mt-3">
+    {% if user %}
+    <form hx-post="/rules/{{ rule.id }}/vote" hx-target="#rule-widget-{{ rule.id }}" hx-swap="outerHTML" class="flex flex-wrap gap-2 mb-2">
+        {% for opt in rule.options %}
+        {% set labels = rule.option_labels %}
+        {% set is_default = (opt == rule.default_value) %}
+        {% set is_voted = (user_vote == opt) %}
+        <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer border-2 transition relative
+            {% if is_voted %}bg-primary text-white border-primary
+            {% elif is_default %}bg-white text-slate-700 border-red-400 hover:border-primary hover:text-primary
+            {% else %}bg-white text-slate-600 border-slate-200 hover:border-primary hover:text-primary{% endif %}">
+            <input type="radio" name="chosen_option" value="{{ opt }}" class="hidden"
+                   {% if is_voted %}checked{% endif %}
+                   onchange="this.form.requestSubmit()">
+            {{ labels.get(opt, opt) }}
+        </label>
+        {% endfor %}
+    </form>
+    {% else %}
+    {# Show options read-only for logged-out users #}
+    <div class="flex flex-wrap gap-2 mb-2">
+        {% for opt in rule.options %}
+        {% set labels = rule.option_labels %}
+        {% set is_default = (opt == rule.default_value) %}
+        {% set is_active = (opt == rule.active_value) %}
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border-2
+            {% if is_default %}bg-white text-slate-700 border-red-400
+            {% elif is_active %}bg-emerald-50 text-emerald-700 border-emerald-300
+            {% else %}bg-white text-slate-500 border-slate-200{% endif %}">
+            {{ labels.get(opt, opt) }}
+        </span>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {# Vote distribution bar #}
+    {% set total = total_voters or 0 %}
+    {% if total > 0 %}
+    {% set colors = ['bg-blue-500', 'bg-emerald-500', 'bg-amber-500', 'bg-purple-500', 'bg-red-500', 'bg-indigo-500', 'bg-pink-500', 'bg-teal-500', 'bg-orange-500', 'bg-cyan-500'] %}
+    <div class="flex items-center gap-2">
+        <div class="flex-1 h-2 rounded-full overflow-hidden flex bg-slate-100">
+            {% for opt in rule.options %}
+            {% set count = distribution.get(opt, 0) %}
+            {% if count > 0 %}
+            <div style="width: {{ (count / total * 100)|round(1) }}%" class="{{ colors[loop.index0 % 10] }}" title="{{ rule.option_labels.get(opt, opt) }}: {{ count }} vote{{ 's' if count != 1 else '' }}"></div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        <span class="text-xs text-slate-400 whitespace-nowrap">{{ total }} vote{{ 's' if total != 1 else '' }}</span>
+    </div>
+    {# Legend #}
+    <div class="flex flex-wrap gap-x-3 gap-y-1 mt-1.5">
+        {% for opt in rule.options %}
+        {% set count = distribution.get(opt, 0) %}
+        {% if count > 0 %}
+        <span class="inline-flex items-center gap-1 text-[10px] text-slate-500">
+            <span class="w-2 h-2 rounded-full {{ colors[loop.index0 % 10] }}"></span>
+            {{ rule.option_labels.get(opt, opt) }} ({{ count }})
+        </span>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% elif not user %}
+    <p class="text-xs text-slate-400 mt-1">Log in with ORCID to vote on this rule.</p>
+    {% endif %}
+</div>

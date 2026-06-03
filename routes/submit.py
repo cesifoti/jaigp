@@ -115,9 +115,9 @@ async def submit_paper(
         raise HTTPException(status_code=401, detail="User not found")
 
     # Concurrent submission gate — limit active pipeline papers by badge
-    _BADGE_LIMITS = {"new": 1, "copper": 1, "bronze": 2, "silver": 3, "gold": 5}
+    from services.governance import get_rule_value_int, get_rule_value
     badge = user.badge or "new"
-    limit = _BADGE_LIMITS.get(badge, 1)
+    limit = get_rule_value_int(f"concurrent_limit_{badge}", db)
     active_count = (
         db.query(Paper)
         .join(PaperHumanAuthor)
@@ -159,12 +159,14 @@ async def submit_paper(
     # Validate PDF
     pdf_content = await pdf_handler.validate_pdf(pdf_file)
 
-    # Validate image if provided
+    # Validate image — enforce requirement if governance rule says so
     image_content = None
     image_extension = None
     if image_file and image_file.filename:
         image_content = await pdf_handler.validate_image(image_file)
         image_extension = pdf_handler.get_extension_from_filename(image_file.filename)
+    elif get_rule_value("cover_image_required", db) == "required":
+        raise HTTPException(status_code=400, detail="Cover image is required by journal rules (JPG or PNG).")
 
     # Parse JSON data
     try:

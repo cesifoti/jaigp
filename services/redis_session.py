@@ -15,7 +15,7 @@ class RedisSessionBackend:
 
     def __init__(self, session_id: str):
         self.session_id = session_id
-        self.key = f"session:{session_id}"
+        self.key = f"{config.REDIS_KEY_PREFIX}session:{session_id}"
 
     def get(self) -> Dict[str, Any]:
         """Get session data from Redis."""

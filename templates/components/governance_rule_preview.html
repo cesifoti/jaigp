@@ -1,0 +1,19 @@
+{# Inline preview card for rule links in community posts #}
+<a href="/rules#{{ rule.slug }}" class="block my-2 p-3 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 transition no-underline">
+    <div class="flex items-center gap-2">
+        <svg class="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Rule</span>
+    </div>
+    <div class="mt-1 text-sm font-semibold text-secondary">{{ rule.title }}</div>
+    <div class="mt-0.5 flex items-center gap-2 text-xs text-slate-500">
+        <span>Current value:</span>
+        <span class="font-semibold px-1.5 py-0.5 rounded bg-white border border-slate-200 text-slate-700">
+            {{ rule.option_labels.get(rule.active_value, rule.active_value) if rule.is_votable else rule.active_value }}
+        </span>
+        {% if rule.is_votable %}
+        <span class="text-primary">Vote on this rule →</span>
+        {% endif %}
+    </div>
+</a>

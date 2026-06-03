@@ -712,7 +712,10 @@ _SCORE_LABELS = {
 
 _SCORE_COLORS = {1: "red", 2: "amber", 3: "emerald", 4: "green"}
 
-MAX_REVISION_ROUNDS = 4  # round 1 = initial; rounds 2-4 = revision attempts 1-3
+def _max_revision_rounds(db):
+    """Max total rounds (1 initial + N revisions) from governance."""
+    from services.governance import get_rule_value_int
+    return get_rule_value_int("ai_review_max_revisions", db) + 1
 
 
 def _err(title: str, detail: str) -> HTMLResponse:
@@ -891,14 +894,16 @@ async def resubmit_ai_review(
         raise HTTPException(status_code=400, detail="No completed AI review awaiting response")
 
     new_round = latest_review.review_round + 1
-    if new_round > MAX_REVISION_ROUNDS:
+    max_rounds = _max_revision_rounds(db)
+    if new_round > max_rounds:
+        max_revisions = max_rounds - 1
         return _err(
             "Maximum revision attempts reached",
-            "You have used all 3 revision attempts for this review cycle.",
+            f"You have used all {max_revisions} revision attempts for this review cycle.",
         )
 
-    attempt_number = new_round - 1  # 1, 2, or 3
-    is_final_attempt = (new_round == MAX_REVISION_ROUNDS)
+    attempt_number = new_round - 1
+    is_final_attempt = (new_round == max_rounds)
 
     form = await request.form()
     updated_title = form.get("updated_title", "").strip()
@@ -1027,7 +1032,7 @@ async def resubmit_ai_review(
 
         # Still has attempts remaining — commit and show scores
         db.commit()
-        attempts_remaining = MAX_REVISION_ROUNDS - new_round
+        attempts_remaining = _max_revision_rounds(db) - new_round
         return HTMLResponse(_needs_revision_result_html(paper_id, evaluations, attempt_number, attempts_remaining))
 
     except Exception as e:

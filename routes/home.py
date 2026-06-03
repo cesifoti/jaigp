@@ -114,7 +114,6 @@ async def homepage(
             "Taking ideas seriously, not ourselves.",
             "We might be wrong. That's why we publish."
         ]
-        import random
         motto = random.choice(mottos)
 
         return templates.TemplateResponse(
@@ -166,7 +165,6 @@ async def homepage(
             "Taking ideas seriously, not ourselves.",
             "We might be wrong. That's why we publish."
         ]
-        import random
         motto = random.choice(mottos)
 
         return templates.TemplateResponse(

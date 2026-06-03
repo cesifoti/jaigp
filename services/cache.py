@@ -23,6 +23,11 @@ def check_redis_connection():
     except redis.ConnectionError:
         return False
 
+def _ns(key: str) -> str:
+    """Namespace a Redis key so dev and prod don't share keyspace."""
+    return f"{config.REDIS_KEY_PREFIX}{key}"
+
+
 class CacheService:
     """Redis caching service."""
 
@@ -33,7 +38,7 @@ class CacheService:
             return None
 
         try:
-            value = redis_client.get(key)
+            value = redis_client.get(_ns(key))
             if value:
                 return json.loads(value)
             return None
@@ -49,7 +54,7 @@ class CacheService:
 
         try:
             redis_client.setex(
-                key,
+                _ns(key),
                 timeout,
                 json.dumps(value, default=str)  # default=str handles datetime objects
             )
@@ -65,7 +70,7 @@ class CacheService:
             return False
 
         try:
-            redis_client.delete(key)
+            redis_client.delete(_ns(key))
             return True
         except Exception as e:
             print(f"Cache delete error: {e}")
@@ -78,7 +83,7 @@ class CacheService:
             return False
 
         try:
-            keys = redis_client.keys(pattern)
+            keys = redis_client.keys(_ns(pattern))
             if keys:
                 redis_client.delete(*keys)
             return True
@@ -93,7 +98,7 @@ class CacheService:
             return None
 
         try:
-            return redis_client.incrby(key, amount)
+            return redis_client.incrby(_ns(key), amount)
         except Exception as e:
             print(f"Cache increment error: {e}")
             return None
@@ -105,7 +110,7 @@ class CacheService:
             return False
 
         try:
-            redis_client.expire(key, seconds)
+            redis_client.expire(_ns(key), seconds)
             return True
         except Exception as e:
             print(f"Cache expiry error: {e}")
@@ -172,7 +177,7 @@ class RateLimiter:
             return (True, limit)  # Allow if Redis is down
 
         try:
-            key = f"rate_limit:{identifier}"
+            key = f"{config.REDIS_KEY_PREFIX}rate_limit:{identifier}"
             current = redis_client.get(key)
 
             if current is None:
@@ -201,7 +206,7 @@ class RateLimiter:
             return False
 
         try:
-            key = f"rate_limit:{identifier}"
+            key = f"{config.REDIS_KEY_PREFIX}rate_limit:{identifier}"
             redis_client.delete(key)
             return True
         except Exception as e:

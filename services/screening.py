@@ -204,20 +204,23 @@ async def _screen_paper(paper_id: int, db: Session) -> None:
     triggered_strike = False
     cooldown_until = None
 
+    from services.governance import get_rule_value_int, get_rule_value_timedelta
+
     if outcome == "borderline":
         new_streak = consecutive_before + 1
-        if new_streak >= 3:
+        streak_threshold = get_rule_value_int("screening_borderline_streak", db)
+        if new_streak >= streak_threshold:
             triggered_strike = True
-            cooldown_until = datetime.utcnow() + timedelta(hours=48)
+            cooldown_until = datetime.utcnow() + get_rule_value_timedelta("screening_cooldown_borderline", db)
         stored_consecutive = new_streak
     elif outcome == "reject":
         # Count total rejections (including this one)
         total_rejections = (_count_total_rejections(user_id, db) if user_id else 0) + 1
-        if total_rejections >= 3:
-            # 3 rejections → 6 month block
-            cooldown_until = datetime.utcnow() + timedelta(days=180)
+        max_rejections = get_rule_value_int("screening_max_rejections", db)
+        if total_rejections >= max_rejections:
+            cooldown_until = datetime.utcnow() + get_rule_value_timedelta("screening_block_3rd_rejection", db)
         else:
-            cooldown_until = datetime.utcnow() + timedelta(hours=48)
+            cooldown_until = datetime.utcnow() + get_rule_value_timedelta("screening_cooldown_rejection", db)
         stored_consecutive = 0
     else:  # pass
         stored_consecutive = 0

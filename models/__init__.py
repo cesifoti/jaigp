@@ -15,6 +15,7 @@ from models.prompt import CommunityPrompt, PromptComment, PromptCommentVote, Pro
 from models.discussion import DiscussionPost, DiscussionComment, DiscussionCommentVote, DiscussionVote, UserFollow
 from models.notification import Notification
 from models.message import DirectMessage
+from models.governance import GovernanceRule, GovernanceVote, GovernanceVoteHistory, GovernanceTally
 
 __all__ = [
     "Base",
@@ -51,4 +52,8 @@ __all__ = [
     "UserFollow",
     "Notification",
     "DirectMessage",
+    "GovernanceRule",
+    "GovernanceVote",
+    "GovernanceVoteHistory",
+    "GovernanceTally",
 ]
