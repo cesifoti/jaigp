@@ -403,6 +403,13 @@ async def view_paper(
     ).order_by(AIReview.review_round.asc()).all()
     latest_ai_review = all_ai_reviews[-1] if all_ai_reviews else None
 
+    # Governed endorsement gate (counts + qualifying badges come from the rules)
+    from services.stage_transition import stage_transition_service
+    endorse_ctx = stage_transition_service.endorsement_requirements(paper_id, db)
+    can_endorse = bool(
+        user_db and (user_db.badge or "new") in endorse_ctx["allowed_badges"]
+    )
+
     return templates.TemplateResponse(
         "paper.html",
         {
@@ -412,9 +419,10 @@ async def view_paper(
             "user_db": user_db,
             "endorsements": paper.endorsements if hasattr(paper, 'endorsements') else [],
             "has_endorsed": has_endorsed,
-            "can_endorse": user_db.can_endorse if user_db else False,
+            "can_endorse": can_endorse,
             "latest_ai_review": latest_ai_review,
             "all_ai_reviews": all_ai_reviews,
+            **endorse_ctx,
         }
     )
 

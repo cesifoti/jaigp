@@ -26,7 +26,7 @@ RULES = [
         "slug": "email_verification",
         "section": "submission",
         "title": "Email Verification",
-        "description": "After submitting a paper, you must verify your email within 7 days or the submission expires.",
+        "description": "After submitting a paper, you must verify your email address before the paper becomes publicly visible and enters screening.",
         "options_json": None,
         "default_value": "yes",
         "is_votable": False,

@@ -1,19 +1,19 @@
 {# Endorsement Button Component #}
 {# Shows endorsement status and action button for eligible users #}
 
-{# Compute whether any author has 'new' badge (0 works) — requires 2 endorsements #}
-{% set ns = namespace(has_new_author=false, bronze_count=0) %}
-{% for author in paper.human_authors %}
-    {% if author.user and author.user.badge == 'new' %}
-        {% set ns.has_new_author = true %}
-    {% endif %}
-{% endfor %}
-{% set endorsements_required = 2 if ns.has_new_author else 1 %}
+{# Endorsement gate is governed by the rules page. The route passes
+   endorsements_required, allowed_badges, and min_endorser_badge — all derived
+   from the governance rules for this paper's lowest-badge author — so this
+   component never hardcodes counts or qualifying badges. Defaults are a safe
+   fallback only if a caller omits them. #}
+{% set endorsements_required = endorsements_required | default(1) %}
+{% set allowed_badges = allowed_badges | default(['bronze', 'silver', 'gold']) %}
+{% set min_endorser_label = (min_endorser_badge | default('bronze')) | capitalize %}
 
-{# Count bronze+ endorsements received #}
+{# Count endorsements from qualifying (governed) badges #}
 {% set ns2 = namespace(bronze_count=0) %}
 {% for e in endorsements %}
-    {% if e.user and e.user.badge in ['bronze', 'silver', 'gold'] %}
+    {% if e.user and (e.user.badge or 'new') in allowed_badges %}
         {% set ns2.bronze_count = ns2.bronze_count + 1 %}
     {% endif %}
 {% endfor %}
@@ -39,11 +39,11 @@
         {% endfor %}
     </div>
 
-    {# Progress bar for papers needing 2 endorsements #}
-    {% if paper.review_stage == 1 and endorsements_required == 2 %}
+    {# Progress bar for papers needing more than one endorsement #}
+    {% if paper.review_stage == 1 and endorsements_required > 1 %}
     <div class="mb-4">
         <div class="flex justify-between text-xs text-slate-500 mb-1">
-            <span>Bronze+ endorsements received</span>
+            <span>{{ min_endorser_label }}+ endorsements received</span>
             <span class="font-medium">{{ ns2.bronze_count }} / {{ endorsements_required }}</span>
         </div>
         <div class="w-full bg-slate-100 rounded-full h-1.5">
@@ -56,11 +56,10 @@
     {% else %}
     <p class="text-sm text-slate-500 mb-4">
         No endorsements yet.
-        {% if endorsements_required == 2 %}
-        This paper needs <strong>2 endorsements</strong> from bronze+ scholars to advance
-        (one author has no prior ORCID publications).
+        {% if endorsements_required > 1 %}
+        This paper needs <strong>{{ endorsements_required }} endorsements</strong> from {{ min_endorser_label }}+ scholars to advance.
         {% else %}
-        This paper needs 1 endorsement from a bronze+ scholar to advance.
+        This paper needs 1 endorsement from a {{ min_endorser_label }}+ scholar to advance.
         {% endif %}
     </p>
     {% endif %}
@@ -74,7 +73,7 @@
                         class="w-full px-4 py-2 bg-slate-100 text-slate-600 rounded-md hover:bg-slate-200 transition text-sm font-medium">
                     Withdraw Endorsement
                 </button>
-            {% elif user_db and user_db.can_endorse %}
+            {% elif can_endorse %}
                 {% set ns_auth = namespace(is_author=false) %}
                 {% for author in paper.human_authors %}
                     {% if author.user_id == user.id %}
@@ -86,10 +85,9 @@
                         <p class="text-sm text-blue-800 font-medium mb-2">Authors cannot endorse their own papers</p>
                         <p class="text-xs text-blue-700 leading-relaxed">
                             Endorsement is an independent eligibility check: another ORCID-verified scholar
-                            with a Bronze badge or higher must endorse your paper before it can proceed to AI review.
-                            {% if endorsements_required == 2 %}
-                            Because one of the listed authors has no prior ORCID publications, this paper
-                            requires <strong>{{ endorsements_required }} endorsements</strong>.
+                            with a {{ min_endorser_label }} badge or higher must endorse your paper before it can proceed to AI review.
+                            {% if endorsements_required > 1 %}
+                            This paper requires <strong>{{ endorsements_required }} endorsements</strong>.
                             {% endif %}
                             Share your paper with colleagues who have an ORCID profile and ask them to endorse it here.
                         </p>
@@ -103,7 +101,7 @@
                     </button>
                 {% endif %}
             {% else %}
-                <p class="text-xs text-slate-400 italic">Bronze badge or higher required to endorse papers.</p>
+                <p class="text-xs text-slate-400 italic">{{ min_endorser_label }} badge or higher required to endorse papers.</p>
             {% endif %}
         {% else %}
             <a href="/auth/login"

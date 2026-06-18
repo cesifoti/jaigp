@@ -36,6 +36,40 @@ def badges_at_or_above(min_badge: str) -> list[str]:
     return BADGE_ORDER[idx:]
 
 
+def _badge_rank(badge: str) -> int:
+    """Rank a badge within BADGE_ORDER; unknown/None ranks as 'new' (lowest)."""
+    try:
+        return BADGE_ORDER.index(badge)
+    except ValueError:
+        return 0
+
+
+def lowest_author_badge(paper_id: int, db: Session) -> str:
+    """Return the lowest badge among a paper's human authors.
+
+    The endorsement requirement is keyed to the *weakest* author: a paper is
+    only as credentialed as its least-credentialed author. A missing/None or
+    unrecognized badge counts as 'new' (most conservative), and a paper with
+    no linked human authors also defaults to 'new'.
+
+    NOTE: callers previously initialized the running minimum to 'new' and only
+    lowered it — but 'new' is already the global minimum, so the result was
+    pinned to 'new' for every paper (every paper wrongly required the
+    'new author' endorsement count). This helper computes the true minimum.
+    """
+    from models.user import User
+    from models.paper import PaperHumanAuthor
+    authors = db.query(PaperHumanAuthor).join(
+        User, User.id == PaperHumanAuthor.user_id
+    ).filter(PaperHumanAuthor.paper_id == paper_id).all()
+    lowest = None
+    for a in authors:
+        badge = a.user.badge if (a.user and a.user.badge in BADGE_ORDER) else "new"
+        if lowest is None or _badge_rank(badge) < _badge_rank(lowest):
+            lowest = badge
+    return lowest or "new"
+
+
 # ── Duration parser ─────────────────────────────────────────────────────────
 
 _DURATION_MAP = {

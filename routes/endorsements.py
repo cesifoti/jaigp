@@ -45,16 +45,9 @@ async def endorse_paper(
     if not paper:
         raise HTTPException(status_code=404, detail="Paper not found")
 
-    # Check badge eligibility via governance rules
-    from services.governance import get_rule_value, badges_at_or_above
-    # Find the lowest badge among paper authors
-    _badge_order = {"new": 0, "copper": 1, "bronze": 2, "silver": 3, "gold": 4}
-    lowest_author_badge = "new"
-    for a in paper.human_authors:
-        if a.user and a.user.badge:
-            if _badge_order.get(a.user.badge, 0) < _badge_order.get(lowest_author_badge, 0):
-                lowest_author_badge = a.user.badge
-    min_endorser = get_rule_value(f"endorser_min_badge_{lowest_author_badge}", db)
+    # Check badge eligibility via governance rules, keyed to the lowest-badge author
+    from services.governance import get_rule_value, badges_at_or_above, lowest_author_badge
+    min_endorser = get_rule_value(f"endorser_min_badge_{lowest_author_badge(paper_id, db)}", db)
     allowed_badges = badges_at_or_above(min_endorser)
     if (user.badge or "new") not in allowed_badges:
         raise HTTPException(status_code=403, detail=f"{min_endorser.capitalize()} badge or higher required to endorse")
@@ -76,7 +69,7 @@ async def endorse_paper(
             '<p class="text-sm text-blue-800 font-medium mb-2">Authors cannot endorse their own papers</p>'
             '<p class="text-xs text-blue-700 leading-relaxed">'
             'Endorsement is an independent eligibility check: another ORCID-verified scholar '
-            'with a Bronze badge or higher must endorse your paper before it can proceed to AI review. '
+            f'with a {min_endorser.capitalize()} badge or higher must endorse your paper before it can proceed to AI review. '
             'Share your paper with colleagues who have an ORCID profile and ask them to endorse it here.'
             '</p></div></div>'
         )
@@ -137,6 +130,7 @@ async def endorse_paper(
             "endorsements": paper.endorsements,
             "has_endorsed": True,
             "can_endorse": False,
+            **stage_transition_service.endorsement_requirements(paper_id, db),
         },
     )
 
@@ -178,6 +172,7 @@ async def withdraw_endorsement(
     user = db.query(User).filter(User.id == session_user["id"]).first()
     db.refresh(paper)
 
+    endorse_ctx = stage_transition_service.endorsement_requirements(paper_id, db)
     return templates.TemplateResponse(
         "components/endorsement_button.html",
         {
@@ -187,7 +182,8 @@ async def withdraw_endorsement(
             "user_db": user,
             "endorsements": paper.endorsements,
             "has_endorsed": False,
-            "can_endorse": user.can_endorse if user else False,
+            "can_endorse": bool(user and (user.badge or "new") in endorse_ctx["allowed_badges"]),
+            **endorse_ctx,
         },
     )
 
@@ -204,6 +200,8 @@ async def list_endorsements(
         raise HTTPException(status_code=404, detail="Paper not found")
 
     session_user = request.session.get("user")
+    user_db = db.query(User).filter(User.id == session_user["id"]).first() if session_user else None
+    endorse_ctx = stage_transition_service.endorsement_requirements(paper_id, db)
 
     return templates.TemplateResponse(
         "components/endorsement_button.html",
@@ -211,9 +209,10 @@ async def list_endorsements(
             "request": request,
             "paper": paper,
             "user": session_user,
-            "user_db": db.query(User).filter(User.id == session_user["id"]).first() if session_user else None,
+            "user_db": user_db,
             "endorsements": paper.endorsements,
             "has_endorsed": any(e.user_id == session_user["id"] for e in paper.endorsements) if session_user else False,
-            "can_endorse": False,  # Computed in template
+            "can_endorse": bool(user_db and (user_db.badge or "new") in endorse_ctx["allowed_badges"]),
+            **endorse_ctx,
         },
     )

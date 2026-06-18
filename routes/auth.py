@@ -17,6 +17,26 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 templates = Jinja2Templates(directory="templates")
 templates.env = register_filters(templates.env)
 
+
+def _reevaluate_after_badge_change(user_id: int, db: Session):
+    """A badge upgrade can satisfy the endorsement bar on Stage 1 papers this
+    user has already endorsed. Re-check just those so they don't stay stuck.
+
+    Best-effort: never let this break the login/refresh flow.
+    """
+    try:
+        from models.endorsement import Endorsement
+        from services.stage_transition import stage_transition_service
+        paper_ids = [
+            e.paper_id for e in db.query(Endorsement.paper_id).filter(
+                Endorsement.user_id == user_id
+            ).all()
+        ]
+        if paper_ids:
+            stage_transition_service.reevaluate_stage1_endorsements(db, paper_ids=paper_ids)
+    except Exception as e:
+        print(f"Error re-evaluating endorsements after badge change for user {user_id}: {e}")
+
 @router.get("/login")
 async def login(request: Request):
     """Initiate ORCID OAuth flow."""
@@ -134,6 +154,9 @@ async def callback(
 
     db.commit()
     db.refresh(user)
+
+    if should_update_badge:
+        _reevaluate_after_badge_change(user.id, db)
 
     # Store user in session
     request.session["user"] = {
@@ -763,6 +786,8 @@ async def refresh_badge(request: Request, db: Session = Depends(get_db)):
 
         db.commit()
         db.refresh(user)
+
+        _reevaluate_after_badge_change(user.id, db)
 
         return JSONResponse({
             "success": True,

@@ -7,7 +7,12 @@ from models.review import AIReview, HumanReview
 from models.editorial import EditorialDecision
 from models.stage_history import StageHistory
 from models.extension import ExtensionRequest
-from services.governance import get_rule_value, get_rule_value_int, badges_at_or_above
+from services.governance import (
+    get_rule_value,
+    get_rule_value_int,
+    badges_at_or_above,
+    lowest_author_badge,
+)
 
 
 class StageTransitionService:
@@ -18,21 +23,27 @@ class StageTransitionService:
 
         Looks up the governance rule based on the lowest badge among the paper's authors.
         """
-        from models.user import User
-        from models.paper import PaperHumanAuthor
-        authors = db.query(PaperHumanAuthor).join(
-            User, User.id == PaperHumanAuthor.user_id
-        ).filter(
-            PaperHumanAuthor.paper_id == paper_id,
-        ).all()
-        # Find the lowest badge among authors
-        badge_order = {"new": 0, "copper": 1, "bronze": 2, "silver": 3, "gold": 4}
-        lowest_badge = "new"
-        for a in authors:
-            if a.user and a.user.badge:
-                if badge_order.get(a.user.badge, 0) < badge_order.get(lowest_badge, 0):
-                    lowest_badge = a.user.badge
+        lowest_badge = lowest_author_badge(paper_id, db)
         return get_rule_value_int(f"endorsements_required_{lowest_badge}", db)
+
+    def endorsement_requirements(self, paper_id: int, db: Session) -> dict:
+        """Return the governed endorsement gate for a paper, for display/UI.
+
+        All values are derived from the governance rules for this paper's
+        lowest-badge author, so templates never hardcode counts or badges:
+          - endorsements_required: how many qualifying endorsements are needed
+          - allowed_badges: the set of endorser badges that count
+          - min_endorser_badge: the minimum endorser badge (e.g. "bronze")
+        """
+        lowest_badge = lowest_author_badge(paper_id, db)
+        min_badge = get_rule_value(f"endorser_min_badge_{lowest_badge}", db)
+        return {
+            "endorsements_required": get_rule_value_int(
+                f"endorsements_required_{lowest_badge}", db
+            ),
+            "allowed_badges": badges_at_or_above(min_badge),
+            "min_endorser_badge": min_badge,
+        }
 
     def advance_to_screened(self, paper_id: int, screener_user_id: int, db: Session) -> bool:
         """Advance paper from Stage 0 (Submitted) to Stage 1 (AI Screened).
@@ -68,16 +79,7 @@ class StageTransitionService:
 
         # Determine which endorser badges qualify based on author's lowest badge
         from models.user import User
-        from models.paper import PaperHumanAuthor
-        authors = db.query(PaperHumanAuthor).join(
-            User, User.id == PaperHumanAuthor.user_id
-        ).filter(PaperHumanAuthor.paper_id == paper_id).all()
-        badge_order = {"new": 0, "copper": 1, "bronze": 2, "silver": 3, "gold": 4}
-        lowest_badge = "new"
-        for a in authors:
-            if a.user and a.user.badge:
-                if badge_order.get(a.user.badge, 0) < badge_order.get(lowest_badge, 0):
-                    lowest_badge = a.user.badge
+        lowest_badge = lowest_author_badge(paper_id, db)
         min_endorser = get_rule_value(f"endorser_min_badge_{lowest_badge}", db)
         allowed_badges = badges_at_or_above(min_endorser)
         endorsement_count = db.query(Endorsement).join(
@@ -99,7 +101,62 @@ class StageTransitionService:
             trigger_type="endorsement",
             db=db,
         )
+
+        # Authors we can't reach by email get an in-app "ready for AI review"
+        # nudge so they don't silently stall at this stage. Best-effort.
+        try:
+            from services.notification import notify_unreachable_authors_ready
+            if notify_unreachable_authors_ready(paper_id, db):
+                db.commit()
+        except Exception as e:
+            print(f"Error creating ai_review_ready notifications for paper {paper_id}: {e}")
+
         return True
+
+    def _qualifying_endorser_id(self, paper_id: int, db: Session):
+        """Return a user_id of an endorser who currently qualifies, else None.
+
+        Used to attribute a re-evaluated transition to a real endorser.
+        """
+        from models.user import User
+        lowest_badge = lowest_author_badge(paper_id, db)
+        min_endorser = get_rule_value(f"endorser_min_badge_{lowest_badge}", db)
+        allowed_badges = badges_at_or_above(min_endorser)
+        endorsement = db.query(Endorsement).join(
+            User, User.id == Endorsement.user_id
+        ).filter(
+            Endorsement.paper_id == paper_id,
+            User.badge.in_(allowed_badges),
+        ).order_by(Endorsement.created_at).first()
+        return endorsement.user_id if endorsement else None
+
+    def reevaluate_stage1_endorsements(self, db: Session, paper_ids=None) -> list:
+        """Re-check Stage 1 papers against the *current* endorsement rules and
+        advance any that now qualify. Returns the list of advanced paper ids.
+
+        Advancement is normally evaluated only at the instant an endorsement is
+        submitted, so a paper can be left stuck if it later becomes eligible —
+        e.g. an endorser's badge is upgraded, or a governance rule changes the
+        required count. This sweep closes that gap and is safe to call
+        repeatedly: advance_to_endorsed re-validates every condition itself.
+
+        Pass paper_ids to restrict the sweep (e.g. just the papers a freshly
+        upgraded user has endorsed); omit it to sweep all Stage 1 papers.
+        """
+        query = db.query(Paper).filter(
+            Paper.review_stage == 1, Paper.status == "published"
+        )
+        if paper_ids is not None:
+            ids = list(paper_ids)
+            if not ids:
+                return []
+            query = query.filter(Paper.id.in_(ids))
+        advanced = []
+        for paper in query.all():
+            endorser_id = self._qualifying_endorser_id(paper.id, db)
+            if endorser_id and self.advance_to_endorsed(paper.id, endorser_id, db):
+                advanced.append(paper.id)
+        return advanced
 
     def advance_to_ai_review(self, paper_id: int, user_id: int, db: Session) -> bool:
         """Advance paper from Stage 2 (Endorsed) to Stage 3 (AI Review).

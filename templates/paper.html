@@ -363,7 +363,7 @@
                     </svg>
                     <div>
                         <p class="text-sm font-medium text-blue-800">Awaiting Endorsement</p>
-                        <p class="text-xs text-slate-500 mt-1">Needs a Bronze+ ORCID scholar endorsement to advance.</p>
+                        <p class="text-xs text-slate-500 mt-1">Needs {% if endorsements_required and endorsements_required > 1 %}{{ endorsements_required }} {{ (min_endorser_badge | default('bronze')) | capitalize }}+ ORCID scholar endorsements{% else %}a {{ (min_endorser_badge | default('bronze')) | capitalize }}+ ORCID scholar endorsement{% endif %} to advance.</p>
                     </div>
                 </div>
 

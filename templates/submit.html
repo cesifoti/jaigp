@@ -97,8 +97,8 @@
 
             <!-- Cover Image -->
             <div class="mb-5">
-                <label for="image_file" class="block text-sm font-medium text-slate-700 mb-1.5">Cover Image <span class="font-normal text-slate-400">(optional)</span></label>
-                <input type="file" id="image_file" name="image_file" accept=".jpg,.jpeg,.png"
+                <label for="image_file" class="block text-sm font-medium text-slate-700 mb-1.5">Cover Image <span class="font-normal text-slate-400">({{ 'required' if cover_image_required else 'optional' }})</span></label>
+                <input type="file" id="image_file" name="image_file" accept=".jpg,.jpeg,.png"{% if cover_image_required %} required{% endif %}
                        class="block w-full text-sm text-slate-500
                               file:mr-3 file:py-2 file:px-4
                               file:rounded-lg file:border-0

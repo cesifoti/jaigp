@@ -33,7 +33,7 @@ def require_auth(request: Request):
     return user
 
 @router.get("", response_class=HTMLResponse)
-async def submit_form(request: Request):
+async def submit_form(request: Request, db: Session = Depends(get_db)):
     """Show paper submission form."""
     user = request.session.get("user")
 
@@ -41,11 +41,15 @@ async def submit_form(request: Request):
     if not user:
         return RedirectResponse(url="/auth/login", status_code=303)
 
+    from services.governance import get_rule_value
+    cover_image_required = get_rule_value("cover_image_required", db) == "required"
+
     return templates.TemplateResponse(
         "submit.html",
         {
             "request": request,
-            "user": user
+            "user": user,
+            "cover_image_required": cover_image_required,
         }
     )
 
@@ -177,9 +181,14 @@ async def submit_paper(
     except json.JSONDecodeError:
         raise HTTPException(status_code=400, detail="Invalid JSON data")
 
-    # Validate categories (minimum 1 required)
-    if len(categories_data) < 1:
-        raise HTTPException(status_code=400, detail="Please select at least 1 category")
+    # Validate paper details to match the journal-rules "paper_details" policy:
+    # 1–5 subject categories, and at least one AI author and one human prompter.
+    if not (1 <= len(categories_data) <= 5):
+        raise HTTPException(status_code=400, detail="Please select between 1 and 5 categories")
+    if len(ai_authors_data) < 1:
+        raise HTTPException(status_code=400, detail="Please add at least one AI author")
+    if len(human_authors_data) < 1:
+        raise HTTPException(status_code=400, detail="Please add at least one human author (prompter)")
 
     # Generate verification token
     verification_token = secrets.token_urlsafe(32)

@@ -46,8 +46,6 @@ To complete your submission and make your paper publicly visible, please verify 
 
 {verification_url}
 
-This link will expire in 7 days.
-
 If you did not submit this paper, please ignore this email.
 
 Best regards,
@@ -97,7 +95,7 @@ https://jaigp.org
             </p>
 
             <p style="font-size: 14px; color: #64748b; margin-top: 30px;">
-                This link will expire in 7 days. If you did not submit this paper, please ignore this email.
+                If you did not submit this paper, please ignore this email.
             </p>
         </div>
         <div class="footer">
@@ -353,13 +351,15 @@ JAIGP Editorial Team"""
 
     def send_staleness_warning(self, to_email: str, paper_title: str, days_remaining: int, paper_url: str) -> bool:
         """Warn author about approaching stage deadline."""
+        from services.governance import get_rule_value_int
+        extension_days = get_rule_value_int("extension_days")
         subject = f"Deadline Approaching: {paper_title} ({days_remaining} days remaining)"
 
         text_content = f"""Your paper "{paper_title}" has {days_remaining} days remaining in its current review stage.
 
 Please take action to advance your paper before the deadline.
 
-You can request a 20-day extension if you need more time.
+You can request a {extension_days}-day extension if you need more time.
 
 View your paper: https://jaigp.org{paper_url}
 
@@ -372,7 +372,7 @@ JAIGP Team"""
             <div class="highlight">
                 <strong>Paper:</strong><br>{paper_title}
             </div>
-            <p>Please take action to advance your paper before the deadline. You can also request a 20-day extension if needed.</p>
+            <p>Please take action to advance your paper before the deadline. You can also request a {extension_days}-day extension if needed.</p>
             <p style="text-align: center; margin: 30px 0;">
                 <a href="https://jaigp.org{paper_url}" class="button">View Paper</a>
             </p>"""
@@ -382,12 +382,14 @@ JAIGP Team"""
 
     def send_extension_decision(self, to_email: str, paper_title: str, approved: bool, paper_url: str) -> bool:
         """Notify author of extension request decision."""
+        from services.governance import get_rule_value_int
+        extension_days = get_rule_value_int("extension_days")
         status = "Approved" if approved else "Denied"
         subject = f"Extension Request {status}: {paper_title}"
 
         text_content = f"""Your extension request for "{paper_title}" has been {status.lower()}.
 
-{'Your deadline has been extended by 20 days.' if approved else 'Please take action to advance your paper.'}
+{f'Your deadline has been extended by {extension_days} days.' if approved else 'Please take action to advance your paper.'}
 
 View your paper: https://jaigp.org{paper_url}
 
@@ -399,7 +401,7 @@ JAIGP Team"""
             <div class="highlight">
                 <strong>Paper:</strong><br>{paper_title}
             </div>
-            <p>{'Your deadline has been extended by 20 days.' if approved else 'Your extension request was denied. Please take action to advance your paper.'}</p>
+            <p>{f'Your deadline has been extended by {extension_days} days.' if approved else 'Your extension request was denied. Please take action to advance your paper.'}</p>
             <p style="text-align: center; margin: 30px 0;">
                 <a href="https://jaigp.org{paper_url}" class="button">View Paper</a>
             </p>"""
@@ -440,11 +442,13 @@ JAIGP Team"""
 
     def send_borderline_rejection(self, to_email: str, paper_title: str, streak: int) -> bool:
         """Soft rejection for borderline papers — encourages revision and resubmission."""
+        from services.governance import get_rule_value_int
+        threshold = get_rule_value_int("screening_borderline_streak")
         subject = f"JAIGP Submission Not Accepted: {paper_title}"
 
         streak_note = ""
         if streak >= 2:
-            streak_note = f"\n\nNote: This is your {streak}{'nd' if streak == 2 else 'rd'} consecutive borderline submission. A third will result in a temporary 48-hour submission pause."
+            streak_note = f"\n\nNote: This is consecutive borderline submission #{streak}. Reaching {threshold} consecutive borderline submissions results in a temporary submission pause."
 
         text_content = f"""Thank you for submitting to JAIGP.
 
@@ -466,23 +470,24 @@ https://jaigp.org"""
             </div>
             <p>After AI screening, your paper could not be accepted in its current form. The abstract did not provide sufficient evidence of academic substance for us to advance it through the pipeline.</p>
             <p>We encourage you to <strong>revisit your submission</strong> and strengthen the abstract to more clearly articulate your research question, methodology, and findings before resubmitting.</p>
-            {"<p style='color:#b45309;'><strong>Note:</strong> This is your " + ("2nd" if streak == 2 else "3rd") + " consecutive borderline submission. A third will result in a temporary 48-hour submission pause.</p>" if streak >= 2 else ""}
+            {f"<p style='color:#b45309;'><strong>Note:</strong> This is consecutive borderline submission #{streak}. Reaching {threshold} consecutive borderline submissions results in a temporary submission pause.</p>" if streak >= 2 else ""}
             <p>We look forward to your revised submission.</p>"""
 
         html_content = self._email_wrapper(html_body, text_content)
         return self._send_email(to_email, subject, text_content, html_content)
 
     def send_borderline_strike(self, to_email: str, paper_title: str, cooldown_until) -> bool:
-        """Three consecutive borderlines — applies 48 h cooldown."""
-        from datetime import timezone
-        cooldown_str = cooldown_until.strftime("%Y-%m-%d %H:%M UTC") if cooldown_until else "48 hours from now"
+        """Consecutive borderline streak reached — applies the governed cooldown."""
+        from services.governance import get_rule_value_int
+        threshold = get_rule_value_int("screening_borderline_streak")
+        cooldown_str = cooldown_until.strftime("%Y-%m-%d %H:%M UTC") if cooldown_until else "shortly"
         subject = f"JAIGP Submission Paused: {paper_title}"
 
         text_content = f"""Thank you for submitting to JAIGP.
 
 Your paper "{paper_title}" was not accepted after AI screening.
 
-Because this is your third consecutive borderline submission, your account has been placed on a 48-hour submission pause (until {cooldown_str}).
+Because you have reached {threshold} consecutive borderline submissions, your account has been placed on a submission pause (until {cooldown_str}).
 
 We strongly encourage you to carefully review our submission guidelines and ensure your abstract clearly describes a real research contribution before submitting again.
 
@@ -496,15 +501,15 @@ https://jaigp.org"""
                 <strong>Paper:</strong><br>{paper_title}
             </div>
             <p>Your paper was not accepted after AI screening.</p>
-            <p style="color:#dc2626;"><strong>Because this is your third consecutive borderline submission, your account has been placed on a 48-hour submission pause until {cooldown_str}.</strong></p>
+            <p style="color:#dc2626;"><strong>Because you have reached {threshold} consecutive borderline submissions, your account has been placed on a submission pause until {cooldown_str}.</strong></p>
             <p>We strongly encourage you to review our submission guidelines and ensure your abstract clearly describes a real research contribution before submitting again.</p>"""
 
         html_content = self._email_wrapper(html_body, text_content)
         return self._send_email(to_email, subject, text_content, html_content)
 
     def send_hard_rejection(self, to_email: str, paper_title: str, concern: str, cooldown_until) -> bool:
-        """Hard rejection — paper deleted, 48 h cooldown applied."""
-        cooldown_str = cooldown_until.strftime("%Y-%m-%d %H:%M UTC") if cooldown_until else "48 hours from now"
+        """Hard rejection — paper deleted, governed cooldown applied."""
+        cooldown_str = cooldown_until.strftime("%Y-%m-%d %H:%M UTC") if cooldown_until else "shortly"
         concern_text = concern or "The submission did not meet minimum academic content standards."
         subject = f"JAIGP Submission Rejected: {paper_title}"
 
@@ -514,7 +519,7 @@ We regret to inform you that your paper "{paper_title}" has been rejected by our
 
 Reason: {concern_text}
 
-Your account has been placed on a 48-hour submission pause (until {cooldown_str}). You may submit a new paper after this period.
+Your account has been placed on a submission pause (until {cooldown_str}). You may submit a new paper after this period.
 
 If you believe this decision was made in error, please contact us at contact@jaigp.org.
 
@@ -531,7 +536,7 @@ https://jaigp.org"""
             <div style="background:#fef2f2;border-left:4px solid #ef4444;padding:12px 15px;margin:20px 0;">
                 <strong>Reason:</strong> {concern_text}
             </div>
-            <p style="color:#dc2626;"><strong>Your account has been placed on a 48-hour submission pause until {cooldown_str}.</strong></p>
+            <p style="color:#dc2626;"><strong>Your account has been placed on a submission pause until {cooldown_str}.</strong></p>
             <p>You may submit a new paper after this period. If you believe this decision was made in error, please <a href="mailto:contact@jaigp.org" style="color:#2563eb;">contact us</a>.</p>"""
 
         html_content = self._email_wrapper(html_body, text_content)
