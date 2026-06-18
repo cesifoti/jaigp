@@ -26,6 +26,7 @@ templates.env = register_filters(templates.env)
 # Tab 4: Peer Reviewed (review_stage=5 — cleared human peer review, future)
 # Tab 5: Accepted (future)
 TAB_LABELS = {
+    -2: "All",
     0: "Screened Out",
     1: "Screened",
     2: "Endorsed",
@@ -292,20 +293,30 @@ async def papers_tab(
     offset = (page - 1) * per_page
 
     review_stages = TAB_TO_STAGES.get(stage, [])
-    if stage == 0:
+    if stage == -2:
+        # "All" — every visible paper, most-advanced first, then newest first.
+        # Mirrors the stage=-2 block in the "/" route so the HTMX tab matches
+        # the initial server render.
+        query = db.query(Paper).filter(Paper.status.in_(["published", "ai_screen_rejected"]))
+        order_cols = (
+            Paper.review_stage.desc(),
+            Paper.stage_entered_at.desc().nulls_last(),
+            Paper.published_date.desc(),
+        )
+    elif stage == 0:
         query = db.query(Paper).filter(Paper.status == "ai_screen_rejected", Paper.review_stage == 0)
+        order_cols = (Paper.stage_entered_at.desc().nulls_last(), Paper.published_date.desc())
     elif review_stages:
         query = db.query(Paper).filter(Paper.status == "published", Paper.review_stage.in_(review_stages))
+        order_cols = (Paper.stage_entered_at.desc().nulls_last(), Paper.published_date.desc())
     else:
         query = db.query(Paper).filter(Paper.id < 0)
+        order_cols = (Paper.stage_entered_at.desc().nulls_last(), Paper.published_date.desc())
 
     total_papers = query.count()
     total_pages = max(1, (total_papers + per_page - 1) // per_page)
 
-    papers = query.order_by(
-        Paper.stage_entered_at.desc().nulls_last(),
-        Paper.published_date.desc(),
-    ).limit(per_page).offset(offset).all()
+    papers = query.order_by(*order_cols).limit(per_page).offset(offset).all()
 
     user = request.session.get("user")
 
