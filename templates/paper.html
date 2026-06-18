@@ -580,8 +580,9 @@
                 {% endif %}
             </div>
 
-            <!-- Endorsements (stage 1 only) -->
-            {% if paper.review_stage == 1 %}
+            <!-- Endorsements: the endorse CTA at stage 1, plus the endorser
+                 list (name + badge) on any paper that has been endorsed. -->
+            {% if paper.review_stage == 1 or paper.endorsements %}
             {% include 'components/endorsement_button.html' %}
             {% endif %}
 
