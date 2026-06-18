@@ -119,7 +119,7 @@ async def startup_event():
 
 # Import and include routers
 from routes import home, auth, papers, submit, issues, comments, delete, paper_votes, api, admin
-from routes import endorsements, ai_review, human_review, extensions, prompts, rules, activity, notifications, messaging, search
+from routes import endorsements, ai_review, human_review, extensions, prompts, rules, activity, notifications, messaging, search, ready
 
 app.include_router(home.router)
 app.include_router(auth.router)
@@ -141,6 +141,7 @@ app.include_router(activity.router)
 app.include_router(notifications.router)
 app.include_router(messaging.router)
 app.include_router(search.router)
+app.include_router(ready.router)
 
 # Redirect legacy /discussion to /prompts
 from fastapi.responses import RedirectResponse as _RedirectResponse

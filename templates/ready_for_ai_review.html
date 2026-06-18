@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Ready for AI Review - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <div class="flex items-center gap-2 mb-2">
+        <svg class="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+        </svg>
+        <h1 class="text-3xl font-bold text-secondary">Ready for AI Review</h1>
+    </div>
+
+    {% if papers %}
+    <p class="text-slate-600 mb-6">
+        {% if papers|length == 1 %}
+        Great news — your paper below has been endorsed and has reached the AI review stage.
+        {% else %}
+        Great news — the papers below have been endorsed and have reached the AI review stage.
+        {% endif %}
+        This is where a panel of AI reviewers reads the full paper and returns detailed, structured feedback before it moves on to human peer review.
+    </p>
+
+    {% if needs_email %}
+    <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+        <p class="text-sm font-semibold text-amber-800 mb-1">One step first: add an email address</p>
+        <p class="text-sm text-amber-700 leading-relaxed">
+            We don't have an email on file for you. AI review returns feedback on your paper, and we use your email to let you know when it's ready — so we need one before you can start.
+        </p>
+        <a href="/auth/profile/edit"
+           class="inline-flex items-center gap-1.5 mt-3 px-4 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700 transition text-sm font-medium">
+            Add an email to your profile &rarr;
+        </a>
+    </div>
+    {% endif %}
+
+    <div class="space-y-3">
+        {% for paper in papers %}
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-5">
+            <p class="text-xs font-medium text-purple-700 uppercase tracking-wide mb-1">Endorsed · Ready for AI Review</p>
+            <h2 class="text-base font-semibold text-secondary leading-snug mb-3">{{ paper.title|smart_title }}</h2>
+            <a href="/paper/{{ paper.id }}"
+               class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition text-sm font-medium">
+                {% if needs_email %}View paper{% else %}Open paper &amp; submit for AI review{% endif %} &rarr;
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if needs_email %}
+    <p class="text-xs text-slate-500 mt-6">
+        After adding your email, open your paper and press <strong>“Submit for AI Review.”</strong>
+    </p>
+    {% endif %}
+
+    {% else %}
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-8 text-center">
+        <p class="text-slate-600">You don't have any papers waiting for AI review right now.</p>
+        <a href="/" class="inline-block mt-4 text-primary hover:text-blue-700 font-medium text-sm">Back to the journal &rarr;</a>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
