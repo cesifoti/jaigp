@@ -43,6 +43,14 @@
                     {% if profile_user.email %}
                     <div class="text-sm text-slate-600 mb-1">
                         <span class="font-medium">Email:</span> {{ profile_user.email }}
+                        {% if is_own_profile %}
+                        <a href="/auth/profile/edit#email-addresses" class="text-primary hover:underline text-xs ml-1">Change</a>
+                        {% endif %}
+                    </div>
+                    {% elif is_own_profile %}
+                    <div class="text-sm text-slate-600 mb-1">
+                        <span class="font-medium">Email:</span>
+                        <a href="/auth/profile/edit#email-addresses" class="text-primary hover:underline">Add an email address</a>
                     </div>
                     {% endif %}
 

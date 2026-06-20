@@ -262,6 +262,78 @@ JAIGP Team"""
         html_content = self._email_wrapper(html_body, text_content)
         return self._send_email(to_email, subject, text_content, html_content)
 
+    def send_email_verification(self, to_email: str, verify_url: str) -> bool:
+        """Confirm ownership of an email a user added to their JAIGP profile."""
+        subject = "Confirm your email address for JAIGP"
+
+        text_content = f"""This email address was added to a JAIGP profile.
+
+Confirm it belongs to you by opening this link:
+
+{verify_url}
+
+Once confirmed, it can be set as your primary contact address. If you didn't request this, you can safely ignore this email.
+
+Best regards,
+JAIGP Team
+https://jaigp.org"""
+
+        html_body = f"""
+            <h2 style="color: #1e293b; margin-top: 0;">Confirm your email address</h2>
+            <p>This email address was added to a JAIGP profile. Confirm it belongs to you so it can be used as a contact address.</p>
+            <p style="text-align: center; margin: 30px 0;">
+                <a href="{verify_url}" class="button">Confirm Email Address</a>
+            </p>
+            <p style="font-size: 14px; color: #64748b;">Or paste this link into your browser:<br>
+            <a href="{verify_url}" style="color:#2563eb; word-break: break-all;">{verify_url}</a></p>
+            <p style="font-size: 14px; color: #64748b;">If you didn't request this, you can ignore this email.</p>"""
+
+        html_content = self._email_wrapper(html_body, text_content)
+        return self._send_email(to_email, subject, text_content, html_content)
+
+    def send_submission_recovery(self, to_email: str, name: str, papers: list) -> bool:
+        """Notify an author that their stuck submission(s) can now be verified.
+
+        papers: list of (title, verify_url) tuples.
+        """
+        first = name.split()[0] if name else "there"
+        n = len(papers)
+        plural = "submissions" if n > 1 else "submission"
+        they = "them" if n > 1 else "it"
+        are = "are" if n > 1 else "is"
+
+        text_lines = "\n\n".join(f"  • {t}\n    Verify & continue: {u}" for t, u in papers)
+        text_content = f"""Hi {first},
+
+A while back you submitted to JAIGP, but the email-verification link returned an error and your {plural} never made it into the review pipeline. We're sorry about that — the problem has been fixed.
+
+Your {plural} {are} still saved. Just confirm your email to send {they} into AI screening:
+
+{text_lines}
+
+Once verified, your paper enters the pipeline automatically. If you'd rather not continue, you can ignore this email.
+
+Best regards,
+The JAIGP team
+https://jaigp.org"""
+
+        items = "".join(
+            f'<li style="margin-bottom:14px;">{t}<br>'
+            f'<a href="{u}" style="color:#2563eb;">Verify &amp; continue &rarr;</a></li>'
+            for t, u in papers
+        )
+        html_body = f"""
+            <h2 style="color: #1e293b; margin-top: 0;">Your submission is ready to continue</h2>
+            <p>Hi {first},</p>
+            <p>A while back you submitted to JAIGP, but the email-verification link returned an error and your {plural} never made it into the review pipeline. We're sorry about that — <strong>the problem has been fixed.</strong></p>
+            <p>Your {plural} {are} still saved. Confirm your email to send {they} into AI screening:</p>
+            <ul style="padding-left:20px;">{items}</ul>
+            <p style="font-size: 13px; color: #64748b;">If you'd rather not continue, you can ignore this email.</p>"""
+
+        html_content = self._email_wrapper(html_body, text_content)
+        return self._send_email(to_email, subject="Your JAIGP submission is ready to continue",
+                                text_content=text_content, html_content=html_content)
+
     def send_review_invitation(self, to_email: str, reviewer_name: str, paper_title: str, invitation_url: str, reviewer_type: str) -> bool:
         """Invite a reviewer to review a paper."""
         type_desc = "author-suggested reviewer" if reviewer_type == "author_suggested" else "reference-cited reviewer"

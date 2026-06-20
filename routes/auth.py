@@ -7,7 +7,8 @@ from sqlalchemy.orm import Session
 from models.database import get_db
 from models.user import User
 from services.orcid import orcid_service
-from services.user_email import add_email_if_new
+from services.user_email import add_email_if_new, make_email_verify_token, verify_email_token
+from services.email import email_service
 from models.user_email import UserEmail
 import config
 import json
@@ -456,6 +457,17 @@ async def add_email(
             db=db,
         )
         db.commit()
+        # Confirm ownership before this address can be used as primary.
+        if result and not result.verified_at:
+            token = make_email_verify_token(result.id)
+            verify_url = f"{config.BASE_URL}/auth/profile/email/verify/{token}"
+            try:
+                email_service.send_email_verification(result.email, verify_url)
+            except Exception as e:
+                print(f"Error sending email verification to {result.email}: {e}")
+            return RedirectResponse(url="/auth/profile/edit?sent=1", status_code=303)
+        if result is None:
+            return RedirectResponse(url="/auth/profile/edit?error=taken", status_code=303)
 
     return RedirectResponse(url="/auth/profile/edit", status_code=303)
 
@@ -473,7 +485,11 @@ async def set_primary(
     if not session_user:
         return RedirectResponse(url="/auth/login")
 
-    set_primary_email(session_user["id"], email_id, db)
+    ok = set_primary_email(session_user["id"], email_id, db)
+    if not ok:
+        # Most common reason: the email isn't verified yet.
+        db.rollback()
+        return RedirectResponse(url="/auth/profile/edit?error=unverified", status_code=303)
     db.commit()
 
     # Refresh session email cache
@@ -486,7 +502,7 @@ async def set_primary(
             "email": user.email,
         }
 
-    return RedirectResponse(url="/auth/profile/edit", status_code=303)
+    return RedirectResponse(url="/auth/profile/edit?primary=1", status_code=303)
 
 
 @router.post("/profile/email/remove")
@@ -506,6 +522,51 @@ async def remove_email_route(
     db.commit()
 
     return RedirectResponse(url="/auth/profile/edit", status_code=303)
+
+
+@router.get("/profile/email/verify/{token}", response_class=HTMLResponse)
+async def verify_profile_email(token: str, request: Request, db: Session = Depends(get_db)):
+    """Confirm ownership of an email added to a profile (link from email)."""
+    ue = verify_email_token(token, db)
+    if not ue:
+        return HTMLResponse(
+            "<div style='font-family:sans-serif;max-width:480px;margin:80px auto;text-align:center;'>"
+            "<h2>Link expired or invalid</h2>"
+            "<p>This confirmation link is no longer valid. Sign in and resend the "
+            "verification from your profile.</p>"
+            "<p><a href='/auth/profile/edit' style='color:#2563eb;'>Go to your profile &rarr;</a></p></div>",
+            status_code=400,
+        )
+    db.commit()
+    session_user = request.session.get("user")
+    if session_user and session_user.get("id") == ue.user_id:
+        return RedirectResponse(url="/auth/profile/edit?verified=1", status_code=303)
+    return HTMLResponse(
+        "<div style='font-family:sans-serif;max-width:480px;margin:80px auto;text-align:center;'>"
+        f"<h2>Email confirmed</h2><p><strong>{ue.email}</strong> is now verified for your JAIGP account.</p>"
+        "<p><a href='/auth/profile/edit' style='color:#2563eb;'>Manage your emails &rarr;</a></p></div>"
+    )
+
+
+@router.post("/profile/email/{email_id}/resend-verification")
+async def resend_email_verification(email_id: int, request: Request, db: Session = Depends(get_db)):
+    """Resend the ownership-confirmation link for an unverified email."""
+    session_user = request.session.get("user")
+    if not session_user:
+        return RedirectResponse(url="/auth/login")
+
+    ue = db.query(UserEmail).filter(
+        UserEmail.id == email_id,
+        UserEmail.user_id == session_user["id"],
+    ).first()
+    if ue and not ue.verified_at:
+        token = make_email_verify_token(ue.id)
+        verify_url = f"{config.BASE_URL}/auth/profile/email/verify/{token}"
+        try:
+            email_service.send_email_verification(ue.email, verify_url)
+        except Exception as e:
+            print(f"Error resending email verification to {ue.email}: {e}")
+    return RedirectResponse(url="/auth/profile/edit?sent=1", status_code=303)
 
 
 @router.get("/profile/export")

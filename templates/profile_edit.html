@@ -55,9 +55,22 @@
 
             <!-- Email Addresses -->
             <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                <label id="email-addresses" class="block text-sm font-semibold text-slate-700 mb-2">
                     Email Addresses
                 </label>
+
+                {% set q = request.query_params %}
+                {% if q.get('error') == 'unverified' %}
+                <div class="mb-3 p-3 rounded-md bg-amber-50 border border-amber-200 text-sm text-amber-800">Please verify that address before making it primary — check your inbox for the confirmation link.</div>
+                {% elif q.get('error') == 'taken' %}
+                <div class="mb-3 p-3 rounded-md bg-red-50 border border-red-200 text-sm text-red-700">That email is already associated with another account.</div>
+                {% elif q.get('sent') %}
+                <div class="mb-3 p-3 rounded-md bg-blue-50 border border-blue-200 text-sm text-blue-800">Confirmation link sent — click the link in your inbox to verify the address.</div>
+                {% elif q.get('verified') %}
+                <div class="mb-3 p-3 rounded-md bg-green-50 border border-green-200 text-sm text-green-800">Email verified. You can now set it as your primary address.</div>
+                {% elif q.get('primary') %}
+                <div class="mb-3 p-3 rounded-md bg-green-50 border border-green-200 text-sm text-green-800">Primary email updated.</div>
+                {% endif %}
 
                 {% if user_emails %}
                 <div class="space-y-2 mb-3">
@@ -70,15 +83,23 @@
                             {% endif %}
                             {% if ue.verified_at %}
                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">Verified</span>
+                            {% else %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800">Unverified</span>
                             {% endif %}
                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-600">{{ ue.source }}</span>
                         </div>
                         <div class="flex items-center gap-2 ml-2 flex-shrink-0">
-                            {% if not ue.is_primary %}
+                            {% if not ue.verified_at %}
+                            <form action="/auth/profile/email/{{ ue.id }}/resend-verification" method="POST" class="inline">
+                                <button type="submit" class="text-xs text-primary hover:underline">Resend verification</button>
+                            </form>
+                            {% elif not ue.is_primary %}
                             <form action="/auth/profile/email/set-primary" method="POST" class="inline">
                                 <input type="hidden" name="email_id" value="{{ ue.id }}">
                                 <button type="submit" class="text-xs text-primary hover:underline">Make Primary</button>
                             </form>
+                            {% endif %}
+                            {% if not ue.is_primary %}
                             <form action="/auth/profile/email/remove" method="POST" class="inline"
                                   onsubmit="return confirm('Remove this email?')">
                                 <input type="hidden" name="email_id" value="{{ ue.id }}">
@@ -111,7 +132,8 @@
                     </button>
                 </div>
                 <p class="text-xs text-slate-500 mt-1">
-                    Your primary email is used for notifications. Emails are never publicly displayed.
+                    A new email gets a confirmation link before it can become your primary address.
+                    Your primary email is used for notifications and is never publicly displayed.
                 </p>
             </div>
 
