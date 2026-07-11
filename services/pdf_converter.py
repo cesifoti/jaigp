@@ -10,6 +10,61 @@ from collections import Counter
 class PDFConverter:
     """Convert PDF files to HTML and Markdown formats."""
 
+    # Section names that are headings regardless of font size
+    _SECTION_WORDS = re.compile(
+        r'^(abstract|references|bibliography|acknowledg\w*|introduction|conclusions?|'
+        r'discussion|results|methods?|appendix( [A-Z])?|supplementary material)\b[.:]?\s*$',
+        re.IGNORECASE,
+    )
+    _NUMBERED_SECTION = re.compile(r'^(\d+(\.\d+)*)\.?\s+[A-Z(]')
+
+    @staticmethod
+    def _clean_block_text(text: str) -> str:
+        """Join hard-wrapped lines: repair end-of-line hyphenation, collapse newlines."""
+        # "pro-\nducing" -> "producing" (keep real hyphens before capitals: "non-\nGaussian")
+        text = re.sub(r'(\w)-\n([a-z])', r'\1\2', text)
+        text = re.sub(r'\s*\n\s*', ' ', text)
+        return re.sub(r'  +', ' ', text).strip()
+
+    @staticmethod
+    def _font_stats(doc) -> Tuple[float, List[float]]:
+        """Return (body font size, heading sizes sorted large->small) for the document."""
+        size_weight: Counter = Counter()
+        for page in doc:
+            for block in page.get_text("dict")["blocks"]:
+                if block.get("type") != 0:
+                    continue
+                for line in block.get("lines", []):
+                    for span in line.get("spans", []):
+                        t = span.get("text", "").strip()
+                        if t:
+                            size_weight[round(span["size"], 1)] += len(t)
+        if not size_weight:
+            return 10.0, []
+        body_size = size_weight.most_common(1)[0][0]
+        heading_sizes = sorted(
+            (s for s in size_weight if s >= body_size * 1.15), reverse=True
+        )
+        return body_size, heading_sizes[:3]
+
+    def _classify_heading(self, text: str, block_size: float, body_size: float,
+                          heading_sizes: List[float]) -> int:
+        """Return heading level (2-4) or 0 if the block is body text."""
+        if len(text) > 150 or text.endswith(('.', ',', ';')) and not self._SECTION_WORDS.match(text):
+            return 0
+        if self._SECTION_WORDS.match(text):
+            return 2
+        m = self._NUMBERED_SECTION.match(text)
+        if block_size >= body_size * 1.15 and block_size in heading_sizes:
+            level = 2 + heading_sizes.index(block_size)
+            if m:
+                level = min(2 + m.group(1).count('.'), 4)
+            return min(level, 4)
+        # Numbered section in bold-but-same-size fonts: require short text
+        if m and len(text) < 90:
+            return min(2 + m.group(1).count('.'), 4)
+        return 0
+
     def extract_images_from_pdf(self, pdf_path: str, output_dir: str) -> List[Dict]:
         """
         Extract images from PDF and save them to output directory.
@@ -321,6 +376,9 @@ class PDFConverter:
                     tables_by_page[page] = []
                 tables_by_page[page].append(tbl)
 
+            # Font statistics for heading detection
+            body_size, heading_sizes = self._font_stats(doc)
+
             # Now extract all content in order
             all_content = []
 
@@ -329,41 +387,54 @@ class PDFConverter:
                 top_threshold = page_height * 0.1
                 bottom_threshold = page_height * 0.9
 
-                # Get all text blocks
-                blocks = page.get_text("blocks")
-
                 # Combine text blocks, images, and tables for this page
                 page_items = []
 
-                # Add text blocks
-                for block in blocks:
-                    if len(block) >= 5:
-                        y0 = block[1]
-                        y1 = block[3]
-                        text = block[4].strip()
+                # Add text blocks (dict mode keeps font sizes for heading detection)
+                for block in page.get_text("dict")["blocks"]:
+                    if block.get("type") != 0:
+                        continue
+                    y0, _, y1, _ = block["bbox"][1], block["bbox"][0], block["bbox"][3], block["bbox"][2]
 
-                        if not text:
+                    lines_text = []
+                    max_size = 0.0
+                    for line in block.get("lines", []):
+                        span_text = "".join(s.get("text", "") for s in line.get("spans", []))
+                        if span_text.strip():
+                            lines_text.append(span_text)
+                            max_size = max(
+                                max_size,
+                                max((s["size"] for s in line["spans"] if s.get("text", "").strip()), default=0.0),
+                            )
+                    raw_text = "\n".join(lines_text).strip()
+                    if not raw_text:
+                        continue
+
+                    # Skip headers/footers (patterns were collected from raw block text)
+                    if raw_text in header_patterns or raw_text in footer_patterns:
+                        continue
+
+                    # Skip page numbers in header/footer regions
+                    if re.match(r'^\d+$', raw_text) and len(raw_text) <= 3:
+                        if y0 < top_threshold or y1 > bottom_threshold:
                             continue
 
-                        # Skip headers/footers
-                        if text in header_patterns or text in footer_patterns:
-                            continue
+                    # Skip very short texts in header/footer regions
+                    if len(raw_text) < 10 and (y0 < top_threshold or y1 > bottom_threshold):
+                        continue
 
-                        # Skip page numbers in header/footer regions
-                        if re.match(r'^\d+$', text) and len(text) <= 3:
-                            if y0 < top_threshold or y1 > bottom_threshold:
-                                continue
+                    text = self._clean_block_text(raw_text)
+                    heading_level = self._classify_heading(
+                        text, round(max_size, 1), body_size, heading_sizes
+                    )
 
-                        # Skip very short texts in header/footer regions
-                        if len(text) < 10 and (y0 < top_threshold or y1 > bottom_threshold):
-                            continue
-
-                        page_items.append({
-                            'type': 'text',
-                            'content': text,
-                            'position': y0,
-                            'page': page_num
-                        })
+                    page_items.append({
+                        'type': 'text',
+                        'content': text,
+                        'heading_level': heading_level,
+                        'position': y0,
+                        'page': page_num
+                    })
 
                 # Add images for this page
                 if page_num in images_by_page:
@@ -533,7 +604,14 @@ class PDFConverter:
 
         for block in content_blocks:
             if block['type'] == 'text':
-                current_paragraph.append(block['content'])
+                if block.get('heading_level'):
+                    # Flush paragraph, then emit heading
+                    if current_paragraph:
+                        markdown += '\n\n'.join(current_paragraph) + '\n\n'
+                        current_paragraph = []
+                    markdown += f"\n{'#' * block['heading_level']} {block['content']}\n\n"
+                else:
+                    current_paragraph.append(block['content'])
 
             elif block['type'] == 'image':
                 # Flush paragraph
@@ -589,8 +667,19 @@ class PDFConverter:
 
             for block in content_blocks:
                 if block['type'] == 'text':
-                    # Accumulate text into paragraphs
-                    current_paragraph.append(block['content'])
+                    if block.get('heading_level'):
+                        # Flush current paragraph, then emit heading
+                        if current_paragraph:
+                            text = '\n\n'.join(current_paragraph)
+                            for p in text.split('\n\n'):
+                                if p.strip():
+                                    content_html += f'<p>{self._escape_html(p)}</p>\n'
+                            current_paragraph = []
+                        level = block['heading_level']
+                        content_html += f'<h{level}>{self._escape_html(block["content"])}</h{level}>\n'
+                    else:
+                        # Accumulate text into paragraphs
+                        current_paragraph.append(block['content'])
 
                 elif block['type'] == 'image':
                     # Flush current paragraph

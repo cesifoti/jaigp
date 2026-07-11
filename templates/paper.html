@@ -160,8 +160,28 @@
                 <p class="text-slate-700 leading-relaxed whitespace-pre-line">{{ paper.abstract }}</p>
             </div>
 
-            <!-- PDF Viewer -->
+            <!-- Paper Viewer (Reading view + PDF tabs) -->
             <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden" id="pdf-viewer-wrapper">
+                {% if has_html %}
+                <div class="flex border-b border-slate-200 bg-slate-50" role="tablist">
+                    <button id="tab-reading" onclick="switchView('reading')" role="tab"
+                            class="px-5 py-3 text-sm font-medium border-b-2 border-primary text-primary bg-white">
+                        Reading View
+                    </button>
+                    <button id="tab-pdf" onclick="switchView('pdf')" role="tab"
+                            class="px-5 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700">
+                        PDF
+                    </button>
+                </div>
+                <div id="reading-pane">
+                    <iframe id="reading-iframe"
+                            src="/paper/{{ paper.id }}/html?embed=1"
+                            title="{{ paper.title }} (reading view)"
+                            class="w-full"
+                            style="height: 78vh; border: 0;"></iframe>
+                </div>
+                {% endif %}
+                <div id="pdf-pane" class="{% if has_html %}hidden{% endif %}">
                 <div class="pdf-viewer-container" id="pdf-viewer-container">
                     <!-- Loading Indicator -->
                     <div id="pdf-loading" class="absolute inset-0 flex items-center justify-center bg-slate-50 z-20">
@@ -208,15 +228,18 @@
                         </svg>
                         <span id="fullscreen-text" class="hidden sm:inline">Fullscreen</span>
                     </button>
+                    {# PDF.js viewer: the native browser plugin renders only the first
+                       page of iframed PDFs on iOS/mobile WebKit. Lazy-loaded via
+                       data-src when the reading view is the default tab. #}
                     <iframe
-                        src="/paper/{{ paper.id }}/pdf#view=FitH"
+                        {% if has_html %}data-src{% else %}src{% endif %}="/static/pdfjs/web/viewer.html?file={{ ('/paper/' ~ paper.id ~ '/pdf') | urlencode }}"
                         title="{{ paper.title }}"
-                        type="application/pdf"
                         class="w-full h-full"
                         id="pdf-iframe"
                         onload="handlePDFLoad()"
                         onerror="handlePDFError()"
                     ></iframe>
+                </div>
                 </div>
                 <div class="p-4 bg-slate-50 border-t border-slate-200">
                     <!-- Mobile-first button layout -->
@@ -733,6 +756,33 @@ pdfLoadTimeout = setTimeout(() => {
         // Don't show error automatically - PDF might still be loading
     }
 }, 30000);
+
+// Reading view / PDF tab switching
+function switchView(view) {
+    const readingPane = document.getElementById('reading-pane');
+    const pdfPane = document.getElementById('pdf-pane');
+    const tabReading = document.getElementById('tab-reading');
+    const tabPdf = document.getElementById('tab-pdf');
+    if (!readingPane || !pdfPane) return;
+    const active = 'px-5 py-3 text-sm font-medium border-b-2 border-primary text-primary bg-white';
+    const inactive = 'px-5 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700';
+    if (view === 'pdf') {
+        readingPane.classList.add('hidden');
+        pdfPane.classList.remove('hidden');
+        tabPdf.className = active;
+        tabReading.className = inactive;
+        // Lazy-load the PDF.js viewer on first activation
+        const frame = document.getElementById('pdf-iframe');
+        if (frame && !frame.getAttribute('src') && frame.dataset.src) {
+            frame.src = frame.dataset.src;
+        }
+    } else {
+        pdfPane.classList.add('hidden');
+        readingPane.classList.remove('hidden');
+        tabReading.className = active;
+        tabPdf.className = inactive;
+    }
+}
 
 // Handle PDF expansion - mobile opens in new tab, desktop uses fullscreen
 function handleExpandPDF() {

@@ -62,14 +62,66 @@ async def serve_pdf(
         }
     )
 
+def _sanitize_paper_html(html_content: str, pdf_basename: str, paper_id: int,
+                         current_version: int) -> str:
+    """Extract body, rewrite figure paths to routes, and sanitize (XSS from crafted PDFs)."""
+    import re
+    import nh3
+
+    body_match = re.search(r'<body.*?>(.*?)</body>', html_content, re.DOTALL)
+    if body_match:
+        html_content = body_match.group(1)
+
+    image_pattern = rf'{re.escape(pdf_basename)}_images/([^"]+\.(png|jpg|jpeg|gif))"'
+
+    def replace_image_path(match):
+        figure_name = match.group(1)
+        return f'/paper/{paper_id}/figures/{figure_name}?version={current_version}"'
+
+    html_content = re.sub(image_pattern, replace_image_path, html_content)
+
+    return nh3.clean(
+        html_content,
+        tags={"p", "br", "b", "i", "em", "strong", "h1", "h2", "h3", "h4", "h5", "h6",
+              "ul", "ol", "li", "table", "thead", "tbody", "tr", "th", "td",
+              "img", "a", "span", "div", "figure", "figcaption", "blockquote",
+              "pre", "code", "sub", "sup", "hr", "section", "article",
+              # MathML (LaTeXML output); browsers render MathML Core natively
+              "math", "semantics", "annotation", "mrow", "mi", "mo", "mn", "ms",
+              "mtext", "mspace", "msup", "msub", "msubsup", "mfrac", "msqrt",
+              "mroot", "mstyle", "merror", "mpadded", "mphantom", "mfenced",
+              "menclose", "munder", "mover", "munderover", "mmultiscripts",
+              "mtable", "mtr", "mtd", "mlabeledtr", "none"},
+        attributes={
+            "img": {"src", "alt", "width", "height", "class", "style"},
+            "a": {"href", "title", "class"},
+            "td": {"colspan", "rowspan", "class", "style"},
+            "th": {"colspan", "rowspan", "class", "style"},
+            "span": {"class", "style"},
+            "div": {"class", "style"},
+            "p": {"class", "style"},
+            "table": {"class", "style"},
+            "math": {"display", "alttext", "xmlns"},
+            "mo": {"stretchy", "form", "fence", "separator", "lspace", "rspace"},
+            "mtable": {"columnalign", "rowalign"},
+            "mtd": {"columnalign", "columnspan", "rowspan"},
+            "mspace": {"width", "height"},
+            "annotation": {"encoding"},
+            "*": {"id", "class", "mathvariant", "displaystyle", "scriptlevel"},
+        },
+        url_schemes={"http", "https"},
+    )
+
+
 @router.get("/{paper_id}/html", response_class=HTMLResponse)
 async def serve_html(
     paper_id: int,
     version: int = None,
+    embed: bool = False,
     request: Request = None,
     db: Session = Depends(get_db)
 ):
-    """Serve HTML version of a paper with navigation."""
+    """Serve HTML version of a paper with navigation (embed=1: bare reading pane)."""
     # Get paper
     paper = db.query(Paper).filter(Paper.id == paper_id).first()
     if not paper:
@@ -109,45 +161,8 @@ async def serve_html(
         with open(file_path, 'r', encoding='utf-8') as f:
             html_content = f.read()
 
-        # Extract just the body content (strip html/head/body tags)
-        # Find content between <body> and </body>
-        import re
-        body_match = re.search(r'<body>(.*?)</body>', html_content, re.DOTALL)
-        if body_match:
-            html_content = body_match.group(1)
-
-        # Replace relative image paths with absolute URLs
-        # Pattern: paper-{id}-v{version}_images/figure_N.ext
         pdf_basename = paper_version.pdf_filename.replace('.pdf', '')
-        image_pattern = rf'{pdf_basename}_images/([^"]+\.(png|jpg|jpeg|gif))"'
-
-        def replace_image_path(match):
-            figure_name = match.group(1)
-            return f'/paper/{paper_id}/figures/{figure_name}?version={current_version}"'
-
-        html_content = re.sub(image_pattern, replace_image_path, html_content)
-
-        # Sanitize HTML to prevent XSS from crafted PDFs
-        import nh3
-        html_content = nh3.clean(
-            html_content,
-            tags={"p", "br", "b", "i", "em", "strong", "h1", "h2", "h3", "h4", "h5", "h6",
-                  "ul", "ol", "li", "table", "thead", "tbody", "tr", "th", "td",
-                  "img", "a", "span", "div", "figure", "figcaption", "blockquote",
-                  "pre", "code", "sub", "sup", "hr", "section", "article"},
-            attributes={
-                "img": {"src", "alt", "width", "height", "class", "style"},
-                "a": {"href", "title", "class"},
-                "td": {"colspan", "rowspan", "class", "style"},
-                "th": {"colspan", "rowspan", "class", "style"},
-                "span": {"class", "style"},
-                "div": {"class", "style"},
-                "p": {"class", "style"},
-                "table": {"class", "style"},
-                "*": {"id"},
-            },
-            url_schemes={"http", "https"},
-        )
+        html_content = _sanitize_paper_html(html_content, pdf_basename, paper_id, current_version)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error reading HTML file")
@@ -155,9 +170,9 @@ async def serve_html(
     # Get user from session
     user = request.session.get("user") if request else None
 
-    # Render template with navigation
+    # Render template with navigation (or the bare embed pane for the paper-page tab)
     return templates.TemplateResponse(
-        "paper_html.html",
+        "paper_embed.html" if embed else "paper_html.html",
         {
             "request": request,
             "paper": paper,
@@ -172,9 +187,11 @@ async def serve_html(
 async def serve_markdown(
     paper_id: int,
     version: int = None,
+    raw: bool = False,
+    request: Request = None,
     db: Session = Depends(get_db)
 ):
-    """Serve Markdown version of a paper."""
+    """Serve Markdown version of a paper: rendered page by default, raw=1 downloads the .md."""
     # Get paper
     paper = db.query(Paper).filter(Paper.id == paper_id).first()
     if not paper:
@@ -207,12 +224,40 @@ async def serve_markdown(
     if not file_path.exists():
         raise HTTPException(status_code=404, detail="Markdown version not found")
 
-    # Serve Markdown file as download
-    return FileResponse(
-        path=file_path,
-        media_type="text/markdown",
-        headers={
-            "Content-Disposition": f"attachment; filename=\"{md_filename}\""
+    if raw:
+        # Raw .md download (previous default behavior)
+        return FileResponse(
+            path=file_path,
+            media_type="text/markdown",
+            headers={
+                "Content-Disposition": f"attachment; filename=\"{md_filename}\""
+            }
+        )
+
+    # Rendered, readable page
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            md_text = f.read()
+
+        from services.ai_converter import ai_converter
+        html_doc = ai_converter.markdown_to_html(md_text, paper_version.pdf_filename)
+        pdf_basename = paper_version.pdf_filename.replace('.pdf', '')
+        current_version = paper_version.version_number
+        html_content = _sanitize_paper_html(html_doc, pdf_basename, paper_id, current_version)
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error rendering Markdown file")
+
+    user = request.session.get("user") if request else None
+    return templates.TemplateResponse(
+        "paper_html.html",
+        {
+            "request": request,
+            "paper": paper,
+            "user": user,
+            "html_content": html_content,
+            "current_version": current_version,
+            "version_number": version,
+            "markdown_view": True,
         }
     )
 
@@ -410,6 +455,18 @@ async def view_paper(
         user_db and (user_db.badge or "new") in endorse_ctx["allowed_badges"]
     )
 
+    # Does a converted HTML artifact exist? (drives the reading-view tab)
+    has_html = False
+    current_pv = db.query(PaperVersion).filter(
+        PaperVersion.paper_id == paper_id,
+        PaperVersion.version_number == paper.current_version
+    ).first()
+    if current_pv:
+        html_path = file_storage.get_file_path(
+            current_pv.pdf_filename.replace('.pdf', '.html'), paper.published_date
+        )
+        has_html = html_path.exists()
+
     return templates.TemplateResponse(
         "paper.html",
         {
@@ -417,6 +474,7 @@ async def view_paper(
             "paper": paper,
             "user": user,
             "user_db": user_db,
+            "has_html": has_html,
             "endorsements": paper.endorsements if hasattr(paper, 'endorsements') else [],
             "has_endorsed": has_endorsed,
             "can_endorse": can_endorse,

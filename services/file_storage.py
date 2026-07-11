@@ -64,19 +64,35 @@ class FileStorageService:
         async with aiofiles.open(file_path, 'wb') as f:
             await f.write(file_content)
 
-        # Generate HTML and Markdown versions
+        # Generate HTML and Markdown versions in the background: PyMuPDF
+        # placeholder first (seconds), then AI conversion overwrites it (~1-2 min)
         if paper_title and paper_abstract:
             base_path = str(file_path).rsplit('.', 1)[0]  # Remove .pdf extension
             try:
-                pdf_converter.save_converted_formats(
-                    str(file_path),
-                    base_path,
-                    paper_title,
-                    paper_abstract
-                )
+                from services.ai_converter import schedule_conversion
+                schedule_conversion(str(file_path), base_path, paper_title, paper_abstract)
             except Exception as e:
-                print(f"Warning: Could not generate HTML/Markdown versions: {e}")
+                print(f"Warning: Could not schedule HTML/Markdown conversion: {e}")
 
+        return filename, file_path
+
+    async def save_latex_source(
+        self,
+        file_content: bytes,
+        paper_id: int,
+        version: int,
+        extension: str,
+        date: datetime = None,
+    ) -> Tuple[str, Path]:
+        """Save an author-provided LaTeX source (.tex or .zip).
+
+        Must be written before save_pdf() so the conversion pipeline finds it.
+        """
+        date_dir = self.ensure_date_directory(date)
+        filename = f"paper-{paper_id}-v{version}-source{extension}"
+        file_path = date_dir / filename
+        async with aiofiles.open(file_path, 'wb') as f:
+            await f.write(file_content)
         return filename, file_path
 
     async def save_image(

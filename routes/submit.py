@@ -96,6 +96,30 @@ async def fetch_openalex_fields(
             }
         )
 
+async def _read_latex_source(latex_source: UploadFile):
+    """Validate the optional LaTeX source upload; returns (content, ext) or (None, None)."""
+    if not latex_source or not latex_source.filename:
+        return None, None
+    name = latex_source.filename.lower()
+    if name.endswith(".zip"):
+        ext = ".zip"
+    elif name.endswith(".tex"):
+        ext = ".tex"
+    else:
+        raise HTTPException(status_code=400, detail="LaTeX source must be a .tex file or a .zip archive")
+    content = await latex_source.read()
+    if len(content) > 30 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="LaTeX source must be under 30 MB")
+    if ext == ".zip":
+        import io
+        import zipfile
+        try:
+            zipfile.ZipFile(io.BytesIO(content)).namelist()
+        except Exception:
+            raise HTTPException(status_code=400, detail="LaTeX source archive is not a valid zip file")
+    return content, ext
+
+
 @router.post("")
 async def submit_paper(
     request: Request,
@@ -105,6 +129,7 @@ async def submit_paper(
     submitter_email: str = Form(...),
     pdf_file: UploadFile = File(...),
     image_file: UploadFile = File(None),
+    latex_source: UploadFile = File(None),
     human_authors: str = Form(...),  # JSON string
     ai_authors: str = Form(None),  # JSON string
     fields: str = Form(None),  # JSON string
@@ -172,6 +197,9 @@ async def submit_paper(
     elif get_rule_value("cover_image_required", db) == "required":
         raise HTTPException(status_code=400, detail="Cover image is required by journal rules (JPG or PNG).")
 
+    # Optional LaTeX source (enables the highest-fidelity HTML reading view)
+    latex_content, latex_ext = await _read_latex_source(latex_source)
+
     # Parse JSON data
     try:
         human_authors_data = json.loads(human_authors) if human_authors else []
@@ -206,6 +234,12 @@ async def submit_paper(
     )
     db.add(paper)
     db.flush()  # Get paper ID
+
+    # Save LaTeX source first — save_pdf's conversion pipeline detects it
+    if latex_content:
+        await file_storage.save_latex_source(
+            latex_content, paper.id, 1, latex_ext, paper.published_date
+        )
 
     # Save PDF and generate HTML/Markdown versions
     pdf_filename, pdf_path = await file_storage.save_pdf(
@@ -492,6 +526,7 @@ async def submit_update(
     title: str = Form(None),
     abstract: str = Form(None),
     image_file: UploadFile = File(None),
+    latex_source: UploadFile = File(None),
     categories: str = Form(None)  # JSON string
 ):
     """Submit new version of paper with optional metadata updates."""
@@ -563,6 +598,13 @@ async def submit_update(
     if abstract and abstract.strip() and abstract.strip() != paper.abstract:
         paper.abstract = abstract.strip()
         updated_abstract = paper.abstract
+
+    # Optional LaTeX source — must be saved before save_pdf schedules conversion
+    latex_content, latex_ext = await _read_latex_source(latex_source)
+    if latex_content:
+        await file_storage.save_latex_source(
+            latex_content, paper.id, new_version_number, latex_ext, paper.published_date
+        )
 
     # Save PDF and generate HTML/Markdown versions with updated metadata
     # Use paper.published_date so all versions are stored in the same date directory
