@@ -2,10 +2,11 @@
 
 Integrates with the Reviewer3.com API for AI-powered manuscript review.
 Flow: ensure R3 user -> upload PDF -> poll for results -> display comments.
-Authors upload revised manuscript + response letter PDF for synchronous re-scoring via /revise.
+Authors upload revised manuscript + response letter PDF; re-scoring via /revise runs
+as a background task and the page polls /ai-review/status until it resolves.
 Auto-advances to stage 4 when all revision scores >= 3. Desk rejects after 3 failed attempts.
 """
-from fastapi import APIRouter, Request, Depends, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, BackgroundTasks, Request, Depends, HTTPException, UploadFile, File, Form
 from fastapi.responses import HTMLResponse, Response
 from fastapi.templating import Jinja2Templates
 from template_helpers import register_filters
@@ -468,6 +469,17 @@ async def ai_review_page(
     # Latest review is the most recent one in this cycle
     latest_review = all_reviews[-1] if all_reviews else None
 
+    # A failed revision round must not dead-end the page: surface the failure as a
+    # banner and fall back to the last completed review so the resubmit form renders
+    failed_revision = None
+    if latest_review and latest_review.review_round > 1:
+        if latest_review.status == "in_progress":
+            _fail_stuck_revision(latest_review, db)
+        if latest_review.status == "failed":
+            failed_revision = latest_review
+            completed = [r for r in all_reviews if r.status == "completed"]
+            latest_review = completed[-1] if completed else None
+
     # If latest review is pending, poll Reviewer3
     if latest_review and latest_review.status in ("submitted", "in_progress") and latest_review.reviewer3_tracking_id:
         try:
@@ -511,6 +523,7 @@ async def ai_review_page(
             "user": session_user,
             "all_reviews": all_reviews,
             "latest_review": latest_review,
+            "failed_revision": failed_revision,
             "author_email": author_email,
             "previous_cycle_count": previous_cycle_count,
         },
@@ -635,6 +648,19 @@ async def ai_review_status(
     paper = db.query(Paper).filter(Paper.id == paper_id).first()
     if not paper:
         return HTMLResponse('<div class="bg-slate-50 border border-slate-200 rounded-lg p-4"><p class="text-slate-600">Paper not found.</p></div>')
+
+    # Revision rounds are scored by a local background task (no Reviewer3 session to
+    # poll). Checked without the cycle filter because a desk rejection bumps
+    # paper.review_cycle while the poller still needs to see the outcome.
+    latest_any = db.query(AIReview).filter(
+        AIReview.paper_id == paper_id,
+    ).order_by(AIReview.created_at.desc()).first()
+    if latest_any and latest_any.review_round > 1:
+        if latest_any.status == "completed":
+            return HTMLResponse(_revision_result_html(paper_id, latest_any, db))
+        if latest_any.status == "failed" or _fail_stuck_revision(latest_any, db):
+            return HTMLResponse(_revision_failed_html(paper_id))
+        return HTMLResponse(_revision_wait_html(paper_id, latest_any.review_round))
 
     ai_review = db.query(AIReview).filter(
         AIReview.paper_id == paper_id,
@@ -861,16 +887,171 @@ def _needs_revision_result_html(paper_id: int, evaluations: list, attempt_number
 
 
 # ---------------------------------------------------------------------------
-# Resubmit endpoint (synchronous /revise flow)
+# Resubmit endpoint (async /revise flow: background task + status polling)
 # ---------------------------------------------------------------------------
+
+# revise_paper's httpx timeout is 300s; anything in_progress much longer than
+# that means the background task died (e.g. service restart mid-scoring)
+REVISION_SCORING_TIMEOUT_MINUTES = 20
+
+
+def _fail_stuck_revision(review: AIReview, db: Session) -> bool:
+    """Mark an in-progress revision as failed if its background task is clearly dead.
+
+    Returns True if the review was just transitioned to failed.
+    """
+    if (
+        review.review_round > 1
+        and review.status == "in_progress"
+        and review.submitted_at
+        and (datetime.utcnow() - review.submitted_at).total_seconds()
+        > REVISION_SCORING_TIMEOUT_MINUTES * 60
+    ):
+        review.status = "failed"
+        review.completed_at = datetime.utcnow()
+        review.review_data = {"error": "revision scoring timed out (background task lost)"}
+        db.commit()
+        return True
+    return False
+
+
+def _revision_wait_html(paper_id: int, round_number: int) -> str:
+    """Polling box shown while a revision is being scored in the background."""
+    return (
+        f'<div hx-get="/paper/{paper_id}/ai-review/status" hx-trigger="every 15s" hx-swap="outerHTML">'
+        '<div class="bg-purple-50 border border-purple-200 rounded-lg p-6 text-center">'
+        '<svg class="animate-spin h-8 w-8 text-purple-600 mx-auto mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">'
+        '<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>'
+        '<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>'
+        f'<p class="text-purple-800 font-semibold text-lg mb-2">Revision Under Review (Round {round_number})</p>'
+        '<p class="text-sm text-purple-700 mb-1">Your revised manuscript and response letter have been submitted.</p>'
+        '<p class="text-sm text-purple-700 mb-3">The AI reviewers are re-evaluating your paper against their '
+        'original comments. This box updates automatically &mdash; you can also safely close this page and '
+        'come back later.</p>'
+        '<div class="flex items-center justify-center gap-2 text-xs text-purple-600">'
+        '<span>This typically takes 1–5 minutes</span>'
+        '</div></div></div>'
+    )
+
+
+def _revision_failed_html(paper_id: int) -> str:
+    return (
+        '<div class="bg-red-50 border border-red-200 rounded-lg p-4 text-center">'
+        '<p class="text-red-800 font-medium">Revision scoring failed</p>'
+        '<p class="text-sm text-red-600 mt-1">The AI review service could not score your revision. '
+        'No revision attempt was used.</p>'
+        f'<a href="/paper/{paper_id}/ai-review" class="inline-block mt-3 px-4 py-2 bg-primary text-white '
+        'rounded-md hover:bg-blue-700 transition text-sm font-medium">Reload &amp; Try Again</a>'
+        '</div>'
+    )
+
+
+def _revision_result_html(paper_id: int, review: AIReview, db: Session) -> str:
+    """Outcome HTML for a completed revision round (same views the old synchronous
+    flow returned inline)."""
+    evaluations = review.revision_scores or []
+    if review.approved:
+        return _approved_result_html(paper_id, evaluations)
+    if review.desk_rejected:
+        return _desk_reject_result_html(paper_id, evaluations)
+    max_rounds = _max_revision_rounds(db)
+    if review.review_round >= max_rounds:
+        return _exhausted_result_html(paper_id, evaluations)
+    attempt_number = review.review_round - 1
+    attempts_remaining = max_rounds - review.review_round
+    return _needs_revision_result_html(paper_id, evaluations, attempt_number, attempts_remaining)
+
+
+async def score_revision_background(
+    review_id: int,
+    paper_id: int,
+    user_id: int,
+    session_id: str,
+    revised_pdf_path: str,
+    author_response_text: str,
+) -> None:
+    """FastAPI background task: score a revision via Reviewer3 /revise.
+
+    Creates its own DB session — the request session is closed by the time this runs.
+    """
+    import traceback
+    from models.database import SessionLocal
+
+    db = SessionLocal()
+    try:
+        review = db.query(AIReview).filter(AIReview.id == review_id).first()
+        if not review or review.status != "in_progress":
+            return
+
+        try:
+            r3_result = await reviewer3_service.revise_paper(
+                session_id=session_id,
+                revised_pdf_path=revised_pdf_path,
+                author_response_text=author_response_text,
+            )
+        except Exception as e:
+            print(f"[Reviewer3] Revision scoring error for review {review_id}: {e!r}")
+            review.status = "failed"
+            review.completed_at = datetime.utcnow()
+            review.review_data = {"error": repr(e)}
+            db.commit()
+            return
+
+        desk_rejected = r3_result.get("deskReject", False)
+        evaluations = r3_result.get("evaluations", [])
+        approved = (
+            not desk_rejected
+            and bool(evaluations)
+            and all(e.get("score", 0) >= 3 for e in evaluations)
+        )
+
+        review.revision_scores = evaluations
+        review.desk_rejected = desk_rejected
+        review.approved = approved
+        review.status = "completed"
+        review.completed_at = datetime.utcnow()
+        db.flush()
+
+        is_final_attempt = review.review_round >= _max_revision_rounds(db)
+
+        # Branch on outcome; each service call commits internally (committing the
+        # review fields above atomically with the stage change)
+        if desk_rejected:
+            stage_transition_service.desk_reject_to_stage1(
+                paper_id=paper_id,
+                triggered_by_user_id=user_id,
+                db=db,
+                reason=f"Desk rejected at revision attempt {review.review_round - 1}",
+            )
+        elif approved:
+            stage_transition_service.advance_to_human_review(
+                paper_id=paper_id,
+                user_id=user_id,
+                db=db,
+            )
+        elif is_final_attempt:
+            stage_transition_service.desk_reject_to_stage1(
+                paper_id=paper_id,
+                triggered_by_user_id=user_id,
+                db=db,
+                reason="Desk rejected after exhausting all 3 revision attempts",
+            )
+        db.commit()
+    except Exception:
+        traceback.print_exc()
+    finally:
+        db.close()
+
 
 @router.post("/{paper_id}/ai-review/resubmit", response_class=HTMLResponse)
 async def resubmit_ai_review(
     paper_id: int,
     request: Request,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ):
-    """Author uploads revised manuscript + response letter PDF for synchronous AI re-scoring."""
+    """Author uploads revised manuscript + response letter PDF; AI re-scoring is
+    queued as a background task and the returned box polls /ai-review/status."""
     session_user = request.session.get("user")
     if not session_user:
         raise HTTPException(status_code=401, detail="Authentication required")
@@ -881,6 +1062,16 @@ async def resubmit_ai_review(
 
     if not _is_paper_author(paper_id, session_user["id"], db):
         raise HTTPException(status_code=403, detail="Only paper authors can resubmit")
+
+    # A revision is already being scored — show its progress instead of starting another
+    in_progress = db.query(AIReview).filter(
+        AIReview.paper_id == paper_id,
+        AIReview.review_cycle == paper.review_cycle,
+        AIReview.review_round > 1,
+        AIReview.status == "in_progress",
+    ).first()
+    if in_progress and not _fail_stuck_revision(in_progress, db):
+        return HTMLResponse(_revision_wait_html(paper_id, in_progress.review_round))
 
     # Get the latest completed review that is NOT approved (current cycle only)
     latest_review = db.query(AIReview).filter(
@@ -901,9 +1092,6 @@ async def resubmit_ai_review(
             "Maximum revision attempts reached",
             f"You have used all {max_revisions} revision attempts for this review cycle.",
         )
-
-    attempt_number = new_round - 1
-    is_final_attempt = (new_round == max_rounds)
 
     form = await request.form()
     updated_title = form.get("updated_title", "").strip()
@@ -968,80 +1156,45 @@ async def resubmit_ai_review(
             print(f"[Reviewer3] Warning: could not extract text from response PDF: {e}")
             author_response_text = "(author response text extraction failed)"
 
-        # Call /revise synchronously against the original session ID
-        r3_result = await reviewer3_service.revise_paper(
-            session_id=paper.reviewer3_tracking_id,
-            revised_pdf_path=str(saved_path),
-            author_response_text=author_response_text,
-        )
-
-        desk_rejected = r3_result.get("deskReject", False)
-        evaluations = r3_result.get("evaluations", [])
-        approved = (
-            not desk_rejected
-            and bool(evaluations)
-            and all(e.get("score", 0) >= 3 for e in evaluations)
-        )
-
-        # Record revision AIReview (status=completed immediately; no polling needed)
+        # Record the revision round, then score it in the background —
+        # Reviewer3's /revise can take minutes and must not block this request
         new_review = AIReview(
             paper_id=paper_id,
             reviewer3_tracking_id=None,
-            status="completed",
+            status="in_progress",
             submitted_at=datetime.utcnow(),
-            completed_at=datetime.utcnow(),
             review_round=new_round,
             parent_review_id=latest_review.id,
             paper_version=new_version,
             review_cycle=paper.review_cycle,
-            revision_scores=evaluations,
-            desk_rejected=desk_rejected,
             author_response_path=response_filename,
-            approved=approved,
         )
         db.add(new_review)
         paper.draft_responses = None
-        db.flush()
-
-        # Branch on outcome; each service call commits internally
-        if desk_rejected:
-            stage_transition_service.desk_reject_to_stage1(
-                paper_id=paper_id,
-                triggered_by_user_id=session_user["id"],
-                db=db,
-                reason=f"Desk rejected at revision attempt {attempt_number}",
-            )
-            return HTMLResponse(_desk_reject_result_html(paper_id, evaluations))
-
-        if approved:
-            stage_transition_service.advance_to_human_review(
-                paper_id=paper_id,
-                user_id=session_user["id"],
-                db=db,
-            )
-            return HTMLResponse(_approved_result_html(paper_id, evaluations))
-
-        if is_final_attempt:
-            stage_transition_service.desk_reject_to_stage1(
-                paper_id=paper_id,
-                triggered_by_user_id=session_user["id"],
-                db=db,
-                reason="Desk rejected after exhausting all 3 revision attempts",
-            )
-            return HTMLResponse(_exhausted_result_html(paper_id, evaluations))
-
-        # Still has attempts remaining — commit and show scores
         db.commit()
-        attempts_remaining = _max_revision_rounds(db) - new_round
-        return HTMLResponse(_needs_revision_result_html(paper_id, evaluations, attempt_number, attempts_remaining))
+
+        background_tasks.add_task(
+            score_revision_background,
+            review_id=new_review.id,
+            paper_id=paper_id,
+            user_id=session_user["id"],
+            session_id=paper.reviewer3_tracking_id,
+            revised_pdf_path=str(saved_path),
+            author_response_text=author_response_text,
+        )
+        return HTMLResponse(_revision_wait_html(paper_id, new_round))
 
     except Exception as e:
-        print(f"[Reviewer3] Resubmission error: {e}")
+        # str(e) is empty for httpx.ReadError and friends — log the repr so the
+        # exception type survives into the journal
+        print(f"[Reviewer3] Resubmission error: {e!r}")
+        detail = str(e).strip() or f"The review service did not respond ({type(e).__name__})."
         # Return 200 so HTMX swaps the error into the DOM
         return HTMLResponse(
             '<div class="bg-red-50 border border-red-200 rounded-lg p-4 text-center">'
             '<p class="text-red-800 font-medium">Resubmission failed</p>'
-            f'<p class="text-sm text-red-600 mt-1">{html_escape(str(e))}</p>'
-            '<p class="text-sm text-slate-500 mt-2">Please try again or contact support.</p>'
+            f'<p class="text-sm text-red-600 mt-1">{html_escape(detail)}</p>'
+            '<p class="text-sm text-slate-500 mt-2">Reload this page to check whether your revision '
+            'was recorded before trying again, or contact support.</p>'
             '</div>'
         )

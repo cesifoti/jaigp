@@ -144,6 +144,19 @@
             </div>
             {% endif %}
 
+            {# --- FAILED REVISION: red banner; resubmit form still renders below --- #}
+            {% if failed_revision %}
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                <p class="text-red-800 font-medium">Your last revision submission could not be scored</p>
+                <p class="text-sm text-red-600 mt-1">
+                    The AI review service failed while scoring the revision you submitted
+                    {% if failed_revision.submitted_at %}on {{ failed_revision.submitted_at.strftime('%B %d, %Y at %H:%M UTC') }}{% endif %}.
+                    No revision attempt was used &mdash; please resubmit your files below.
+                    If this keeps happening, contact the editorial team.
+                </p>
+            </div>
+            {% endif %}
+
             {# --- IN PROGRESS (submitted/in_progress) --- #}
             {% if latest_review and latest_review.status in ('submitted', 'in_progress') %}
             <div id="review-status-poll"
@@ -230,6 +243,33 @@
                             <strong>{{ attempts_remaining }} revision attempt{{ 's' if attempts_remaining != 1 else '' }}</strong>
                             remaining (including this one).
                         </p>
+                    </div>
+                    {% endif %}
+
+                    {# Revision rounds (2+): show the scored evaluations for this round #}
+                    {% if latest_review.review_round > 1 and latest_review.revision_scores %}
+                    <div class="space-y-3">
+                        <h4 class="text-sm font-semibold text-secondary">Scores for Revision {{ latest_review.review_round - 1 }}</h4>
+                        {% set score_labels = {1: 'Ignored', 2: 'Weakly acknowledged', 3: 'Well acknowledged', 4: 'Fully addressed'} %}
+                        {% set score_colors = {1: 'red', 2: 'amber', 3: 'emerald', 4: 'green'} %}
+                        {% for ev in latest_review.revision_scores %}
+                        {% set sc = ev.get('score', 0) %}
+                        {% set color = score_colors.get(sc, 'slate') %}
+                        <div class="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                            <div class="flex items-start justify-between gap-2 mb-1">
+                                <p class="text-sm text-slate-700 whitespace-pre-line flex-1">{{ ev.get('originalComment', '') }}</p>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-{{ color }}-100 text-{{ color }}-800 whitespace-nowrap flex-shrink-0">
+                                    {{ sc }}/4 &mdash; {{ score_labels.get(sc, '') }}
+                                </span>
+                            </div>
+                            {% if ev.get('reviewerResponse') %}
+                            <div class="mt-2 pl-3 border-l-2 border-{{ color }}-300">
+                                <span class="text-xs font-medium text-{{ color }}-700">Reviewer assessment:</span>
+                                <p class="text-sm text-slate-600 mt-0.5 whitespace-pre-line">{{ ev.get('reviewerResponse', '') }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
                     </div>
                     {% endif %}
 
@@ -323,7 +363,8 @@
                             </button>
                             <p class="text-xs text-slate-400 text-center mt-2">
                                 Your files will be uploaded and sent to the AI reviewers for re-evaluation.
-                                This process may take several minutes &mdash; please do not close this page.
+                                Scoring runs in the background and typically takes 1&ndash;5 minutes &mdash;
+                                once the upload completes you can safely leave this page and come back.
                             </p>
                         </div>
 
@@ -337,17 +378,36 @@
                                 '<svg class="animate-spin h-8 w-8 text-purple-600 mx-auto mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">' +
                                 '<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>' +
                                 '<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>' +
-                                '<p class="text-purple-800 font-semibold text-lg mb-2">Revision Under Review</p>' +
-                                '<p class="text-sm text-purple-700 mb-1">Your revised manuscript and response letter have been submitted.</p>' +
-                                '<p class="text-sm text-purple-700 mb-3">The AI reviewers are now re-evaluating your paper against their original comments. Each comment will be scored on how well it was addressed.</p>' +
+                                '<p class="text-purple-800 font-semibold text-lg mb-2">Uploading Your Revision&hellip;</p>' +
+                                '<p class="text-sm text-purple-700 mb-1">Your revised manuscript and response letter are being uploaded.</p>' +
                                 '<div class="flex items-center justify-center gap-2 text-xs text-purple-600">' +
-                                '<span>This typically takes 1\u20135 minutes</span>' +
-                                '<span class="text-purple-400">\u00b7</span>' +
-                                '<span>Please do not close or refresh this page</span>' +
+                                '<span>Please keep this page open until the upload finishes</span>' +
                                 '</div></div>'
                             );
                             // Hide form fields
                             area.querySelectorAll(':scope > div:not(#resubmit-wait)').forEach(function(el) { el.style.display = 'none'; });
+                        });
+                        // Without these handlers a timeout or dropped connection leaves
+                        // the spinner up forever with no feedback
+                        ['htmx:timeout', 'htmx:sendError', 'htmx:responseError'].forEach(function(evt) {
+                            document.querySelector('#resubmit-area').addEventListener(evt, function(e) {
+                                var wait = document.getElementById('resubmit-wait');
+                                if (wait) { wait.remove(); }
+                                var area = document.getElementById('resubmit-area');
+                                area.querySelectorAll(':scope > div').forEach(function(el) { el.style.display = ''; });
+                                var btn = document.getElementById('resubmit-btn');
+                                if (btn) { btn.disabled = false; btn.classList.remove('opacity-50', 'cursor-not-allowed'); }
+                                var old = document.getElementById('resubmit-error');
+                                if (old) { old.remove(); }
+                                area.insertAdjacentHTML('beforeend',
+                                    '<div id="resubmit-error" class="mt-4 bg-red-50 border border-red-200 rounded-lg p-4 text-center">' +
+                                    '<p class="text-red-800 font-medium">We could not confirm your revision was received</p>' +
+                                    '<p class="text-sm text-red-600 mt-1">The review service took too long to respond or the connection was interrupted.</p>' +
+                                    '<p class="text-sm text-slate-600 mt-2"><strong>Reload this page first</strong> — if your revision was recorded, it will appear here. ' +
+                                    'If not, please submit it again. If this keeps happening, contact the editorial team.</p>' +
+                                    '</div>'
+                                );
+                            });
                         });
                         </script>
                     </form>
