@@ -512,6 +512,87 @@ JAIGP Team"""
         html_content = self._email_wrapper(html_body, text_content)
         return self._send_email(to_email, subject, text_content, html_content)
 
+    def send_revision_scored(self, to_email: str, paper_title: str, paper_id: int, outcome: str, attempts_remaining: int = 0) -> bool:
+        """Notify author that background scoring of their revision has finished.
+
+        outcome: 'approved' | 'needs_revision' | 'desk_rejected' | 'exhausted'
+        """
+        review_url = f"https://jaigp.org/paper/{paper_id}/ai-review"
+
+        if outcome == "approved":
+            subject = f"Revision Approved — AI Review Passed: {paper_title}"
+            outcome_text = (
+                "Great news! The AI reviewers determined that all of their comments have been "
+                "adequately addressed. Your paper has passed AI review and advanced to "
+                "Stage 4: Human Peer Review. The editorial board will assign reviewers when ready."
+            )
+            outcome_html = (
+                "<p>Great news! The AI reviewers determined that all of their comments have been "
+                "adequately addressed. Your paper has <strong>passed AI review</strong> and advanced to "
+                "<strong>Stage 4: Human Peer Review</strong>. The editorial board will assign reviewers when ready.</p>"
+            )
+        elif outcome == "needs_revision":
+            subject = f"Revision Scored — Further Changes Needed: {paper_title}"
+            attempts_note = f"You have {attempts_remaining} revision attempt{'s' if attempts_remaining != 1 else ''} remaining in this review cycle."
+            outcome_text = (
+                "The AI reviewers have scored your revision. Some comments were not yet "
+                f"addressed strongly enough, so your paper remains at Stage 3. {attempts_note} "
+                "Visit the review page to see the per-comment scores and submit another revision."
+            )
+            outcome_html = (
+                "<p>The AI reviewers have scored your revision. Some comments were not yet "
+                f"addressed strongly enough, so your paper remains at <strong>Stage 3</strong>. {attempts_note} "
+                "Visit the review page to see the per-comment scores and submit another revision.</p>"
+            )
+        elif outcome == "exhausted":
+            subject = f"Revision Scored — Review Cycle Ended: {paper_title}"
+            outcome_text = (
+                "The AI reviewers have scored your revision, and unfortunately it did not pass on the "
+                "final available attempt. Your paper has been returned to Stage 1 and will need a new "
+                "endorsement to re-enter the review pipeline."
+            )
+            outcome_html = (
+                "<p>The AI reviewers have scored your revision, and unfortunately it did not pass on the "
+                "final available attempt. Your paper has been returned to <strong>Stage 1</strong> and will "
+                "need a new endorsement to re-enter the review pipeline.</p>"
+            )
+        else:  # desk_rejected
+            subject = f"Revision Scored — Not Accepted: {paper_title}"
+            outcome_text = (
+                "The AI reviewers determined that this revision does not adequately address their "
+                "feedback. Your paper has been returned to Stage 1 and will need a new endorsement "
+                "to re-enter the review pipeline."
+            )
+            outcome_html = (
+                "<p>The AI reviewers determined that this revision does not adequately address their "
+                "feedback. Your paper has been returned to <strong>Stage 1</strong> and will need a new "
+                "endorsement to re-enter the review pipeline.</p>"
+            )
+
+        text_content = f"""Your revision has been scored.
+
+Paper: {paper_title}
+
+{outcome_text}
+
+View the full results: {review_url}
+
+Best regards,
+JAIGP Team"""
+
+        html_body = f"""
+            <h2 style="color: #1e293b; margin-top: 0;">Your Revision Has Been Scored</h2>
+            <div class="highlight">
+                <strong>Paper:</strong><br>{paper_title}
+            </div>
+            {outcome_html}
+            <p style="text-align: center; margin: 30px 0;">
+                <a href="{review_url}" class="button-green">View Full Results</a>
+            </p>"""
+
+        html_content = self._email_wrapper(html_body, text_content)
+        return self._send_email(to_email, subject, text_content, html_content)
+
     def send_borderline_rejection(self, to_email: str, paper_title: str, streak: int) -> bool:
         """Soft rejection for borderline papers — encourages revision and resubmission."""
         from services.governance import get_rule_value_int

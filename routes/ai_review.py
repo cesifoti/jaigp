@@ -1037,6 +1037,42 @@ async def score_revision_background(
                 reason="Desk rejected after exhausting all 3 revision attempts",
             )
         db.commit()
+
+        # Scoring finishes long after the author may have left the page —
+        # tell them the outcome by email. Never let a mail failure taint the result.
+        try:
+            import asyncio
+            from services.email import email_service
+
+            if desk_rejected:
+                outcome = "desk_rejected"
+            elif approved:
+                outcome = "approved"
+            elif is_final_attempt:
+                outcome = "exhausted"
+            else:
+                outcome = "needs_revision"
+            attempts_remaining = max(0, _max_revision_rounds(db) - review.review_round)
+
+            paper = db.query(Paper).filter(Paper.id == paper_id).first()
+            author_link = db.query(PaperHumanAuthor).filter(
+                PaperHumanAuthor.paper_id == paper_id,
+                PaperHumanAuthor.author_order == 1,
+            ).first()
+            author = db.query(User).filter(User.id == author_link.user_id).first() if author_link else None
+            to_email = (author.email if author else None) or (paper.submitter_email if paper else None)
+
+            if to_email and paper:
+                await asyncio.to_thread(
+                    email_service.send_revision_scored,
+                    to_email=to_email,
+                    paper_title=paper.title,
+                    paper_id=paper_id,
+                    outcome=outcome,
+                    attempts_remaining=attempts_remaining,
+                )
+        except Exception as e:
+            print(f"[Reviewer3] Could not send revision-scored email for paper {paper_id}: {e!r}")
     except Exception:
         traceback.print_exc()
     finally:
