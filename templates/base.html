@@ -50,8 +50,11 @@
     <!-- KaTeX for TeX math rendering -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+    {# Delimiter strings after HTML-attribute + JS-string parsing must be the two-char
+       sequences \( \) \[ \] — the previous double-escaped '\\\\(' matched a literal
+       double backslash, which never occurs, silently breaking all inline math #}
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"
-        onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true},{left: '\\\\(', right: '\\\\)', display: false},{left: '\\\\[', right: '\\\\]', display: true}], throwOnError: false});"></script>
+        onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true},{left: '\\(', right: '\\)', display: false},{left: '\\[', right: '\\]', display: true}], throwOnError: false, ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'option']});"></script>
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/static/css/custom.css">
