@@ -154,16 +154,10 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Main Content -->
         <div class="lg:col-span-2 space-y-8">
-            <!-- Abstract -->
-            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-                <h2 class="text-2xl font-bold text-secondary mb-4">Abstract</h2>
-                <p class="text-slate-700 leading-relaxed">{{ paper.abstract }}</p>
-            </div>
-
-            <!-- Full paper: reading view flows with the page (no inner scrollbox) -->
+            <!-- The paper: one continuous reading surface (abstract lead + body) -->
             <div class="bg-white sm:rounded-lg sm:shadow-sm sm:border border-slate-200 -mx-4 sm:mx-0">
                 <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 sm:px-6 py-3 border-b border-slate-200 bg-slate-50 sm:rounded-t-lg sticky top-0 z-10">
-                    <span class="text-sm font-semibold text-secondary">Full Paper</span>
+                    <span class="text-xs text-slate-500">Reading version &middot; the PDF is the version of record</span>
                     <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
                         <a href="/paper/{{ paper.id }}/pdf" download="{{ paper.title }}.pdf"
                            class="text-primary hover:text-blue-700 font-medium inline-flex items-center">
@@ -183,20 +177,24 @@
                         </a>
                     </div>
                 </div>
-                {% if reading_html %}
                 <article class="paper-reading px-4 sm:px-8 lg:px-10 py-6 sm:py-8">
+                    <header class="paper-abstract">
+                        <span class="paper-abstract-label">Abstract</span>
+                        <p>{{ paper.abstract }}</p>
+                    </header>
+                    {% if reading_html %}
                     {{ reading_html|safe }}
+                    {% else %}
+                    <div class="text-center py-10" style="font-family: -apple-system, 'Segoe UI', sans-serif;">
+                        <p class="text-slate-600 font-medium mb-2">The full reading version is being prepared.</p>
+                        <p class="text-sm text-slate-500 mb-4">It usually appears within a few minutes of submission. Meanwhile:</p>
+                        <a href="/paper/{{ paper.id }}/pdf" target="_blank"
+                           class="inline-block bg-primary text-white px-6 py-3 rounded-md hover:bg-blue-700 transition font-medium">
+                            Open the PDF
+                        </a>
+                    </div>
+                    {% endif %}
                 </article>
-                {% else %}
-                <div class="p-8 text-center">
-                    <p class="text-slate-600 font-medium mb-2">The reading version of this paper is being prepared.</p>
-                    <p class="text-sm text-slate-500 mb-4">It usually appears within a few minutes of submission. Meanwhile:</p>
-                    <a href="/paper/{{ paper.id }}/pdf" target="_blank"
-                       class="inline-block bg-primary text-white px-6 py-3 rounded-md hover:bg-blue-700 transition font-medium">
-                        Open the PDF
-                    </a>
-                </div>
-                {% endif %}
             </div>
 
             <!-- Comments Section -->

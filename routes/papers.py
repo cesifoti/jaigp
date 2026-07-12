@@ -113,6 +113,42 @@ def _sanitize_paper_html(html_content: str, pdf_basename: str, paper_id: int,
     )
 
 
+def _strip_artifact_preamble(html: str) -> str:
+    """Trim the artifact's own title/authors/abstract and footer note.
+
+    On the paper page those are shown by the page header and the abstract lead,
+    so the article body should start at the first real section.
+    """
+    import re
+
+    first_h2 = re.search(r'<h2[\s>]', html)
+    if not first_h2:
+        return html
+    # Preamble = title + author lines. If it's suspiciously large, something is
+    # unusual about this artifact — better to repeat than to eat content.
+    if first_h2.start() > 6000:
+        return html
+    rest = html[first_h2.start():]
+
+    # Drop the "Abstract" section (the lead block already shows it). It is not
+    # always the first section — e.g. an "Author Note" may precede it — so look
+    # anywhere near the top of the document.
+    m = re.search(r'<h2[^>]*>\s*(?:\d+\.?\s*)?abstract\s*[.:]?\s*</h2>', rest[:8000], re.IGNORECASE)
+    if m:
+        nxt = re.search(r'<h[1-4][\s>]', rest[m.end():])
+        if nxt:
+            rest = rest[:m.start()] + rest[m.end() + nxt.start():]
+        # No later heading: abstract-only artifact — leave it alone rather
+        # than emptying the page (the lead would duplicate it, harmlessly)
+
+    # Drop the artifact's trailing provenance note (now shown in the toolbar)
+    rest = re.sub(
+        r'<hr\s*/?>\s*<p><em>This (reading version|document) was (generated|automatically generated)[^<]*</em></p>\s*$',
+        '', rest,
+    )
+    return rest
+
+
 @router.get("/{paper_id}/html", response_class=HTMLResponse)
 async def serve_html(
     paper_id: int,
@@ -475,6 +511,7 @@ async def view_paper(
                     paper_id,
                     current_pv.version_number,
                 )
+                reading_html = _strip_artifact_preamble(reading_html)
             except Exception as e:
                 print(f"[paper] Could not load reading view for paper {paper_id}: {e!r}")
 

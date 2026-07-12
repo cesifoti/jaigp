@@ -288,3 +288,26 @@ button,
 /* KaTeX display math: scroll long equations sideways, never the page */
 .paper-reading .katex-display { overflow-x: auto; overflow-y: hidden; padding: 0.3em 0; }
 .paper-reading .katex { font-size: 1.05em; }
+
+/* Abstract lead: the article opens with the abstract, set apart by a
+   small-caps label rather than a box — the body's first section heading
+   (with its own rule) provides the visual break that follows. */
+.paper-abstract { margin: 0 0 2.5em; }
+.paper-abstract-label {
+    display: block;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 0.9em;
+}
+.paper-abstract p {
+    font-size: 1.03em;
+    line-height: 1.8;
+    color: #334155;
+    margin: 0;
+}
+/* First section heading sits close under the abstract — no double gap */
+.paper-reading .paper-abstract + h2 { margin-top: 0.4em; }
