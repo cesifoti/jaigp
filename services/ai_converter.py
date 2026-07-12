@@ -19,7 +19,7 @@ import config
 from services.pdf_converter import pdf_converter
 
 MODEL = "claude-opus-4-8"
-MAX_OUTPUT_TOKENS = 64000
+MAX_OUTPUT_TOKENS = 128000  # model max; long papers (60+ pp) truncated at 64K
 
 # Keep strong references to fire-and-forget conversion tasks so they aren't GC'd
 _BACKGROUND_TASKS: set = set()
@@ -74,31 +74,51 @@ class AIConverter:
         )
 
         client = anthropic.AsyncAnthropic(api_key=config.ANTHROPIC_API_KEY)
-        async with client.messages.stream(
-            model=MODEL,
-            max_tokens=MAX_OUTPUT_TOKENS,
-            system=_SYSTEM_PROMPT,
-            messages=[{
-                "role": "user",
-                "content": [
-                    {
-                        "type": "document",
-                        "source": {
-                            "type": "base64",
-                            "media_type": "application/pdf",
-                            "data": pdf_b64,
-                        },
+        messages = [{
+            "role": "user",
+            "content": [
+                {
+                    "type": "document",
+                    "source": {
+                        "type": "base64",
+                        "media_type": "application/pdf",
+                        "data": pdf_b64,
                     },
-                    {"type": "text", "text": user_text},
-                ],
-            }],
-        ) as stream:
-            message = await stream.get_final_message()
+                },
+                {"type": "text", "text": user_text},
+            ],
+        }]
 
-        if message.stop_reason == "max_tokens":
-            raise RuntimeError(f"AI conversion truncated at {MAX_OUTPUT_TOKENS} tokens")
+        # Very long papers (100+ pages) exceed the 128K output cap of a single
+        # response; continue the conversation until the document completes.
+        # (Mid-conversation assistant turns are fine — only trailing prefill is banned.)
+        parts = []
+        for _round in range(4):
+            async with client.messages.stream(
+                model=MODEL,
+                max_tokens=MAX_OUTPUT_TOKENS,
+                system=_SYSTEM_PROMPT,
+                messages=messages,
+            ) as stream:
+                message = await stream.get_final_message()
 
-        md_text = "".join(b.text for b in message.content if b.type == "text").strip()
+            part = "".join(b.text for b in message.content if b.type == "text")
+            parts.append(part)
+            if message.stop_reason != "max_tokens":
+                break
+            messages.append({"role": "assistant", "content": part})
+            messages.append({
+                "role": "user",
+                "content": (
+                    "Your output was cut off mid-document. Continue the Markdown "
+                    "EXACTLY from the character where you stopped — no repetition, "
+                    "no preamble, no code fences. Just keep going."
+                ),
+            })
+        else:
+            raise RuntimeError("AI conversion still truncated after continuation rounds")
+
+        md_text = "".join(parts).strip()
         # Strip an accidental fence despite instructions
         md_text = re.sub(r'^```(?:markdown)?\s*\n', '', md_text)
         md_text = re.sub(r'\n```\s*$', '', md_text)
