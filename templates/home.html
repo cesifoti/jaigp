@@ -174,6 +174,16 @@
             Recent
         </button>
 
+        <!-- Most viewed tab -->
+        <button hx-get="/papers-tab?stage=-3" hx-target="#papers-content" hx-swap="innerHTML"
+           onclick="setActiveTab(this, -3)"
+           data-stage="-3" data-color="secondary"
+           class="flex items-center gap-2 px-4 py-3 font-medium transition whitespace-nowrap cursor-pointer
+                  {% if stage == -3 %}text-secondary border-b-2 border-secondary
+                  {% else %}text-slate-500 hover:text-slate-700{% endif %}">
+            Most viewed
+        </button>
+
         <!-- Separator -->
         <div class="flex items-center px-1"><span class="text-slate-200">|</span></div>
 

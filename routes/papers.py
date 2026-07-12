@@ -460,6 +460,10 @@ async def view_paper(
     if not paper:
         raise HTTPException(status_code=404, detail="Paper not found")
 
+    # First-party view counting (unique visitor per day, bot-filtered)
+    from services.view_tracker import record_paper_view
+    record_paper_view(paper_id, request, db)
+
     # Get user from session
     user = request.session.get("user")
 

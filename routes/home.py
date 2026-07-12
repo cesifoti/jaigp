@@ -49,7 +49,7 @@ TAB_TO_STAGES = {
 async def homepage(
     request: Request,
     db: Session = Depends(get_db),
-    stage: int = Query(None, ge=-2, le=5),
+    stage: int = Query(None, ge=-3, le=5),
     page: int = Query(1, ge=1),
     # Keep backward compat with old status param
     status: str = Query(None),
@@ -85,20 +85,26 @@ async def homepage(
     if stage is None:
         stage = -2
 
-    # Handle "All" tab (stage=-2) — all papers sorted by most advanced first
-    if stage == -2:
+    # Handle "All" (stage=-2) and "Most viewed" (stage=-3) tabs
+    if stage in (-2, -3):
         all_per_page = 9
         all_query = db.query(Paper).filter(Paper.status.in_(["published", "ai_screen_rejected"]))
+        if stage == -3:
+            all_query = db.query(Paper).filter(Paper.status == "published")
         total_all = all_query.count()
         total_all_pages = max(1, (total_all + all_per_page - 1) // all_per_page)
         all_offset = (min(page, total_all_pages) - 1) * all_per_page
 
-        papers = (
-            all_query.order_by(
+        if stage == -3:
+            order_cols = (Paper.view_count.desc(), Paper.published_date.desc())
+        else:
+            order_cols = (
                 Paper.review_stage.desc(),
                 Paper.stage_entered_at.desc().nulls_last(),
                 Paper.published_date.desc(),
             )
+        papers = (
+            all_query.order_by(*order_cols)
             .limit(all_per_page)
             .offset(all_offset)
             .all()
@@ -285,7 +291,7 @@ async def homepage(
 async def papers_tab(
     request: Request,
     db: Session = Depends(get_db),
-    stage: int = Query(1, ge=-2, le=5),
+    stage: int = Query(1, ge=-3, le=5),
     page: int = Query(1, ge=1),
 ):
     """HTMX endpoint: returns just the papers content (banner + grid + pagination) for a tab."""
@@ -293,7 +299,11 @@ async def papers_tab(
     offset = (page - 1) * per_page
 
     review_stages = TAB_TO_STAGES.get(stage, [])
-    if stage == -2:
+    if stage == -3:
+        # "Most viewed" — published papers by estimated unique readers
+        query = db.query(Paper).filter(Paper.status == "published")
+        order_cols = (Paper.view_count.desc(), Paper.published_date.desc())
+    elif stage == -2:
         # "All" — every visible paper, most-advanced first, then newest first.
         # Mirrors the stage=-2 block in the "/" route so the HTMX tab matches
         # the initial server render.

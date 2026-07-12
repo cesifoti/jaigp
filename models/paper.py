@@ -44,6 +44,9 @@ class Paper(Base):
     # Review cycle tracking (increments on rewind to stage 1)
     review_cycle = Column(Integer, default=1, nullable=False)
 
+    # Estimated unique daily readers (first-party; see services/view_tracker.py)
+    view_count = Column(Integer, default=0, nullable=False)
+
     # Draft responses for AI review form (saved as {reviewerId: responseText})
     draft_responses = Column(JSON, nullable=True)
 
