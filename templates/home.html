@@ -246,8 +246,8 @@ function setActiveTab(clicked, stageNum) {
             badge.className = badge.className.replace('bg-slate-100', 'bg-' + color + '-100').replace('text-slate-500', 'text-' + color + '-600');
         }
     }
-    // Update URL without reload
-    history.replaceState(null, '', (stageNum == -2) ? '/' : '/?stage=' + stageNum);
+    // Update URL without reload ('/' is the Most Viewed default)
+    history.replaceState(null, '', (stageNum == -3) ? '/' : '/?stage=' + stageNum);
 }
 </script>
 

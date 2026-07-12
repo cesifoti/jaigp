@@ -82,9 +82,9 @@ async def homepage(
         else:
             tab_counts[tab] = 0
 
-    # Default to "All" tab
+    # Default to "Most Viewed" tab
     if stage is None:
-        stage = -2
+        stage = -3
 
     # Handle "All" (stage=-2) and "Most viewed" (stage=-3) tabs
     if stage in (-2, -3):
@@ -131,8 +131,8 @@ async def homepage(
                 "papers": papers,
                 "user": user,
                 "motto": motto,
-                "stage": -2,
-                "stage_name": "All",
+                "stage": stage,
+                "stage_name": TAB_LABELS.get(stage, "All"),
                 "stage_counts": tab_counts,
                 "tab_labels": TAB_LABELS,
                 "page": min(page, total_all_pages),
