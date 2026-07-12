@@ -216,3 +216,75 @@ button,
     z-index: 50;
     max-width: 24rem;
 }
+
+/* ============================================================
+   Paper reading view — mobile-first long-form typography.
+   Content flows with the page; no inner scrollbox.
+   ============================================================ */
+.paper-reading {
+    font-family: Georgia, 'Times New Roman', serif;
+    /* 18px baseline: comfortable phone reading distance */
+    font-size: 1.125rem;
+    line-height: 1.75;
+    color: #1e293b;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+}
+@media (min-width: 1024px) {
+    .paper-reading {
+        font-size: 1.0625rem;
+        max-width: 44rem;   /* ~70ch measure */
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+/* The page header already shows the title — hide the artifact's duplicate */
+.paper-reading > h1:first-child { display: none; }
+.paper-reading h1, .paper-reading h2, .paper-reading h3, .paper-reading h4 {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    color: #0f172a;
+    line-height: 1.3;
+    margin: 2em 0 0.6em;
+    scroll-margin-top: 4rem;
+}
+.paper-reading h1 { font-size: 1.45em; }
+.paper-reading h2 { font-size: 1.3em; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.25em; }
+.paper-reading h3 { font-size: 1.12em; }
+.paper-reading h4 { font-size: 1em; }
+.paper-reading p { margin: 0 0 1.1em; }
+.paper-reading a { color: #2563eb; text-decoration: underline; text-underline-offset: 2px; }
+.paper-reading img { max-width: 100%; height: auto; display: block; margin: 1.5em auto; }
+.paper-reading figure { margin: 1.75em 0; text-align: center; }
+.paper-reading figcaption { font-size: 0.85em; color: #64748b; margin-top: 0.6em; }
+.paper-reading table {
+    display: block;               /* wide tables scroll inside themselves... */
+    overflow-x: auto;             /* ...never the page */
+    max-width: 100%;
+    border-collapse: collapse;
+    margin: 1.5em 0;
+    font-size: 0.88em;
+    line-height: 1.5;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+.paper-reading th, .paper-reading td { border: 1px solid #cbd5e1; padding: 0.4em 0.65em; text-align: left; }
+.paper-reading th { background: #f8fafc; font-weight: 600; }
+.paper-reading ul, .paper-reading ol { margin: 0 0 1.1em; padding-left: 1.4em; }
+.paper-reading li { margin-bottom: 0.5em; }
+.paper-reading blockquote {
+    border-left: 3px solid #cbd5e1;
+    margin: 1.25em 0;
+    padding-left: 1em;
+    color: #475569;
+}
+.paper-reading pre, .paper-reading code {
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 0.85em;
+    background: #f1f5f9;
+}
+.paper-reading pre { padding: 0.9em; overflow-x: auto; border-radius: 6px; margin: 1.25em 0; }
+.paper-reading hr { border: 0; border-top: 1px solid #e2e8f0; margin: 2.5em 0; }
+.paper-reading sup, .paper-reading sub { line-height: 0; }
+/* KaTeX display math: scroll long equations sideways, never the page */
+.paper-reading .katex-display { overflow-x: auto; overflow-y: hidden; padding: 0.3em 0; }
+.paper-reading .katex { font-size: 1.05em; }

@@ -1130,8 +1130,10 @@ async def resubmit_ai_review(
         )
 
     form = await request.form()
-    updated_title = form.get("updated_title", "").strip()
-    updated_abstract = form.get("updated_abstract", "").strip()
+    # Single-paragraph normalization (PDF copy-paste carries hard line breaks)
+    import re
+    updated_title = re.sub(r'\s+', ' ', form.get("updated_title", "")).strip()
+    updated_abstract = re.sub(r'\s+', ' ', form.get("updated_abstract", "")).strip()
     revised_pdf: UploadFile = form.get("revised_pdf")
     author_response_pdf: UploadFile = form.get("author_response_pdf")
 

@@ -455,8 +455,8 @@ async def view_paper(
         user_db and (user_db.badge or "new") in endorse_ctx["allowed_badges"]
     )
 
-    # Does a converted HTML artifact exist? (drives the reading-view tab)
-    has_html = False
+    # Load the reading view inline (sanitized HTML artifact); None -> fallback notice
+    reading_html = None
     current_pv = db.query(PaperVersion).filter(
         PaperVersion.paper_id == paper_id,
         PaperVersion.version_number == paper.current_version
@@ -465,7 +465,18 @@ async def view_paper(
         html_path = file_storage.get_file_path(
             current_pv.pdf_filename.replace('.pdf', '.html'), paper.published_date
         )
-        has_html = html_path.exists()
+        if html_path.exists():
+            try:
+                with open(html_path, 'r', encoding='utf-8') as f:
+                    raw_html = f.read()
+                reading_html = _sanitize_paper_html(
+                    raw_html,
+                    current_pv.pdf_filename.replace('.pdf', ''),
+                    paper_id,
+                    current_pv.version_number,
+                )
+            except Exception as e:
+                print(f"[paper] Could not load reading view for paper {paper_id}: {e!r}")
 
     return templates.TemplateResponse(
         "paper.html",
@@ -474,7 +485,7 @@ async def view_paper(
             "paper": paper,
             "user": user,
             "user_db": user_db,
-            "has_html": has_html,
+            "reading_html": reading_html,
             "endorsements": paper.endorsements if hasattr(paper, 'endorsements') else [],
             "has_endorsed": has_endorsed,
             "can_endorse": can_endorse,

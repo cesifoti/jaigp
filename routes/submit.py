@@ -18,7 +18,16 @@ from services.screening import screen_paper_background, get_active_cooldown
 from models.user_email import UserEmail
 from typing import List, Optional
 import json
+import re
 import secrets
+
+
+def _clean_paragraph(text: str) -> str:
+    """Collapse whitespace/newlines to a single-paragraph string.
+
+    Abstracts pasted from PDFs carry the PDF's hard line breaks.
+    """
+    return re.sub(r'\s+', ' ', text or '').strip()
 import config
 
 router = APIRouter(prefix="/submit", tags=["submit"])
@@ -137,6 +146,10 @@ async def submit_paper(
 ):
     """Submit new paper."""
     user_data = require_auth(request)
+
+    # Single-paragraph normalization (PDF copy-paste carries hard line breaks)
+    title = _clean_paragraph(title)
+    abstract = _clean_paragraph(abstract)
 
     # Get user from database
     user = db.query(User).filter(User.id == user_data["id"]).first()
@@ -586,6 +599,10 @@ async def submit_update(
 
     # Increment version number
     new_version_number = paper.current_version + 1
+
+    # Single-paragraph normalization (PDF copy-paste carries hard line breaks)
+    title = _clean_paragraph(title) if title else title
+    abstract = _clean_paragraph(abstract) if abstract else abstract
 
     # Update optional fields if provided
     updated_title = paper.title
