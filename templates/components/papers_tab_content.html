@@ -6,6 +6,17 @@
 </h2>
 
 <!-- Per-tab description banner -->
+{% if stage == -3 %}
+<div class="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6 flex items-start gap-3">
+    <svg class="w-5 h-5 text-slate-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+    </svg>
+    <p class="text-sm text-slate-600">
+        Ranked by estimated unique readers &mdash; counted once per person per day, bots excluded. No third-party tracking.
+    </p>
+</div>
+{% endif %}
 {% if stage == 0 %}
 <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex items-start gap-3">
     <svg class="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">

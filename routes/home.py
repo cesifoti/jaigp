@@ -26,6 +26,7 @@ templates.env = register_filters(templates.env)
 # Tab 4: Peer Reviewed (review_stage=5 — cleared human peer review, future)
 # Tab 5: Accepted (future)
 TAB_LABELS = {
+    -3: "Most Viewed",
     -2: "All",
     0: "Screened Out",
     1: "Screened",

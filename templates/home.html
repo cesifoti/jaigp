@@ -150,15 +150,16 @@
     {% set tab_labels_map = {0: "Screened Out", 1: "Screened", 2: "Endorsed", 3: "AI Reviewed", 4: "Peer Reviewed", 5: "Accepted"} %}
     {% set tab_colors = {0: "red", 1: "blue", 2: "indigo", 3: "purple", 4: "amber", 5: "green"} %}
 
-    {# Compact tabs: count sits under the label so the bar fits without scrolling #}
-    <div class="flex gap-0.5 mb-6 border-b border-slate-200 overflow-x-auto" id="pipeline-tabs">
+    {# Tabs span the same width as the paper grid: equal-width from lg up,
+       natural width + horizontal scroll below. Counts sit under labels. #}
+    <div class="flex gap-1 mb-6 border-b border-slate-200 overflow-x-auto" id="pipeline-tabs">
         <!-- All papers tab -->
         <button hx-get="/papers-tab?stage=-2" hx-target="#papers-content" hx-swap="innerHTML"
            onclick="setActiveTab(this, -2)"
            data-stage="-2" data-color="secondary"
-           class="flex flex-col items-center justify-center gap-0.5 px-2.5 py-2 text-sm font-medium transition whitespace-nowrap cursor-pointer
+           class="flex-none lg:flex-1 flex flex-col items-center justify-center gap-1 px-3 py-2.5 text-sm font-medium transition whitespace-nowrap cursor-pointer
                   {% if stage == -2 %}text-secondary border-b-2 border-secondary
-                  {% else %}text-slate-500 hover:text-slate-700{% endif %}">
+                  {% else %}text-slate-500 hover:text-slate-700 border-b-2 border-transparent{% endif %}">
             All
             <span class="inline-flex items-center justify-center min-w-[20px] px-1.5 rounded-full text-xs
                 {% if stage == -2 %}bg-slate-200 text-secondary{% else %}bg-slate-100 text-slate-500{% endif %}
@@ -169,9 +170,9 @@
         <button hx-get="/papers-tab/recent" hx-target="#papers-content" hx-swap="innerHTML"
            onclick="setActiveTab(this, -1)"
            data-stage="-1" data-color="secondary"
-           class="flex flex-col items-center justify-center gap-0.5 px-2.5 py-2 text-sm font-medium transition whitespace-nowrap cursor-pointer
+           class="flex-none lg:flex-1 flex flex-col items-center justify-center gap-1 px-3 py-2.5 text-sm font-medium transition whitespace-nowrap cursor-pointer
                   {% if stage == -1 %}text-secondary border-b-2 border-secondary
-                  {% else %}text-slate-500 hover:text-slate-700{% endif %}">
+                  {% else %}text-slate-500 hover:text-slate-700 border-b-2 border-transparent{% endif %}">
             Recent
         </button>
 
@@ -179,23 +180,25 @@
         <button hx-get="/papers-tab?stage=-3" hx-target="#papers-content" hx-swap="innerHTML"
            onclick="setActiveTab(this, -3)"
            data-stage="-3" data-color="secondary"
-           class="flex flex-col items-center justify-center gap-0.5 px-2.5 py-2 text-sm font-medium transition whitespace-nowrap cursor-pointer
+           class="flex-none lg:flex-1 flex flex-col items-center justify-center gap-1 px-3 py-2.5 text-sm font-medium transition whitespace-nowrap cursor-pointer
                   {% if stage == -3 %}text-secondary border-b-2 border-secondary
-                  {% else %}text-slate-500 hover:text-slate-700{% endif %}">
-            Most viewed
+                  {% else %}text-slate-500 hover:text-slate-700 border-b-2 border-transparent{% endif %}">
+            Most Viewed
         </button>
 
-        <!-- Separator -->
-        <div class="flex items-center px-1"><span class="text-slate-200">|</span></div>
+        <!-- Separator: meta views | pipeline stages -->
+        <div class="flex-none self-stretch flex items-center px-0.5" aria-hidden="true">
+            <span class="w-px h-6 bg-slate-200"></span>
+        </div>
 
         {% for s in range(0, 6) %}
         {% set color = tab_colors[s] %}
         <button hx-get="/papers-tab?stage={{ s }}" hx-target="#papers-content" hx-swap="innerHTML"
            onclick="setActiveTab(this, {{ s }})"
            data-stage="{{ s }}" data-color="{{ color }}"
-           class="flex flex-col items-center justify-center gap-0.5 px-2.5 py-2 text-sm font-medium transition whitespace-nowrap cursor-pointer
+           class="flex-none lg:flex-1 flex flex-col items-center justify-center gap-1 px-3 py-2.5 text-sm font-medium transition whitespace-nowrap cursor-pointer
                   {% if stage == s %}text-{{ color }}-600 border-b-2 border-{{ color }}-500
-                  {% else %}text-slate-500 hover:text-slate-700{% endif %}">
+                  {% else %}text-slate-500 hover:text-slate-700 border-b-2 border-transparent{% endif %}">
             {{ tab_labels_map[s] }}
             <span class="inline-flex items-center justify-center min-w-[20px] px-1.5 rounded-full text-xs
                 {% if stage == s %}bg-{{ color }}-100 text-{{ color }}-600
@@ -213,27 +216,35 @@
 
 <script>
 function setActiveTab(clicked, stageNum) {
-    var colorMap = {'-2':'secondary','-1':'secondary',0:'red',1:'blue',2:'indigo',3:'purple',4:'amber',5:'green'};
+    var colorMap = {0:'red',1:'blue',2:'indigo',3:'purple',4:'amber',5:'green'};
     var color = colorMap[stageNum] || 'secondary';
-    // Reset all tabs
+    // Reset all tabs (keep border-b-2 + border-transparent so widths never jump)
     document.querySelectorAll('#pipeline-tabs button').forEach(function(btn) {
-        btn.className = btn.className.replace(/text-\w+-600/g, '').replace(/text-secondary/g, '').replace(/border-b-2/g, '').replace(/border-\w+-500/g, '').replace(/border-secondary/g, '');
-        btn.classList.add('text-slate-500');
+        btn.className = btn.className
+            .replace(/text-\w+-600/g, '').replace(/text-secondary/g, '')
+            .replace(/border-\w+-500/g, '').replace(/border-secondary/g, '')
+            .replace(/border-transparent/g, '');
+        btn.classList.add('text-slate-500', 'border-b-2', 'border-transparent');
         var badge = btn.querySelector('span');
         if (badge) {
-            badge.className = badge.className.replace(/bg-\w+-100/g, 'bg-slate-100').replace(/text-\w+-600/g, 'text-slate-500');
+            badge.className = badge.className
+                .replace(/bg-\w+-100/g, 'bg-slate-100').replace(/bg-slate-200/g, 'bg-slate-100')
+                .replace(/text-\w+-600/g, 'text-slate-500').replace(/text-secondary/g, 'text-slate-500');
         }
     });
     // Activate clicked tab
-    clicked.classList.remove('text-slate-500');
-    if (stageNum == -1 || stageNum == -2) {
-        clicked.classList.add('text-secondary', 'border-b-2', 'border-secondary');
-    } else {
-        clicked.classList.add('text-' + color + '-600', 'border-b-2', 'border-' + color + '-500');
-    }
+    clicked.classList.remove('text-slate-500', 'border-transparent');
     var badge = clicked.querySelector('span');
-    if (badge && stageNum >= 0) {
-        badge.className = badge.className.replace('bg-slate-100', 'bg-' + color + '-100').replace('text-slate-500', 'text-' + color + '-600');
+    if (stageNum < 0) {
+        clicked.classList.add('text-secondary', 'border-secondary');
+        if (badge) {
+            badge.className = badge.className.replace('bg-slate-100', 'bg-slate-200').replace('text-slate-500', 'text-secondary');
+        }
+    } else {
+        clicked.classList.add('text-' + color + '-600', 'border-' + color + '-500');
+        if (badge) {
+            badge.className = badge.className.replace('bg-slate-100', 'bg-' + color + '-100').replace('text-slate-500', 'text-' + color + '-600');
+        }
     }
     // Update URL without reload
     history.replaceState(null, '', (stageNum == -2) ? '/' : '/?stage=' + stageNum);
