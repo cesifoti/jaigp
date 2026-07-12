@@ -150,16 +150,17 @@
     {% set tab_labels_map = {0: "Screened Out", 1: "Screened", 2: "Endorsed", 3: "AI Reviewed", 4: "Peer Reviewed", 5: "Accepted"} %}
     {% set tab_colors = {0: "red", 1: "blue", 2: "indigo", 3: "purple", 4: "amber", 5: "green"} %}
 
-    <div class="flex gap-1 mb-6 border-b border-slate-200 overflow-x-auto" id="pipeline-tabs">
+    {# Compact tabs: count sits under the label so the bar fits without scrolling #}
+    <div class="flex gap-0.5 mb-6 border-b border-slate-200 overflow-x-auto" id="pipeline-tabs">
         <!-- All papers tab -->
         <button hx-get="/papers-tab?stage=-2" hx-target="#papers-content" hx-swap="innerHTML"
            onclick="setActiveTab(this, -2)"
            data-stage="-2" data-color="secondary"
-           class="flex items-center gap-2 px-4 py-3 font-medium transition whitespace-nowrap cursor-pointer
+           class="flex flex-col items-center justify-center gap-0.5 px-2.5 py-2 text-sm font-medium transition whitespace-nowrap cursor-pointer
                   {% if stage == -2 %}text-secondary border-b-2 border-secondary
                   {% else %}text-slate-500 hover:text-slate-700{% endif %}">
             All
-            <span class="inline-flex items-center justify-center min-w-[20px] px-1.5 py-0.5 rounded-full text-xs
+            <span class="inline-flex items-center justify-center min-w-[20px] px-1.5 rounded-full text-xs
                 {% if stage == -2 %}bg-slate-200 text-secondary{% else %}bg-slate-100 text-slate-500{% endif %}
             ">{{ stage_counts.values()|sum }}</span>
         </button>
@@ -168,7 +169,7 @@
         <button hx-get="/papers-tab/recent" hx-target="#papers-content" hx-swap="innerHTML"
            onclick="setActiveTab(this, -1)"
            data-stage="-1" data-color="secondary"
-           class="flex items-center gap-2 px-4 py-3 font-medium transition whitespace-nowrap cursor-pointer
+           class="flex flex-col items-center justify-center gap-0.5 px-2.5 py-2 text-sm font-medium transition whitespace-nowrap cursor-pointer
                   {% if stage == -1 %}text-secondary border-b-2 border-secondary
                   {% else %}text-slate-500 hover:text-slate-700{% endif %}">
             Recent
@@ -178,7 +179,7 @@
         <button hx-get="/papers-tab?stage=-3" hx-target="#papers-content" hx-swap="innerHTML"
            onclick="setActiveTab(this, -3)"
            data-stage="-3" data-color="secondary"
-           class="flex items-center gap-2 px-4 py-3 font-medium transition whitespace-nowrap cursor-pointer
+           class="flex flex-col items-center justify-center gap-0.5 px-2.5 py-2 text-sm font-medium transition whitespace-nowrap cursor-pointer
                   {% if stage == -3 %}text-secondary border-b-2 border-secondary
                   {% else %}text-slate-500 hover:text-slate-700{% endif %}">
             Most viewed
@@ -192,11 +193,11 @@
         <button hx-get="/papers-tab?stage={{ s }}" hx-target="#papers-content" hx-swap="innerHTML"
            onclick="setActiveTab(this, {{ s }})"
            data-stage="{{ s }}" data-color="{{ color }}"
-           class="flex items-center gap-2 px-4 py-3 font-medium transition whitespace-nowrap cursor-pointer
+           class="flex flex-col items-center justify-center gap-0.5 px-2.5 py-2 text-sm font-medium transition whitespace-nowrap cursor-pointer
                   {% if stage == s %}text-{{ color }}-600 border-b-2 border-{{ color }}-500
                   {% else %}text-slate-500 hover:text-slate-700{% endif %}">
             {{ tab_labels_map[s] }}
-            <span class="inline-flex items-center justify-center min-w-[20px] px-1.5 py-0.5 rounded-full text-xs
+            <span class="inline-flex items-center justify-center min-w-[20px] px-1.5 rounded-full text-xs
                 {% if stage == s %}bg-{{ color }}-100 text-{{ color }}-600
                 {% else %}bg-slate-100 text-slate-500{% endif %}
             ">{{ stage_counts.get(s, 0) }}</span>
