@@ -55,6 +55,16 @@ RULES = [
         "display_order": 3,
     },
     {
+        "slug": "daily_submission_limit",
+        "section": "submission",
+        "title": "Daily Submission Limit",
+        "description": "Maximum number of new papers a single ORCID account may submit in any rolling 24-hour period. Each submission triggers AI screening and an AI-generated reading version, so this bounds the cost any one account can incur.",
+        "options_json": ["1", "2", "3", "5", "10"],
+        "default_value": "3",
+        "is_votable": True,
+        "display_order": 4,
+    },
+    {
         "slug": "concurrent_limit_new",
         "section": "submission",
         "title": "Concurrent Papers (New badge)",

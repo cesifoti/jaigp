@@ -34,6 +34,21 @@ router = APIRouter(prefix="/submit", tags=["submit"])
 templates = Jinja2Templates(directory="templates")
 templates.env = register_filters(templates.env)
 
+DAILY_SUBMISSION_LIMIT_FALLBACK = 3  # used only if the governance rule is missing
+
+
+def _submissions_last_24h(user_id: int, db: Session) -> int:
+    """Papers this user authored that were submitted in the last rolling 24 hours."""
+    since = datetime.utcnow() - timedelta(hours=24)
+    return (
+        db.query(Paper.id)
+        .join(PaperHumanAuthor, PaperHumanAuthor.paper_id == Paper.id)
+        .filter(PaperHumanAuthor.user_id == user_id, Paper.submission_date >= since)
+        .distinct()
+        .count()
+    )
+
+
 def require_auth(request: Request):
     """Dependency to require authentication."""
     user = request.session.get("user")
@@ -177,6 +192,19 @@ async def submit_paper(
                 f"You have reached your concurrent submission limit ({active_count} of {limit} "
                 f"active paper{'s' if limit != 1 else ''} allowed for {badge} badge). "
                 "A paper slot frees up when a paper is accepted (stage\u00a05) or desk rejected."
+            ),
+        )
+
+    # Daily cap — bounds how much AI screening/conversion cost one ORCID can trigger
+    daily_limit = get_rule_value_int("daily_submission_limit", db) or DAILY_SUBMISSION_LIMIT_FALLBACK
+    recent_count = _submissions_last_24h(user.id, db)
+    if recent_count >= daily_limit:
+        raise HTTPException(
+            status_code=429,
+            detail=(
+                f"Daily submission limit reached: you have submitted {recent_count} "
+                f"paper{'s' if recent_count != 1 else ''} in the last 24 hours "
+                f"(limit {daily_limit} per ORCID account). Please try again tomorrow."
             ),
         )
 

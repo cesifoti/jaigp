@@ -15,6 +15,10 @@ if [ "$BEHIND" -gt 0 ]; then
 fi
 
 if [ "$AHEAD" -gt 0 ]; then
+    if ! /var/www/ai_journal/scripts/check_secrets.sh --range origin/main..main; then
+        echo "$(date -Is) BLOCKED: possible secret in the $AHEAD unpushed commit(s) — not pushing"
+        exit 1
+    fi
     if git push origin main --quiet 2>&1; then
         echo "$(date -Is) pushed $AHEAD commit(s) to github"
     else

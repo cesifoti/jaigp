@@ -93,3 +93,9 @@ data/papers/**/*.md
 # Backup files
 *.sql
 *.dump
+
+# Secrets: never commit env files or key-rotation backups (only the placeholder .env.example is tracked)
+.env*
+!.env.example
+*.env
+*.bak-*
