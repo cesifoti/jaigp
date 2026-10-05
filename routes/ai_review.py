@@ -1121,6 +1121,7 @@ async def resubmit_ai_review(
         raise HTTPException(status_code=400, detail="No completed AI review awaiting response")
 
     new_round = latest_review.review_round + 1
+    attempt_number = new_round - 1  # used in the PaperVersion change_log below
     max_rounds = _max_revision_rounds(db)
     if new_round > max_rounds:
         max_revisions = max_rounds - 1
